@@ -1,0 +1,52 @@
+@import "bootstrap/dist/css/bootstrap.css";
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+.row{
+    height: 86.5vh;
+} 
+
+.col-2{
+    padding: 1ch 2ch;
+    border: dashed;
+}
+
+.col-10{
+    padding-top: 1cm;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+.col-10 div{
+    text-align: center;
+}
+
+#workspaces p{
+    font-size: medium;
+}
+
+input{
+    border: none;
+    background-color: #FFF9F4;
+    border-color: lightgray;
+    border-radius: 20%;
+}
+
+div button {
+    color: #010662;
+    border: none;
+    /* border-color: #010662; */
+    height: 30px;
+    border-radius: 20%;
+    font-size: medium;
+}
+
+div button:hover {
+    /* border-color: #010662; */
+    background-color: #363886;
+    color: #FFF9F4;
+}
+
+div button:focus{
+    box-shadow: none;
+}
