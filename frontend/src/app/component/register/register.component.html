@@ -1,0 +1,51 @@
+<div class="form">
+    <form [formGroup]="form" (submit)="register()">
+        <h2>Register!</h2>
+        <table>
+            <tr>
+                <td>Name:</td>
+                <td><input type="text" formControlName="name"></td>
+            </tr>
+            <!-- <tr *ngIf="form.dirty && form.controls['name'].invalid">
+                <td></td>
+                <td style="color: rgb(191, 23, 43);">minimum 3 characters</td>
+            </tr> -->
+            <tr *ngIf="form.controls['name'].dirty && form.get('name')?.errors" class="error">
+                <td></td>
+                <td>minimum 3 characters</td>
+            </tr>
+            <tr>
+                <td>Email:</td>
+                <td><input type="email" formControlName="email"></td>
+            </tr>
+            <tr *ngIf="form.controls['email'].dirty && form.get('email')?.errors?.['email']" class="error">
+                <td></td>
+                <td>invalid email format</td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" formControlName="password"></td>
+            </tr>
+            <tr *ngIf="form.controls['password'].dirty && form.get('password')?.errors?.['pattern']" class="error">
+                <td></td>
+                <td>hint: min 8 characters - 1 special <br>character, 1 digit, 1 uppercase, <br>1 lowercase</td>
+            </tr>
+            <tr>
+                <td>Confirm Password:</td>
+                <td><input type="password" formControlName="confirmPassword"></td>
+            </tr>
+            <tr *ngIf="form.controls['confirmPassword'].dirty && unmatchedPassword()" class="error">
+                <td></td>
+                <td>password does not match</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button type="submit" class="btn btn-outline-dark">Sign up</button></td>
+            </tr>
+        </table>
+        <p>Already a member? <a [routerLink]="['/login']">Sign in here!</a></p>
+    </form>
+    <div class="image">
+        <img src="/assets/register2.png" width="400" height="250">
+    </div>
+</div>
