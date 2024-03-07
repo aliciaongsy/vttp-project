@@ -1,14 +1,20 @@
-div {
+#main {
     display: flex;
     align-content: center;
     justify-content: center;
 }
 
+.col-5 {
+    padding-top:6%;
+    padding-bottom:6%;
+    height: auto;
+}
+
 p {
     font-size: xx-large;
-    width: 40%;
-    padding-top: 2.5cm;
-    padding-bottom: 2.5cm;
+    /* width: 40%; */
+    /* padding-top: 2.5cm;
+    padding-bottom: 2.5cm; */
 }
 
 button {
