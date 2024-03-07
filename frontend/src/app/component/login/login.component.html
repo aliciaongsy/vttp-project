@@ -1,0 +1,21 @@
+<div class="form">
+    <form [formGroup]="form" (submit)="login()">
+        <h2>Login</h2>
+        <table>
+            <tr>
+                <td>Email:</td>
+                <td><input type="email" formControlName="email"></td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" formControlName="password"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button type="submit" class="btn btn-outline-dark">Sign in</button></td>
+            </tr>
+        </table>
+        <p>Don't have an account with us yet? <a [routerLink]="['/register']">Join now!</a></p>
+    </form>
+    <img src="/assets/login.png" width="350" height="350">
+</div>
