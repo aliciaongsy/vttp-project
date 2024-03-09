@@ -1,14 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
-@import "bootstrap/dist/css/bootstrap.min.css";
+/* @import "bootstrap/dist/css/bootstrap.min.css"; */
 
-.base{
+.base {
     background-color: #FFF9F4;
     color: #010662;
     font-family: 'Lora', sans-serif;
     /* extend background to the full page */
     height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-p{
+
+p {
     font-size: xx-large;
 }

@@ -2,12 +2,14 @@
     display: flex;
     align-content: center;
     justify-content: center;
+    
 }
 
-.col-5 {
+.home {
     padding-top:6%;
     padding-bottom:6%;
     height: auto;
+    width: 40%;
 }
 
 p {
@@ -17,13 +19,16 @@ p {
     padding-bottom: 2.5cm; */
 }
 
-button {
+:host ::ng-deep .p-button {
+    background: #FFF9F4;
     color: #010662;
+    font-size: large;
     border: 0.75mm solid;
     border-color: #010662;
+    font-family: 'Lora', sans-serif;
 }
 
-button:hover {
+:host ::ng-deep .p-button:hover {
     border-color: #010662;
     background-color: #010662;
     color: #FFF9F4;
