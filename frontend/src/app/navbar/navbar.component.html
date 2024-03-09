@@ -19,5 +19,11 @@
             <a class="nav-link" [routerLink]="['/attributions']">Attributions</a>
         </li>
     </ul>
-    <a class="d-lg-inline-block my-2 my-md-0 ms-md-3 p-3" [routerLink]="['/login']" id="login">Login</a>
+    <div *ngIf="loginStatus | async else login">
+        <!-- display user -->
+        <a class="d-lg-inline-block my-2 my-md-0 ms-md-3 p-3" [routerLink]="['/login']" id="login">User</a>
+    </div>
+    <ng-template #login>
+        <a class="d-lg-inline-block my-2 my-md-0 ms-md-3 p-3" [routerLink]="['/login']" id="login">Login</a>
+    </ng-template>
 </nav>
