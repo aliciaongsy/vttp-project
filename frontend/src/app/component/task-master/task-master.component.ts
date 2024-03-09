@@ -7,14 +7,22 @@ import { Component } from '@angular/core';
 })
 export class TaskMasterComponent {
 
-  addInput(){
-    var newdiv = document.createElement('div');
-    newdiv.innerHTML = "<input type='text' style='border: solid; background-color: #FFF9F4; border-color: lightgray; border-radius: 5px;'>";
-    document.getElementById('workspaces')?.appendChild(newdiv);
+  visible: boolean = false;
+  value!: string
+  workspaces: string[] = []
+
+  showDialog() {
+    this.visible = true;
   }
 
-  // removeInput(btn){
-  //   btn.parentNode.remove();
-  // }
+  createWorkspace(){
+    console.info("press button")
+    console.info(this.value)
+    this.workspaces.push(this.value)
+    // close dialog
+    this.visible=false
+    // clear value
+    this.value=''
+  }
 
 }

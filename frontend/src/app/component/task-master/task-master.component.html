@@ -1,12 +1,30 @@
-<div class="row">
-    <div class="col-2" id="workspaces">
-        <p>Workspaces <span><button type="button" class="btn btn-outline-dark btn-sm"
-                    (click)="addInput()">+</button></span></p>
-    </div>
-    <div class="col-10">
-        <div>
-            <h5>Add a new workspace or click on any existing workspace to add tasks!</h5>
-            <img id="image" src="/assets/task.png" width="400" height="225">
-        </div>
-    </div>
+<div class="card">
+    <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
+        styleClass="mb-5">
+        <ng-template pTemplate>
+            <div class="col flex align-items-center justify-content-center" id="leftpanel">
+                <div class="row">
+                    <p>Workspaces</p>
+                    <div>
+                        <p-button (click)="showDialog()" [rounded]="true" label="+" size="small" [style]="{ color: '#010662', background: '#FFF9F4', border:'none'}"></p-button>
+                        <p-dialog header="Create a new workspace" [(visible)]="visible" [modal]="true" [style]="{ width: '30vw'}"
+                            [draggable]="false" [resizable]="false">
+                            <p class="m-0" style="color: #010662;">
+                                <input pInputText type="text" [(ngModel)]="value"> <p-button (onClick)="createWorkspace()" size="small" height="40px">Create</p-button>
+                            </p>
+                        </p-dialog>
+                    </div>
+                </div>
+                <p *ngFor="let w of workspaces" width="max" id="ws">{{w}}</p>
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <div class="col flex align-items-center justify-content-center" id="rightpanel">
+                <div>
+                    <h2>Add a new workspace or click on any existing workspace to add tasks!</h2>
+                    <img id="image" src="/assets/task.png" width="400" height="225">
+                </div>
+            </div>
+        </ng-template>
+    </p-splitter>
 </div>
