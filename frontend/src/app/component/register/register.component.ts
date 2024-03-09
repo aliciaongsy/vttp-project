@@ -22,7 +22,7 @@ export class RegisterComponent {
 
   createForm(): FormGroup{
     return this.fb.group({
-      name: this.fb.control<string>('', [Validators.required, Validators.minLength(3)]),
+      name: this.fb.control<string>('', [Validators.required, Validators.minLength(3), Validators.maxLength(64)]),
       email: this.fb.control<string>('', [Validators.required, Validators.email]),
       password: this.fb.control<string>('', [Validators.required, Validators.minLength(8), Validators.pattern("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\\!\\?~/\\-'\\[\\];\\(\\)\\{\\}:\\<\\>\\.,@#\\$%\\^&+\\=\\*\\_\\\\])(?=\\S+$).*$")]),
       confirmPassword: this.fb.control<string>('', [Validators.required])
@@ -39,6 +39,10 @@ export class RegisterComponent {
     // check if user's email already exist in db
     this.userSvc.checkUserExist(user.email)
       .then(()=>{
+        // user exist, throw error
+        this.userExist=true
+      })
+      .catch(()=>{
         // if user don't exist, create new user
         if (this.form.valid){
           this.userSvc.createUser(user)
@@ -48,10 +52,6 @@ export class RegisterComponent {
         else {
           alert("field(s) have error")
         }
-      })
-      .catch(()=>{
-        // else throw error - think of how to link to form
-        this.userExist=true
       })
   }
 }
