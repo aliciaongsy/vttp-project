@@ -30,22 +30,24 @@ input:focus{
     outline-color: #010662;
 }
 
-button {
+:host ::ng-deep .p-button {
     color: #010662;
     border: 0.75mm solid;
     border-color: #010662;
     border-radius: 50px;
     /* box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2); */
     float: right;
+    background: #FFF9F4;
+    font-family: 'Lora', sans-serif;
 }
 
-button:hover {
+:host ::ng-deep .p-button:hover {
     background-color: #010662;
     border-color: #010662;
     color: #FFF9F4;
 }
 
-button:focus {
+:host ::ng-deep .p-button:focus {
     box-shadow: none;
 }
 
