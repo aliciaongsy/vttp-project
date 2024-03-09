@@ -17,6 +17,9 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { SplitterModule } from 'primeng/splitter';
 import { InputTextModule } from 'primeng/inputtext';
+import { HttpClientModule } from '@angular/common/http';
+import { UserService } from './service/user.service';
+import { DbStore } from './service/db.store';
 
 @NgModule({
   declarations: [
@@ -38,9 +41,10 @@ import { InputTextModule } from 'primeng/inputtext';
     DialogModule,
     ButtonModule,
     SplitterModule,
-    InputTextModule
+    InputTextModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [UserService, DbStore],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
