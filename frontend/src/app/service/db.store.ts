@@ -13,7 +13,7 @@ export class DbStore extends ComponentStore<UserSlice>{
         super(INIT_STORE)
     }
 
-    readonly changeStatus = this.updater<UserSlice>(
+    readonly changeStatus = this.updater<void>(
         (slice: UserSlice) => {
             // change current status
             const newStatus = !(slice.login)
