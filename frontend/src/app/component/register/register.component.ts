@@ -1,5 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NewUser } from '../../model';
+import { UserService } from '../../service/user.service';
 
 @Component({
   selector: 'app-register',
@@ -8,12 +10,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class RegisterComponent {
 
-  private fb = inject(FormBuilder);
+  private fb = inject(FormBuilder)
+  private userSvc = inject(UserService)
 
   form!: FormGroup
+  userExist: boolean = false
 
   ngOnInit(): void {
-    this.form = this.createForm();
+    this.form = this.createForm()
   }
 
   createForm(): FormGroup{
@@ -30,6 +34,24 @@ export class RegisterComponent {
   }
 
   register(){
-    alert("successfully signed up!")
+    const user = this.form.value as NewUser
+
+    // check if user's email already exist in db
+    this.userSvc.checkUserExist(user.email)
+      .then(()=>{
+        // if user don't exist, create new user
+        if (this.form.valid){
+          this.userSvc.createUser(user)
+          alert("new user created successfully")
+          this.form.reset()
+        }
+        else {
+          alert("field(s) have error")
+        }
+      })
+      .catch(()=>{
+        // else throw error - think of how to link to form
+        this.userExist=true
+      })
   }
 }

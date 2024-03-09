@@ -22,6 +22,10 @@
                 <td></td>
                 <td>invalid email format</td>
             </tr>
+            <tr *ngIf="userExist" class="error">
+                <td></td>
+                <td>email already exist</td>
+            </tr>
             <tr>
                 <td>Password:</td>
                 <td><input type="password" formControlName="password"></td>
