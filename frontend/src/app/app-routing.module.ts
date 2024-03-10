@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'taskmaster', component: TaskMasterComponent },
+  { path: 'workspace/:w', component: TaskMasterComponent },
   { path: 'features', component: FeaturesComponent },
   { path: 'attributions', component: AttributionsComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full'}
