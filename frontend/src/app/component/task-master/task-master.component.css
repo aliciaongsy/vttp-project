@@ -10,11 +10,6 @@ div{
     justify-content: space-between;  
 }
 
-.row div{
-    padding-top: 1ch;
-    /* padding-right: 1ch; */
-}
-
 :host ::ng-deep .p-button:focus{
     box-shadow: none;
 }
@@ -23,6 +18,7 @@ div{
     padding-left: 1ch;
     width: 100%;
     border: dashed;
+    height: 100vh;
 }
 
 #rightpanel{
@@ -49,6 +45,10 @@ input:focus{
     box-shadow: none;
 }
 
+.addButton{
+    justify-content: center;
+}
+
 :host ::ng-deep .p-dialog .p-dialog-header{
     color: #010662;
 }
@@ -57,21 +57,67 @@ input:focus{
     background: #010662;
     color: #FFF9F4;
     border: none;
-    font-size: medium;
 }
 
 :host ::ng-deep .p-component{
     font-family: 'Lora', sans-serif;
 }
 
+#ws{
+    margin: 0;
+    margin-right: 1ch;
+    justify-content: center;
+    border: none;
+    line-height: 30px;
+}
+
 #ws:hover{
     border: none;
     border-radius: 5px;
-    width: auto;
-    height: 30px;
+    line-height: 30px;
     background-color: #f6e7db;
     color: #010662;
 }
+
+h2{
+    padding: 0 2ch;
+}
+
+a {
+    color: #010662;
+}
+
+
+:host ::ng-deep .p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link{
+    background: #FFF9F4;
+    color:#010662;
+    border: none;
+}
+
+:host ::ng-deep .p-tabmenu .p-tabmenu-nav{
+    background: #FFF9F4;
+    color:#010662;
+    border-color: #FFF9F4;
+}
+
+:host ::ng-deep .p-tabmenu .p-tabmenu-nav .p-tabmenuitem:not(.p-highlight):not(.p-disabled):hover .p-menuitem-link{
+    border: none;
+    background-color: #f6e7db;
+}
+
+:host ::ng-deep .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link{  
+    border-bottom: solid;
+    border-color: #010662;
+}
+
+#tab1{
+    padding: 0 2ch;
+}
+
+#tab2{
+    padding: 0 2ch;
+}
+
 
 /* div button {
     color: #010662;
