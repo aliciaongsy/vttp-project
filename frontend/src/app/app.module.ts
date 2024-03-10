@@ -12,14 +12,15 @@ import { RegisterComponent } from './component/register/register.component';
 import { TaskMasterComponent } from './component/task-master/task-master.component';
 import { AttributionsComponent } from './component/attributions/attributions.component';
 import { FeaturesComponent } from './component/features/features.component';
+import { HttpClientModule } from '@angular/common/http';
+import { UserService } from './service/user.service';
+import { DbStore } from './service/db.store';
 
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { SplitterModule } from 'primeng/splitter';
 import { InputTextModule } from 'primeng/inputtext';
-import { HttpClientModule } from '@angular/common/http';
-import { UserService } from './service/user.service';
-import { DbStore } from './service/db.store';
+import { TabMenuModule } from 'primeng/tabmenu';
 
 @NgModule({
   declarations: [
@@ -38,11 +39,12 @@ import { DbStore } from './service/db.store';
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
+    HttpClientModule,
     DialogModule,
     ButtonModule,
     SplitterModule,
     InputTextModule,
-    HttpClientModule
+    TabMenuModule
   ],
   providers: [UserService, DbStore],
   bootstrap: [AppComponent]
