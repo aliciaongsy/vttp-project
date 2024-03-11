@@ -13,42 +13,51 @@ import sg.edu.nus.iss.backend.repository.UserRepository;
 
 @Service
 public class UserService {
-    
+
     @Autowired
     private UserRepository userRepo;
 
-    public JsonObject buildJsonObject(String key, String value){
+    public JsonObject buildJsonObject(String key, String value) {
         JsonObjectBuilder b = Json.createObjectBuilder();
         b.add(key, value);
         return b.build();
     }
 
-    public ResponseEntity<String> findUserByEmail(String email){
+    public ResponseEntity<String> existingUser(String email) {
         boolean exist = userRepo.existingUser(email);
-        if (exist){
-            JsonObject o = userRepo.findUserByEmail(email).get();
+        if (exist) {
+            JsonObject o = buildJsonObject("message", "user does not exists");
             return ResponseEntity.ok(o.toString());
         }
-        
-        JsonObject o = buildJsonObject("message", "user does not exists");
+        JsonObject o = buildJsonObject("message", "existing user");
         return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
     }
 
-    public ResponseEntity<String> userVerification(String email, String password){
-        // email validation is done in frontend
-        boolean valid = userRepo.checkPassword(email, password);
-        if (valid){
-            JsonObject o = buildJsonObject("message", "successfully logged in");
-            return ResponseEntity.ok(o.toString());
+    public ResponseEntity<String> userVerification(String email, String password) {
+        // email validation
+        boolean exist = userRepo.existingUser(email);
+        if (exist) {
+            // password validation
+            boolean valid = userRepo.checkPassword(email, password);
+            if (valid) {
+                // JsonObject o = buildJsonObject("message", "successfully logged in");
+                // return ResponseEntity.ok(o.toString());
+                JsonObject o = userRepo.findUserByEmail(email).get();
+                return ResponseEntity.ok(o.toString());
+            }
+
+            JsonObject o = buildJsonObject("error", "failed to log in");
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
         }
-        
-        JsonObject o = buildJsonObject("error", "failed to log in");
+        // account does not exist
+        JsonObject o = buildJsonObject("error", "user does not exists");
         return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+
     }
 
-    public ResponseEntity<String> createNewUser(User user){
+    public ResponseEntity<String> createNewUser(User user) {
         boolean added = userRepo.addNewUser(user);
-        if (added){
+        if (added) {
 
             String message = "successfully added user %s".formatted(user.getId());
             JsonObject o = buildJsonObject("message", message);
