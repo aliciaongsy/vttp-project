@@ -6,13 +6,21 @@ import { RegisterComponent } from './component/register/register.component';
 import { TaskMasterComponent } from './component/task-master/task-master.component';
 import { FeaturesComponent } from './component/features/features.component';
 import { AttributionsComponent } from './component/attributions/attributions.component';
+import { OverviewComponent } from './component/task-master/overview/overview.component';
+import { TasksComponent } from './component/task-master/tasks/tasks.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'taskmaster', component: TaskMasterComponent },
-  { path: 'workspace/:w', component: TaskMasterComponent },
+  { path: 'workspace/:w', 
+    component: TaskMasterComponent,
+    children: [
+      { path: 'overview', component: OverviewComponent },
+      { path: 'tasks', component: TasksComponent }
+    ]
+   }, 
   { path: 'features', component: FeaturesComponent },
   { path: 'attributions', component: AttributionsComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full'}
