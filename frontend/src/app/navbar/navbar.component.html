@@ -21,7 +21,9 @@
     </ul>
     <div *ngIf="loginStatus | async else login">
         <!-- display user -->
-        <a class="d-lg-inline-block my-2 my-md-0 ms-md-3 p-3" [routerLink]="['/login']" id="login">User</a>
+        <div *ngIf="user | async as user">
+            <a class="d-lg-inline-block my-2 my-md-0 ms-md-3 p-3" [routerLink]="['/login']" id="login">{{user.name}}</a>
+        </div>
     </div>
     <ng-template #login>
         <a class="d-lg-inline-block my-2 my-md-0 ms-md-3 p-3" [routerLink]="['/login']" id="login">Login</a>
