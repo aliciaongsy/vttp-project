@@ -1,9 +1,9 @@
 package sg.edu.nus.iss.backend.service;
 
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
