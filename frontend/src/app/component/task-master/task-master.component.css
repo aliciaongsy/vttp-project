@@ -102,12 +102,16 @@ a {
 
 :host ::ng-deep .p-tabmenu .p-tabmenu-nav .p-tabmenuitem:not(.p-highlight):not(.p-disabled):hover .p-menuitem-link{
     border: none;
-    background-color: #f6e7db;
+    background-color: #d4dbe3;
 }
 
 :host ::ng-deep .p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link{  
     border-bottom: solid;
     border-color: #010662;
+}
+
+:host ::ng-deep .p-chart{
+    font-family: 'Lora', sans-serif;
 }
 
 #tab1{

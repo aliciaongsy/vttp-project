@@ -1,0 +1,28 @@
+div{
+    padding: 0 2ch;
+    display: block;
+}
+
+td{
+    color: #010662;
+    font-family: 'Lora', sans-serif;
+}
+
+input{
+    color: #010662;
+}
+
+:host ::ng-deep .p-dropdown-label{
+    color: #010662;
+    font-family: 'Lora', sans-serif;
+}
+
+:host ::ng-deep .p-component{
+    color: #010662;
+    font-family: 'Lora', sans-serif;
+    font-size: 15px;
+}
+
+:host ::ng-deep .p-button{
+    color: #FFF9F4;
+}

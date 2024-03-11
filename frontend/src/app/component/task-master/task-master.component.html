@@ -41,7 +41,7 @@
                             <p-dialog header="Create a new workspace" [(visible)]="visible" [modal]="true" [style]="{ width: '40vw'}"
                                 [draggable]="false" [resizable]="false">
                                 <p class="m-0" style="color: #010662;">
-                                    <input pInputText type="text" [(ngModel)]="name"> <p-button (onClick)="createWorkspace()" size="small" height="40px">Create</p-button>
+                                    <input pInputText type="text" [(ngModel)]="name"> <p-button (click)="createWorkspace()" size="small" height="40px">Create</p-button>
                                 </p>
                             </p-dialog>
                         </div>
@@ -53,15 +53,19 @@
                 <div class="col flex align-items-center justify-content-center" id="tabmenu">
                     <div class="card">
                         <p-tabMenu [model]="menuItems" [activeItem]="activeTab"></p-tabMenu>
+                        <router-outlet></router-outlet>
                     </div>
-                    <div *ngIf="tab=='Overview'" id="tab1">
+                    <!-- <div *ngIf="tab=='Overview'" id="tab1">
                         <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis quia saepe vitae velit aut? Sunt eveniet, quos dolore adipisci repellat nulla consectetur quidem eaque repudiandae autem iste eius omnis nobis!</p>
+                        <p>Workspace created on: 12/01/2024</p>
+                        <p>Task Overview: </p>
+                        <p-chart type="doughnut" [data]="data" [options]="options" width="200px"></p-chart>
                     </div>
                     <div *ngIf="tab=='Tasks'" id="tab2">
                         <div *ngIf="tasks.length==0">
                             <h2 style="padding: 0">No active task</h2>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </ng-template>
         </p-splitter>

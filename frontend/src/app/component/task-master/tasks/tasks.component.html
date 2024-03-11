@@ -1,0 +1,43 @@
+<div *ngIf="tasks.length==0">
+    <h2 style="padding: 0;">No active task</h2>
+</div>
+<div *ngIf="tasks.length!=0">
+    <h2 style="padding: 0;">Active task</h2>
+</div>
+<div>
+    <p-button size="small" label="Add Task" icon="pi pi-plus" (click)="formDialog()"></p-button>
+    <p-dialog header="Add a new task" [(visible)]="visible" [modal]="true" [style]="{ width: '40vw'}"
+        [draggable]="false" [resizable]="false">
+        <form [formGroup]="taskForm" (submit)="addTask()">
+            <table>
+                <tr>
+                    <td>Task:</td>
+                    <td><input pInputText type="text" formControlName="task"></td>
+                </tr>
+                <tr>
+                    <td>Priority:</td>
+                    <td>
+                        <p-dropdown [options]="priorities" formControlName="priority"></p-dropdown>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Start Date:</td>
+                    <td><p-calendar formControlName="start" appendTo="body" dateFormat="dd/mm/yy"></p-calendar></td>
+                </tr>
+                <tr>
+                    <td>Due Date:</td>
+                    <td><p-calendar formControlName="due" appendTo="body" dateFormat="dd/mm/yy" [minDate]="minDate"></p-calendar></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><p-button size="small" type="submit">Add</p-button></td>
+                </tr>
+            </table>
+        </form>
+    </p-dialog>
+</div>
+<div *ngIf="tasks.length!=0">
+    <div *ngFor="let t of tasks" style="padding: 0;">
+        <p>{{t.task}}</p>
+    </div>
+</div>
