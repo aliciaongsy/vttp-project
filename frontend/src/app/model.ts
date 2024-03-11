@@ -15,7 +15,8 @@ export interface LoginDetails {
 
 export interface Task {
     task: string
-    priority: number
+    priority: string
+    start: number
     due: number
     completed: boolean
 }
