@@ -29,7 +29,7 @@ public class UserController {
     @Autowired
     private UserService userSvc;
 
-    @GetMapping(path = "/user/${email}")
+    @GetMapping(path = "/user/{email}")
     @ResponseBody
     public ResponseEntity<String> checkUserExist(@PathVariable String email) {
         return userSvc.findUserByEmail(email);
