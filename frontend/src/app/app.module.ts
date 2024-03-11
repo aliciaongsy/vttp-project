@@ -15,12 +15,17 @@ import { FeaturesComponent } from './component/features/features.component';
 import { HttpClientModule } from '@angular/common/http';
 import { UserService } from './service/user.service';
 import { DbStore } from './service/db.store';
+import { OverviewComponent } from './component/task-master/overview/overview.component';
+import { TasksComponent } from './component/task-master/tasks/tasks.component';
 
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { SplitterModule } from 'primeng/splitter';
 import { InputTextModule } from 'primeng/inputtext';
 import { TabMenuModule } from 'primeng/tabmenu';
+import { ChartModule } from 'primeng/chart';
+import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
 
 @NgModule({
   declarations: [
@@ -31,7 +36,9 @@ import { TabMenuModule } from 'primeng/tabmenu';
     RegisterComponent,
     TaskMasterComponent,
     AttributionsComponent,
-    FeaturesComponent
+    FeaturesComponent,
+    OverviewComponent,
+    TasksComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +51,10 @@ import { TabMenuModule } from 'primeng/tabmenu';
     ButtonModule,
     SplitterModule,
     InputTextModule,
-    TabMenuModule
+    TabMenuModule,
+    ChartModule,
+    DropdownModule,
+    CalendarModule
   ],
   providers: [UserService, DbStore],
   bootstrap: [AppComponent]
