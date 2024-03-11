@@ -24,9 +24,9 @@ public class UserService {
     }
 
     public ResponseEntity<String> findUserByEmail(String email){
-        boolean exist = userRepo.findUserByEmail(email);
+        boolean exist = userRepo.existingUser(email);
         if (exist){
-            JsonObject o = buildJsonObject("message", "user exists");
+            JsonObject o = userRepo.findUserByEmail(email).get();
             return ResponseEntity.ok(o.toString());
         }
         

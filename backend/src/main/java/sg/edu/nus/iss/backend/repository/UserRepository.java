@@ -1,10 +1,13 @@
 package sg.edu.nus.iss.backend.repository;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import jakarta.json.JsonObject;
 import sg.edu.nus.iss.backend.PassBasedEnc;
 import sg.edu.nus.iss.backend.model.User;
 
@@ -14,9 +17,19 @@ public class UserRepository {
     @Autowired
     private JdbcTemplate template;
 
-    public boolean findUserByEmail(String email){
+    public boolean existingUser(String email){
         SqlRowSet rs = template.queryForRowSet(Queries.SQL_FIND_USER_BY_EMAIL, email);
         return rs.first();
+    }
+
+    public Optional<JsonObject> findUserByEmail(String email){
+        SqlRowSet rs = template.queryForRowSet(Queries.SQL_FIND_USER_BY_EMAIL, email);
+        if(rs.first()){
+            User user = new User();
+            return Optional.ofNullable(user.getJsonDetails(rs));
+        }
+        return Optional.empty();
+        
     }
 
     public boolean addNewUser(User user){

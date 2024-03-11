@@ -2,6 +2,12 @@ package sg.edu.nus.iss.backend.model;
 
 import java.util.UUID;
 
+import org.springframework.jdbc.support.rowset.SqlRowSet;
+
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+
 public class User {
     
     private String id;
@@ -30,5 +36,13 @@ public class User {
         this.email = email;
         this.password = password;
         this.id = UUID.randomUUID().toString().substring(0,8);
+    }
+
+    public JsonObject getJsonDetails(SqlRowSet rs){
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        return b.add("id", rs.getString("id"))
+            .add("name", rs.getString("name"))
+            .add("email", rs.getString("email"))
+            .build();
     }
 }
