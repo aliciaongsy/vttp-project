@@ -32,7 +32,7 @@ public class UserController {
     @GetMapping(path = "/user/{email}")
     @ResponseBody
     public ResponseEntity<String> checkUserExist(@PathVariable String email) {
-        return userSvc.findUserByEmail(email);
+        return userSvc.existingUser(email);
     }
 
     @GetMapping(path = "/login")
