@@ -1,61 +1,69 @@
 <!-- <div *ngIf="loginStatus | async else noAccess"> -->
-    <div class="card" *ngIf="pathVariable==undefined">
-        <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
-            styleClass="mb-5">
-            <ng-template pTemplate>
-                <div class="col flex align-items-center justify-content-center" id="leftpanel">
-                    <div class="row">
-                        <p>Workspaces</p>
-                        <div class="justify-content-center">
-                            <p-button (click)="showDialog()" [rounded]="true" icon="pi pi-plus" size="small" [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }"></p-button>
-                            <p-dialog header="Create a new workspace" [(visible)]="visible" [modal]="true" [style]="{ width: '40vw'}"
-                                [draggable]="false" [resizable]="false">
-                                <p class="m-0" style="color: #010662;">
-                                    <input pInputText type="text" [(ngModel)]="name"> <p-button (onClick)="createWorkspace()" size="small" height="40px">Create</p-button>
-                                </p>
-                            </p-dialog>
-                        </div>
+<div class="card" *ngIf="pathVariable==undefined">
+    <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
+        styleClass="mb-5">
+        <ng-template pTemplate>
+            <div class="col flex align-items-center justify-content-center" id="leftpanel">
+                <div class="row">
+                    <p>Workspaces</p>
+                    <div class="justify-content-center">
+                        <p-button (click)="showDialog()" [rounded]="true" icon="pi pi-plus" size="small"
+                            [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }"></p-button>
+                        <p-dialog header="Create a new workspace" [(visible)]="visible" [modal]="true"
+                            [style]="{ width: '40vw'}" [draggable]="false" [resizable]="false">
+                            <p class="m-0" style="color: #010662;">
+                                <input pInputText type="text" [(ngModel)]="name"> <p-button
+                                    (onClick)="createWorkspace()" size="small" height="40px">Create</p-button>
+                            </p>
+                        </p-dialog>
                     </div>
+                </div>
+                <div *ngIf="workspaces | async as workspaces">
                     <p *ngFor="let w of workspaces" width="max" id="ws" [routerLink]="['/workspace',w]">{{w}}</p>
                 </div>
-            </ng-template>
-            <ng-template pTemplate>
-                <div class="col flex align-items-center justify-content-center" id="rightpanel">
-                    <div>
-                        <h3>Add a new workspace or click on any existing workspace to add tasks!</h3>
-                        <img id="image" src="/assets/task.png" width="400" height="225">
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <div class="col flex align-items-center justify-content-center" id="rightpanel">
+                <div>
+                    <h3>Add a new workspace or click on any existing workspace to add tasks!</h3>
+                    <img id="image" src="/assets/task.png" width="400" height="225">
+                </div>
+            </div>
+        </ng-template>
+    </p-splitter>
+</div>
+<div class="card" *ngIf="pathVariable!=undefined">
+    <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
+        styleClass="mb-5">
+        <ng-template pTemplate>
+            <div class="col flex align-items-center justify-content-center" id="leftpanel">
+                <div class="row">
+                    <p>Workspaces</p>
+                    <div class="justify-content-center">
+                        <p-button (click)="showDialog()" [rounded]="true" icon="pi pi-plus" size="small"
+                            [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }"></p-button>
+                        <p-dialog header="Create a new workspace" [(visible)]="visible" [modal]="true"
+                            [style]="{ width: '40vw'}" [draggable]="false" [resizable]="false">
+                            <p class="m-0" style="color: #010662;">
+                                <input pInputText type="text" [(ngModel)]="name"> <p-button (click)="createWorkspace()"
+                                    size="small" height="40px">Create</p-button>
+                            </p>
+                        </p-dialog>
                     </div>
                 </div>
-            </ng-template>
-        </p-splitter>
-    </div>
-    <div class="card" *ngIf="pathVariable!=undefined">
-        <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
-            styleClass="mb-5">
-            <ng-template pTemplate>
-                <div class="col flex align-items-center justify-content-center" id="leftpanel">
-                    <div class="row">
-                        <p>Workspaces</p>
-                        <div class="justify-content-center">
-                            <p-button (click)="showDialog()" [rounded]="true" icon="pi pi-plus" size="small" [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }"></p-button>
-                            <p-dialog header="Create a new workspace" [(visible)]="visible" [modal]="true" [style]="{ width: '40vw'}"
-                                [draggable]="false" [resizable]="false">
-                                <p class="m-0" style="color: #010662;">
-                                    <input pInputText type="text" [(ngModel)]="name"> <p-button (click)="createWorkspace()" size="small" height="40px">Create</p-button>
-                                </p>
-                            </p-dialog>
-                        </div>
-                    </div>
+                <div *ngIf="workspaces | async as workspaces">
                     <p *ngFor="let w of workspaces" width="max" id="ws" [routerLink]="['/workspace',w]">{{w}}</p>
                 </div>
-            </ng-template>
-            <ng-template pTemplate>
-                <div class="col flex align-items-center justify-content-center" id="tabmenu">
-                    <div class="card">
-                        <p-tabMenu [model]="menuItems" [activeItem]="activeTab"></p-tabMenu>
-                        <router-outlet></router-outlet>
-                    </div>
-                    <!-- <div *ngIf="tab=='Overview'" id="tab1">
+            </div>
+        </ng-template>
+        <ng-template pTemplate>
+            <div class="col flex align-items-center justify-content-center" id="tabmenu">
+                <div class="card">
+                    <p-tabMenu [model]="menuItems" [activeItem]="activeTab"></p-tabMenu>
+                    <router-outlet></router-outlet>
+                </div>
+                <!-- <div *ngIf="tab=='Overview'" id="tab1">
                         <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis quia saepe vitae velit aut? Sunt eveniet, quos dolore adipisci repellat nulla consectetur quidem eaque repudiandae autem iste eius omnis nobis!</p>
                         <p>Workspace created on: 12/01/2024</p>
                         <p>Task Overview: </p>
@@ -66,10 +74,10 @@
                             <h2 style="padding: 0">No active task</h2>
                         </div>
                     </div> -->
-                </div>
-            </ng-template>
-        </p-splitter>
-    </div>
+            </div>
+        </ng-template>
+    </p-splitter>
+</div>
 <!-- </div>
 <ng-template #noAccess>
     <h2><a [routerLink]="['/login']">Login</a> to access this feature</h2>
