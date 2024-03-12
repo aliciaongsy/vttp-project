@@ -1,9 +1,10 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { ComponentStore } from "@ngrx/component-store";
 import { UserDetails, UserSlice } from "../model";
+import { TaskService } from "./task.service";
 
 const INIT_STORE: UserSlice = {
-    login: false, 
+    login: false,
     user: {
         id: '',
         name: '',
@@ -15,7 +16,9 @@ const INIT_STORE: UserSlice = {
 @Injectable()
 export class DbStore extends ComponentStore<UserSlice>{
 
-    constructor(){
+    private taskSvc = inject(TaskService)
+
+    constructor() {
         super(INIT_STORE)
     }
 
@@ -23,17 +26,27 @@ export class DbStore extends ComponentStore<UserSlice>{
         (slice: UserSlice, currUser: UserDetails) => {
             // change current status
             const newStatus = !(slice.login)
-            this.setState({
-                login: newStatus,
-                user: currUser,
-                workspaces: slice.workspaces // get from service
-            })
+            var w: string[] = []
+            this.taskSvc.retrieveWorkspaces(currUser.id)
+                .then((value) => {
+                    console.info('retrieve workspace from backend')
+                    console.info(value)
+                    w = value
+                    console.info(w)
+                    this.setState({
+                        login: newStatus,
+                        user: currUser,
+                        workspaces: w // get from service
+                    })
+                })
             return slice
         }
     )
 
     readonly addWorkspace = this.updater<string>(
         (slice: UserSlice, workspace: string) => {
+            console.info('add workspace to backend')
+            this.taskSvc.addWorkspace(slice.user.id, workspace)
             return {
                 login: slice.login,
                 user: slice.user,
@@ -51,6 +64,9 @@ export class DbStore extends ComponentStore<UserSlice>{
     )
 
     readonly getWorkspaces = this.select<string[]>(
-        (slice: UserSlice) => slice.workspaces
+        (slice: UserSlice) => {
+            console.info('get workspace', slice.workspaces)
+            return slice.workspaces
+        }
     )
 }
