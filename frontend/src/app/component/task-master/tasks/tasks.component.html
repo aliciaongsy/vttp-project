@@ -1,9 +1,11 @@
-<div *ngIf="tasks.length==0">
-    <h2 style="padding: 0;">No active task</h2>
-</div>
-<div *ngIf="tasks.length!=0">
+<div *ngIf="tasks | async else noTasks">
     <h2 style="padding: 0;">Active task</h2>
 </div>
+<ng-template #noTasks>
+    <div>
+        <h2 style="padding: 0;">No active task</h2>
+    </div>  
+</ng-template>
 <div>
     <p-button size="small" label="Add Task" icon="pi pi-plus" (click)="formDialog()"></p-button>
     <p-dialog header="Add a new task" [(visible)]="visible" [modal]="true" [style]="{ width: '40vw'}"
@@ -36,7 +38,7 @@
         </form>
     </p-dialog>
 </div>
-<div *ngIf="tasks.length!=0">
+<div *ngIf="tasks | async as tasks">
     <div *ngFor="let t of tasks" style="padding: 0;">
         <p>{{t.task}}</p>
     </div>

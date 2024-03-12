@@ -26,6 +26,7 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { ChartModule } from 'primeng/chart';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
+import { TaskService } from './service/task.service';
 
 @NgModule({
   declarations: [
@@ -56,7 +57,7 @@ import { CalendarModule } from 'primeng/calendar';
     DropdownModule,
     CalendarModule
   ],
-  providers: [UserService, DbStore],
+  providers: [UserService, DbStore, TaskService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

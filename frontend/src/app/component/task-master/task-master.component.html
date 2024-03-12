@@ -1,5 +1,5 @@
 <!-- <div *ngIf="loginStatus | async else noAccess"> -->
-<div class="card" *ngIf="pathVariable==undefined">
+<div class="card" *ngIf="currentWorkspace==undefined">
     <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
         styleClass="mb-5">
         <ng-template pTemplate>
@@ -33,7 +33,7 @@
         </ng-template>
     </p-splitter>
 </div>
-<div class="card" *ngIf="pathVariable!=undefined">
+<div class="card" *ngIf="currentWorkspace!=undefined">
     <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
         styleClass="mb-5">
         <ng-template pTemplate>

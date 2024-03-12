@@ -19,7 +19,7 @@ export class TaskMasterComponent implements OnInit {
   name!: string // workspace name
   workspaces!: Observable<string[]>
 
-  pathVariable!: string
+  currentWorkspace!: string
 
   loginStatus!: Observable<boolean>
 
@@ -33,7 +33,7 @@ export class TaskMasterComponent implements OnInit {
   activeTab = this.menuItems[0]
 
   ngOnInit(): void {
-    this.pathVariable = this.activatedRoute.snapshot.params['w']
+    this.currentWorkspace = this.activatedRoute.snapshot.params['w']
     console.info(this.activatedRoute.snapshot.params['w'])
     this.loginStatus = this.store.getStatus
     this.workspaces = this.store.getWorkspaces
