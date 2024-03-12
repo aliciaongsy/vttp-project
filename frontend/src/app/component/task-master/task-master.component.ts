@@ -17,7 +17,7 @@ export class TaskMasterComponent implements OnInit {
   visible: boolean = false;
 
   name!: string // workspace name
-  workspaces: string[] = []
+  workspaces!: Observable<string[]>
 
   pathVariable!: string
 
@@ -26,43 +26,17 @@ export class TaskMasterComponent implements OnInit {
   tab: string = 'Overview'
 
   menuItems: MenuItem[] = [
-    {
-      label: 'Overview', 
-      // command: (event: any) => {
-      //   this.tab = event.item.label
-      //   console.info(this.tab)
-      // }, 
-      routerLink: 'overview'
-    },
-    {
-      label: 'Projects', 
-      // command: (event: any) => {
-      //   this.tab = event.item.label
-      //   console.info(this.tab)
-      // }
-    },
-    {
-      label: 'Tasks', 
-      // command: (event: any) => {
-      //   this.tab = event.item.label
-      //   console.info(this.tab)
-      // },
-      routerLink: 'tasks'
-    }
+    { label: 'Overview', routerLink: 'overview' },
+    { label: 'Projects' },
+    { label: 'Tasks', routerLink: 'tasks' }
   ]
   activeTab = this.menuItems[0]
-
-  data: any;
-  options: any;
-
 
   ngOnInit(): void {
     this.pathVariable = this.activatedRoute.snapshot.params['w']
     console.info(this.activatedRoute.snapshot.params['w'])
     this.loginStatus = this.store.getStatus
-
-    // const documentStyle = getComputedStyle(document.documentElement); 
-    
+    this.workspaces = this.store.getWorkspaces
   }
 
   showDialog() {
@@ -72,7 +46,8 @@ export class TaskMasterComponent implements OnInit {
   createWorkspace() {
     console.info("press button")
     console.info(this.name)
-    this.workspaces.push(this.name)
+    // this.workspaces.push(this.name)
+    this.store.addWorkspace(this.name)
     // close dialog
     this.visible = false
     // clear value
