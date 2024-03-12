@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { NewUser } from '../model';
+import { NewUser, UserDetails } from '../model';
 import { firstValueFrom } from 'rxjs';
 
 const URL = environment.url
@@ -25,7 +25,7 @@ export class UserService {
       .set('password', password)
 
     // endpoint: localhost:8080/api/login?email=&password=
-    return firstValueFrom(this.http.get<any>(`${URL}/api/login`, { params }))
+    return firstValueFrom(this.http.get<UserDetails>(`${URL}/api/login`, { params }))
   }
 
   createUser(user: NewUser){
