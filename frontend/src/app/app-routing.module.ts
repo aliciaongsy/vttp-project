@@ -8,6 +8,7 @@ import { FeaturesComponent } from './component/features/features.component';
 import { AttributionsComponent } from './component/attributions/attributions.component';
 import { OverviewComponent } from './component/task-master/overview/overview.component';
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
+import { AccountComponent } from './component/account/account.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -23,6 +24,7 @@ const routes: Routes = [
    }, 
   { path: 'features', component: FeaturesComponent },
   { path: 'attributions', component: AttributionsComponent },
+  { path: 'account', component: AccountComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full'}
 ];
 
