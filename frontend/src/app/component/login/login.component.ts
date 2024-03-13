@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
         console.info(value)
         this.store.changeStatus(value)
         // route to account page
-        this.router.navigate(['/home'])
+        this.router.navigate(['/account'])
       })
       .catch(() => {
         // invalid email or invalid password
