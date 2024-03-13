@@ -1,45 +1,104 @@
-<div *ngIf="tasks | async else noTasks">
-    <h2 style="padding: 0;">Active task</h2>
-</div>
-<ng-template #noTasks>
+<div class="row">
+    <div *ngIf="tasks | async as tasks; else noTasks">
+        <div *ngIf="tasks.length!=0; else noTasks">
+            <h2 style="padding: 0;">Active task</h2>
+        </div>
+    </div>
+    <ng-template #noTasks>
+        <div>
+            <h2 style="padding: 0;">No active task</h2>
+        </div>
+    </ng-template>
     <div>
-        <h2 style="padding: 0;">No active task</h2>
-    </div>  
-</ng-template>
-<div>
-    <p-button size="small" label="Add Task" icon="pi pi-plus" (click)="formDialog()"></p-button>
-    <p-dialog header="Add a new task" [(visible)]="visible" [modal]="true" [style]="{ width: '40vw'}"
-        [draggable]="false" [resizable]="false">
-        <form [formGroup]="taskForm" (submit)="addTask()">
-            <table>
+        <p-button size="small" label="Add Task" icon="pi pi-plus" (click)="formDialog()"></p-button>
+        <p-dialog header="Add a new task" [(visible)]="visible" [modal]="true" [style]="{ width: 'fit-content'}"
+            [draggable]="false" [resizable]="false">
+            <form [formGroup]="taskForm" (submit)="addTask()">
+                <table>
+                    <tr>
+                        <td>Task:</td>
+                        <td><input pInputText type="text" formControlName="task"></td>
+                    </tr>
+                    <tr>
+                        <td>Status:</td>
+                        <td>
+                            <p-dropdown [options]="status" formControlName="status"></p-dropdown>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Priority:</td>
+                        <td>
+                            <p-dropdown [options]="priorities" formControlName="priority"></p-dropdown>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Start Date:</td>
+                        <td><p-calendar formControlName="start" appendTo="body" dateFormat="dd/mm/yy"></p-calendar>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Due Date:</td>
+                        <td><p-calendar formControlName="due" appendTo="body" dateFormat="dd/mm/yy"
+                                [minDate]="minDate"></p-calendar></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><p-button size="small" type="submit">Add</p-button></td>
+                    </tr>
+                </table>
+            </form>
+        </p-dialog>
+    </div>
+</div>
+<div *ngIf="tasks | async as tasks" style="padding: 0 2ch;">
+    <div *ngIf="tasks.length!=0">
+        <p-table [columns]="cols" [value]="tasks" [tableStyle]="{ 'min-width': '50rem' }">
+            <ng-template pTemplate="header" let-columns>
                 <tr>
-                    <td>Task:</td>
-                    <td><input pInputText type="text" formControlName="task"></td>
+                    <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                        {{ col.header }}
+                        <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </th>
                 </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns">
                 <tr>
-                    <td>Priority:</td>
-                    <td>
-                        <p-dropdown [options]="priorities" formControlName="priority"></p-dropdown>
+                    <td *ngFor="let col of columns">
+                        <container-element [ngSwitch]="col.field">
+                            <span *ngSwitchCase="'priority'">
+                                <p-tag *ngIf="rowData[col.field]=='Low'" [value]="rowData[col.field]"
+                                    [style]="{'background': 'rgba(255, 216, 77, 0.7)'}"></p-tag>
+                                <p-tag *ngIf="rowData[col.field]=='Medium'" [value]="rowData[col.field]"
+                                    [style]="{'background': 'rgba(249, 142, 49, 0.7)'}"></p-tag>
+                                <p-tag *ngIf="rowData[col.field]=='High'" [value]="rowData[col.field]"
+                                    [style]="{'background': 'rgba(255, 98, 83, 0.7)'}"></p-tag>
+                            </span>
+                            <span *ngSwitchCase="'status'">                               
+                                <p-tag *ngIf="rowData[col.field]=='In Progress'" [value]="rowData[col.field]"
+                                    [style]="{'background': 'rgba(207, 217, 246, 0.7)'}"></p-tag>
+                                <p-tag *ngIf="rowData[col.field]=='In Review'" [value]="rowData[col.field]"
+                                    [style]="{'background': 'rgba(172, 186, 227, 0.7)'}"></p-tag>
+                                <p-tag *ngIf="rowData[col.field]=='On Hold'" [value]="rowData[col.field]"
+                                    [style]="{'background': 'rgba(125, 142, 196, 0.7)'}"></p-tag>
+                                <p-tag *ngIf="rowData[col.field]=='Completed'" [value]="rowData[col.field]"
+                                    [style]="{'background': 'rgba(97, 112, 168, 0.7)'}"></p-tag>
+                            </span>
+                            <span *ngSwitchCase="'start'">
+                                {{ rowData[col.field] | date}}
+                            </span>
+                            <span *ngSwitchCase="'due'">
+                                {{ rowData[col.field] | date}}
+                            </span>
+                            <span *ngSwitchCase="'completed'">
+                                <p-checkbox [(ngModel)]="completed" [binary]="true" (click)="completedSwitch(rowData.id)"></p-checkbox>
+                            </span>
+                            <ng-template ngSwitchDefault>
+                                {{ rowData[col.field] }}
+                            </ng-template>
+                        </container-element>
                     </td>
                 </tr>
-                <tr>
-                    <td>Start Date:</td>
-                    <td><p-calendar formControlName="start" appendTo="body" dateFormat="dd/mm/yy"></p-calendar></td>
-                </tr>
-                <tr>
-                    <td>Due Date:</td>
-                    <td><p-calendar formControlName="due" appendTo="body" dateFormat="dd/mm/yy" [minDate]="minDate"></p-calendar></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><p-button size="small" type="submit">Add</p-button></td>
-                </tr>
-            </table>
-        </form>
-    </p-dialog>
-</div>
-<div *ngIf="tasks | async as tasks">
-    <div *ngFor="let t of tasks" style="padding: 0;">
-        <p>{{t.task}}</p>
+            </ng-template>
+        </p-table>
     </div>
 </div>
