@@ -60,6 +60,7 @@ public class TaskController {
 
         Task task = new Task();
         task.setTask(o.getString("task"));
+        task.setStatus(o.getString("status"));
         task.setPriority(o.getString("priority"));
         task.setStart(o.getJsonNumber("start").longValue());
         task.setDue(o.getJsonNumber("due").longValue());

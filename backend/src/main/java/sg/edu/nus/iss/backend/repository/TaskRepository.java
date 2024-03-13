@@ -86,7 +86,9 @@ public class TaskRepository {
      * {
      * $project: {
      * _id: 0,
+     * id: "$tasks.id",
      * task:"$tasks.task",
+     * status:"$tasks.status",
      * priority:"$tasks.priority",
      * start:"$tasks.start",
      * due:"$tasks.due",
@@ -106,7 +108,9 @@ public class TaskRepository {
 
         ProjectionOperation projectOps = Aggregation.project()
                 .andExclude("_id")
+                .and("tasks.id").as("id")
                 .and("tasks.task").as("task")
+                .and("tasks.status").as("status")
                 .and("tasks.priority").as("priority")
                 .and("tasks.start").as("start")
                 .and("tasks.due").as("due")
