@@ -7,3 +7,24 @@ a{
 #login:hover{
     text-decoration: none;
 }
+
+:host ::ng-deep .p-splitbutton.p-button-plain.p-button-text > .p-button{
+    font-family: 'Lora', sans-serif;
+    color: #010662;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+:host ::ng-deep .p-tieredmenu.p-tieredmenu-overlay{
+    background: #FFF9F4;
+    font-family: 'Lora', sans-serif;
+    font-size: 15px;
+}
+
+:host ::ng-deep .p-tieredmenu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-icon{
+    color: #010662;
+}
+
+:host ::ng-deep .p-tieredmenu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text {
+    color: #010662;
+}

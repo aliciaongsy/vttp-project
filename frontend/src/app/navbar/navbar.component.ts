@@ -14,10 +14,26 @@ export class NavbarComponent implements OnInit{
 
   loginStatus!: Observable<boolean>
   user!: Observable<UserDetails>
+  items!: any
 
   ngOnInit(): void {
     this.loginStatus = this.store.getStatus
     this.loginStatus.subscribe((value) => console.info(value))
     this.user = this.store.getUser
+
+    this.items = [
+      {
+          label: 'Account',
+          icon: 'pi pi-user',
+          routerLink: ['/account']
+      },
+      {
+          label: 'Sign out',
+          icon: 'pi pi-sign-out',
+          command: () => {
+            this.store.signOut()
+          }
+      }
+  ];
   }
 }
