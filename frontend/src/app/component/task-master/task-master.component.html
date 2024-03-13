@@ -58,22 +58,11 @@
             </div>
         </ng-template>
         <ng-template pTemplate>
-            <div class="col flex align-items-center justify-content-center" id="tabmenu">
+            <div class="col flex align-items-center justify-content-center" id="tabmenu" width="80vw">
                 <div class="card">
                     <p-tabMenu [model]="menuItems" [activeItem]="activeTab"></p-tabMenu>
                     <router-outlet></router-outlet>
                 </div>
-                <!-- <div *ngIf="tab=='Overview'" id="tab1">
-                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Facilis quia saepe vitae velit aut? Sunt eveniet, quos dolore adipisci repellat nulla consectetur quidem eaque repudiandae autem iste eius omnis nobis!</p>
-                        <p>Workspace created on: 12/01/2024</p>
-                        <p>Task Overview: </p>
-                        <p-chart type="doughnut" [data]="data" [options]="options" width="200px"></p-chart>
-                    </div>
-                    <div *ngIf="tab=='Tasks'" id="tab2">
-                        <div *ngIf="tasks.length==0">
-                            <h2 style="padding: 0">No active task</h2>
-                        </div>
-                    </div> -->
             </div>
         </ng-template>
     </p-splitter>
