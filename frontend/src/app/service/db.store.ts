@@ -55,6 +55,13 @@ export class DbStore extends ComponentStore<UserSlice>{
         }
     )
 
+    readonly signOut = this.updater<void>(
+        (slice: UserSlice) => {
+            this.setState(INIT_STORE)
+            return slice;
+        }
+    )
+
     readonly getStatus = this.select<boolean>(
         (slice: UserSlice) => slice.login
     )
