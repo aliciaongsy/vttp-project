@@ -1,6 +1,8 @@
-div{
+.row{
+    display: flex;
+    justify-content: space-between;  
+    align-items: center;
     padding: 0 2ch;
-    display: block;
 }
 
 td{
@@ -9,7 +11,9 @@ td{
 }
 
 input{
+    background-color: #FFF9F4;
     color: #010662;
+    background: rgba(172, 186, 227, 0.7);
 }
 
 :host ::ng-deep .p-dropdown-label{
@@ -25,4 +29,44 @@ input{
 
 :host ::ng-deep .p-button{
     color: #FFF9F4;
+}
+
+:host ::ng-deep .p-datatable-table{
+    margin-top: 1ch;
+    width: 100%;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+    background: #FFF9F4;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    background: #e2e5e7;
+    color:#010662;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+    background: #FFF9F4;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+    background: #FFF9F4;
+}
+
+:host ::ng-deep .p-dropdown{
+    background:#FFF9F4;
+}
+
+:host ::ng-deep .p-inputtext{
+    background:#FFF9F4;
+    font-size: 14px;
+}
+
+:host ::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight{
+    color: #010662;
+    font-size: 14px;
+}
+
+:host ::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight.p-focus{
+    background: #d4dbe3;
 }
