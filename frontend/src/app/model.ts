@@ -26,7 +26,9 @@ export interface LoginDetails {
 }
 
 export interface Task {
+    id?:string
     task: string
+    status: string
     priority: string
     start: number
     due: number
