@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'taskmaster', component: TaskMasterComponent },
+  { path: 'tasktracker', component: TaskMasterComponent },
   { path: 'workspace/:w', 
     component: TaskMasterComponent,
     children: [

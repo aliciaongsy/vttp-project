@@ -17,6 +17,8 @@ import { UserService } from './service/user.service';
 import { DbStore } from './service/db.store';
 import { OverviewComponent } from './component/task-master/overview/overview.component';
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
+import { TaskService } from './service/task.service';
+import { AccountComponent } from './component/account/account.component';
 
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -26,7 +28,11 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { ChartModule } from 'primeng/chart';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
-import { TaskService } from './service/task.service';
+import { ToolbarModule } from 'primeng/toolbar';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { CheckboxModule } from 'primeng/checkbox';
 
 @NgModule({
   declarations: [
@@ -39,7 +45,8 @@ import { TaskService } from './service/task.service';
     AttributionsComponent,
     FeaturesComponent,
     OverviewComponent,
-    TasksComponent
+    TasksComponent,
+    AccountComponent
   ],
   imports: [
     BrowserModule,
@@ -55,7 +62,12 @@ import { TaskService } from './service/task.service';
     TabMenuModule,
     ChartModule,
     DropdownModule,
-    CalendarModule
+    CalendarModule,
+    ToolbarModule,
+    SplitButtonModule,
+    TableModule,
+    TagModule,
+    CheckboxModule
   ],
   providers: [UserService, DbStore, TaskService],
   bootstrap: [AppComponent]

@@ -3,6 +3,7 @@
 div{
     font-family: 'Lora', sans-serif;
     color: #010662;
+    width: 100%;
 }
 
 .row{
@@ -72,6 +73,14 @@ input:focus{
 }
 
 #ws:hover{
+    border: none;
+    border-radius: 5px;
+    line-height: 30px;
+    background-color: #d4dbe3;
+    color: #010662;
+}
+
+#ws:focus{
     border: none;
     border-radius: 5px;
     line-height: 30px;
