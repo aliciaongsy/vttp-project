@@ -3,6 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DbStore } from '../../service/db.store';
 import { Observable } from 'rxjs';
 import { MenuItem } from 'primeng/api';
+import { Store } from '@ngrx/store';
+import { selectStatus, selectWorkspaces } from '../../state/user/user.selectors';
+import { addWorkspace } from '../../state/user/user.actions';
 
 @Component({
   selector: 'app-task-master',
@@ -13,6 +16,7 @@ export class TaskMasterComponent implements OnInit {
 
   private activatedRoute = inject(ActivatedRoute)
   private store = inject(DbStore)
+  private ngrxStore = inject(Store)
 
   visible: boolean = false;
 
@@ -35,8 +39,16 @@ export class TaskMasterComponent implements OnInit {
   ngOnInit(): void {
     this.currentWorkspace = this.activatedRoute.snapshot.params['w']
     console.info(this.activatedRoute.snapshot.params['w'])
-    this.loginStatus = this.store.getStatus
-    this.workspaces = this.store.getWorkspaces
+
+    // component store
+    // this.loginStatus = this.store.getStatus
+    // this.workspaces = this.store.getWorkspaces
+
+    // ngrx store
+    console.info("retrieve from ngrx store")
+    this.loginStatus = this.ngrxStore.select(selectStatus)
+    this.workspaces = this.ngrxStore.select(selectWorkspaces)
+
   }
 
   showDialog() {
@@ -46,8 +58,10 @@ export class TaskMasterComponent implements OnInit {
   createWorkspace() {
     console.info("press button")
     console.info(this.name)
-    // this.workspaces.push(this.name)
-    this.store.addWorkspace(this.name)
+
+    // this.store.addWorkspace(this.name)
+
+    this.ngrxStore.dispatch(addWorkspace({workspace: this.name}))
     // close dialog
     this.visible = false
     // clear value
