@@ -15,3 +15,15 @@ export const selectAllTasks = createSelector(
     selectTask,
     (state: TaskState) => state.tasks
 )
+export const selectTaskSize = createSelector(
+    selectTask,
+    (state: TaskState) => state.totalTask
+)
+export const selectIncompletedTaskSize = createSelector(
+    selectTask,
+    (state: TaskState) => state.incompletedTask
+)
+export const selectCompletedTaskSize = createSelector(
+    selectTask,
+    (state: TaskState) => state.completedTask
+)
