@@ -124,6 +124,6 @@ export class TasksComponent implements OnInit {
     }
     console.info(task)
     const taskId = data.id
-    this.ngrxStore.dispatch(changeCompleteStatus({id: taskId, task: task, completed: task.completed}))
+    this.ngrxStore.dispatch(changeCompleteStatus({id: taskId!, task: task, completed: task.completed}))
   }
 }

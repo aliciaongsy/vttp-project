@@ -9,7 +9,7 @@ export const addTask = createAction(
 // delete task by id
 export const deleteTask = createAction(
     '[Task Page] Delete Task',
-    props<{ id: string }>()
+    props<{ id: string, completed: boolean }>()
 )
 
 export const changeCompleteStatus = createAction(
