@@ -12,6 +12,11 @@ export const deleteTask = createAction(
     props<{ id: string }>()
 )
 
+export const changeCompleteStatus = createAction(
+    '[Task Page] Change complete status',
+    props<{ id: string, task: Task, completed: boolean }>()
+)
+
 export const loadAllTasks = createAction(
     '[Task Page] Load All Tasks',
     props<{ id: string, workspace: string }>()

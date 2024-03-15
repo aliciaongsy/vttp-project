@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store"
 import { Task } from "../../model"
-import { addTask, deleteTask, loadAllTasks, loadAllTasksFromService, resetTaskState } from "./task.actions"
+import { addTask, changeCompleteStatus, deleteTask, loadAllTasks, loadAllTasksFromService, resetTaskState } from "./task.actions"
 
 export interface TaskState {
     id: string // user id
@@ -23,6 +23,11 @@ export const taskReducer = createReducer(
     on(deleteTask, (state, { id }) => ({
         ...state,
         tasks: state.tasks.filter((task) => task.id !== id)
+    })),
+    on(changeCompleteStatus, (state, { id, task }) => ({
+        id: state.id,
+        workspace: state.workspace,
+        tasks: state.tasks.map(t => t.id===id ? task : t)
     })),
     on(loadAllTasks, (state, { id, workspace }) => ({
         id: id,

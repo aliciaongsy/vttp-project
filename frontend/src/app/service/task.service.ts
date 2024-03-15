@@ -40,4 +40,12 @@ export class TaskService {
     // endpoint: localhost:8080/api/{id}/{workspace}/task/new
     return firstValueFrom(this.http.post<any>(`${URL}/api/${id}/${workspace}/task/new`, task))
   }
+
+  updateCompleteStatus(id: string, workspace: string, taskid: string, completed: boolean){
+    const payload = {
+      taskId: taskid,
+      completed: completed
+    }
+    return firstValueFrom(this.http.put<any>(`${URL}/api/${id}/${workspace}/task/complete`, payload))
+  }
 }
