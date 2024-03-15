@@ -70,3 +70,25 @@ input{
 :host ::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight.p-focus{
     background: #d4dbe3;
 }
+
+/* check box */
+:host ::ng-deep button.p-ripple.p-element.p-button.p-component.p-button-icon-only {
+    color: #010662;
+    background: unset;
+    justify-content: left;
+}
+
+p-checkbox {
+    display: flex;
+    justify-content: center;
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box {
+    border: 1.5px solid #010662;
+    background: #FFF9F4;
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box.p-highlight {
+    border-color: #010662;
+    background: #010662;
+}
