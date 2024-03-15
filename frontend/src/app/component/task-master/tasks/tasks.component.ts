@@ -4,10 +4,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TaskService } from '../../../service/task.service';
 import { ActivatedRoute } from '@angular/router';
 import { DbStore } from '../../../service/db.store';
-import { Observable, firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom, map } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectUserDetails } from '../../../state/user/user.selectors';
-import { addTask, loadAllTasks } from '../../../state/tasks/task.actions';
+import { addTask, changeCompleteStatus, loadAllTasks } from '../../../state/tasks/task.actions';
 import { selectAllTasks, selectTask } from '../../../state/tasks/task.selector';
 
 interface Column {
@@ -43,8 +43,6 @@ export class TasksComponent implements OnInit {
 
   cols!: Column[]
 
-  completed: boolean = false
-
   ngOnInit(): void {
     this.taskForm = this.createForm()
     this.minDate = new Date()
@@ -62,20 +60,24 @@ export class TasksComponent implements OnInit {
     firstValueFrom(this.ngrxStore.select(selectUserDetails)).then((value) => {
       this.uid = value.id
       // retrieve task from mongodb
-      this.ngrxStore.dispatch(loadAllTasks({id: this.uid, workspace: this.currentWorkspace}))  
+      this.ngrxStore.dispatch(loadAllTasks({ id: this.uid, workspace: this.currentWorkspace }))
     })
     console.info(this.ngrxStore.select(selectTask))
-    this.tasks = this.ngrxStore.select(selectAllTasks)
+    this.tasks = this.ngrxStore.select(selectTask).pipe(
+      map((value)=>{
+        return [...value.tasks]
+      })
+    )
     firstValueFrom(this.tasks).then((value) => console.info(value))
-    
-    this.cols=[
+
+    this.cols = [
       { field: 'task', header: 'Title' },
       { field: 'status', header: 'Status' },
       { field: 'priority', header: 'Priority' },
       { field: 'start', header: 'Start Date' },
       { field: 'due', header: 'Due Date' },
       { field: 'completed', header: 'Completed' },
-  ];
+    ];
   }
 
   createForm(): FormGroup {
@@ -103,12 +105,25 @@ export class TasksComponent implements OnInit {
     task.completed = false
     // this.taskSvc.addTasksToWorkspace(this.uid, this.currentWorkspace, task)
     //   .then(()=>this.tasks = this.taskSvc.getTasksOfWorkspace(this.uid, this.currentWorkspace))
-    this.ngrxStore.dispatch(addTask({task: task}))
+    this.ngrxStore.dispatch(addTask({ task: task }))
     // this.tasks = this.ngrxStore.select(selectAllTasks)
+    this.visible = false
   }
 
-  completedSwitch(taskId: any){
-    console.info(taskId)
-    console.info(this.completed)
+  completedSwitch(data: Task) {
+    console.info(data)
+    var task: Task = {
+      id: data.id,
+      task: data.task,
+      status: !(data.completed)? "Completed" : data.status==='Completed' ? "In Progress" : data.status,
+      priority: data.priority,
+      start: data.start,
+      due: data.due,
+      completed: !(data.completed)
+
+    }
+    console.info(task)
+    const taskId = data.id
+    this.ngrxStore.dispatch(changeCompleteStatus({id: taskId, task: task, completed: task.completed}))
   }
 }
