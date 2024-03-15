@@ -57,8 +57,9 @@
                 <tr>
                     <th *ngFor="let col of columns" [pSortableColumn]="col.field">
                         {{ col.header }}
-                        <p-sortIcon [field]="col.field"></p-sortIcon>
+                        <p-sortIcon [field]="col.field" *ngIf="col.field=='priority'||col.field=='status'||col.field=='due'"></p-sortIcon>
                     </th>
+                    <th>Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns">
@@ -84,18 +85,22 @@
                                     [style]="{'background': 'rgba(97, 112, 168, 0.7)'}"></p-tag>
                             </span>
                             <span *ngSwitchCase="'start'">
-                                {{ rowData[col.field] | date}}
+                                {{ rowData[col.field] | date }}
                             </span>
                             <span *ngSwitchCase="'due'">
-                                {{ rowData[col.field] | date}}
+                                {{ rowData[col.field] | date }}
                             </span>
                             <span *ngSwitchCase="'completed'">
-                                <p-checkbox [(ngModel)]="completed" [binary]="true" (click)="completedSwitch(rowData.id)"></p-checkbox>
+                                <p-checkbox [binary]="true" (click)="completedSwitch(rowData)" [(ngModel)]="rowData[col.field]"></p-checkbox>
                             </span>
                             <ng-template ngSwitchDefault>
                                 {{ rowData[col.field] }}
                             </ng-template>
                         </container-element>
+                    </td>
+                    <td>
+                        <p-button icon="pi pi-file-edit"></p-button>
+                        <p-button icon="pi pi-trash"></p-button>
                     </td>
                 </tr>
             </ng-template>
