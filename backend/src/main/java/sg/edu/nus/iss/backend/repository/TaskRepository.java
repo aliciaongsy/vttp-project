@@ -167,4 +167,30 @@ public class TaskRepository {
 
     }
 
+    /* db.tasks.updateOne(
+        {
+            "id": "d73726d8",
+            "workspace":"workspace1",
+            "tasks": {"$elemMatch": {"id": "618d9d7b"}}
+        },
+        {
+            "$set": {"tasks.$.completed": false}
+            "$set": {"tasks.$.status": }
+        }
+    ); */
+    public boolean updateCompleteStatus(String id, String workspace, String taskId, boolean completed){
+        Criteria criteria = Criteria.where("id").is(id)
+            .andOperator(Criteria.where("workspace").is(workspace), Criteria.where("tasks").elemMatch(Criteria.where("id").is(taskId)));
+        
+        Query query = new Query(criteria);
+
+        Update updateOps = new Update()
+            .set("tasks.$.completed", completed)
+            .set("tasks.$.status", completed ? "Completed" : "In Progress");
+
+        UpdateResult update = template.updateFirst(query, updateOps, "tasks");
+
+        return update.getMatchedCount() > 0;
+    }
+
 }

@@ -71,4 +71,14 @@ public class TaskService {
         JsonObject o = buildJsonObject("error", "error adding new task to workspace");
         return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
     }
+
+    public ResponseEntity<String> updateCompletedStatus(String id, String workspace, String taskId, boolean completed){
+        boolean updated = taskRepo.updateCompleteStatus(id, workspace, taskId, completed);
+        if (updated){
+            JsonObject o = buildJsonObject("message", "successfully updated completed status");
+            return ResponseEntity.ok(o.toString());
+        }
+        JsonObject o = buildJsonObject("error", "error updating completed status");
+        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+    }
 }
