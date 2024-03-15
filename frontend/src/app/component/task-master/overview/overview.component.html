@@ -3,5 +3,5 @@
         dolore adipisci repellat nulla consectetur quidem eaque repudiandae autem iste eius omnis nobis!</p>
     <p>Workspace created on: 12/01/2024</p>
     <p>Task Overview: </p>
-    <p-chart type="doughnut" [data]="data" [options]="options" width="200px"></p-chart>
+    <p-chart *ngIf="incompleted!=0 || completed!=0" type="doughnut" [data]="data" [options]="options" width="200px"></p-chart>
 </div>
