@@ -26,9 +26,9 @@ export interface LoginDetails {
 }
 
 export interface Task {
-    id?:string
+    id:string
     task: string
-    status: string
+    status: 'In Progress' | 'In Review' | 'On Hold' | 'Completed'
     priority: string
     start: number
     due: number
