@@ -3,6 +3,9 @@
 div{
     font-family: 'Lora', sans-serif;
     color: #010662;
+}
+
+div #tabmenu{
     width: 100%;
 }
 

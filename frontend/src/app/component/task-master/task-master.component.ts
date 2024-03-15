@@ -1,11 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DbStore } from '../../service/db.store';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { MenuItem } from 'primeng/api';
 import { Store } from '@ngrx/store';
-import { selectStatus, selectWorkspaces } from '../../state/user/user.selectors';
+import { selectStatus, selectUserDetails, selectWorkspaces } from '../../state/user/user.selectors';
 import { addWorkspace } from '../../state/user/user.actions';
+import { loadAllTasks } from '../../state/tasks/task.actions';
+import { selectTask } from '../../state/tasks/task.selector';
 
 @Component({
   selector: 'app-task-master',
@@ -15,7 +17,6 @@ import { addWorkspace } from '../../state/user/user.actions';
 export class TaskMasterComponent implements OnInit {
 
   private activatedRoute = inject(ActivatedRoute)
-  private store = inject(DbStore)
   private ngrxStore = inject(Store)
 
   visible: boolean = false;

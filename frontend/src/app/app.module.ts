@@ -33,6 +33,12 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { CheckboxModule } from 'primeng/checkbox';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { UserEffects } from './state/user/user.effects';
+import { userReducer } from './state/user/user.reducer';
+import { taskReducer } from './state/tasks/task.reducer';
+import { TaskEffects } from './state/tasks/task.effects';
 
 @NgModule({
   declarations: [
@@ -67,7 +73,9 @@ import { CheckboxModule } from 'primeng/checkbox';
     SplitButtonModule,
     TableModule,
     TagModule,
-    CheckboxModule
+    CheckboxModule,
+    StoreModule.forRoot({user: userReducer, task: taskReducer}),
+    EffectsModule.forRoot([UserEffects, TaskEffects])
   ],
   providers: [UserService, DbStore, TaskService],
   bootstrap: [AppComponent]

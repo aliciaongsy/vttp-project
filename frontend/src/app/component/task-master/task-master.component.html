@@ -24,7 +24,7 @@
             </div>
         </ng-template>
         <ng-template pTemplate>
-            <div class="col flex align-items-center justify-content-center" id="rightpanel">
+            <div class="col flex align-items-center justify-content-center" id="rightpanel" width="100%">
                 <div>
                     <h3>Add a new workspace or click on any existing workspace to add tasks!</h3>
                     <img id="image" src="/assets/task.png" width="400" height="225">
@@ -53,12 +53,12 @@
                     </div>
                 </div>
                 <div *ngIf="workspaces | async as workspaces">
-                    <p *ngFor="let w of workspaces" width="max" id="ws" [routerLink]="['/workspace',w]">{{w}}</p>
+                    <p *ngFor="let w of workspaces" width="max" id="ws" [routerLink]="['/workspace', w, 'overview']">{{w}}</p>
                 </div>
             </div>
         </ng-template>
         <ng-template pTemplate>
-            <div class="col flex align-items-center justify-content-center" id="tabmenu" width="80vw">
+            <div class="col flex align-items-center justify-content-center" id="tabmenu" width="100%">
                 <div class="card">
                     <p-tabMenu [model]="menuItems" [activeItem]="activeTab"></p-tabMenu>
                     <router-outlet></router-outlet>
