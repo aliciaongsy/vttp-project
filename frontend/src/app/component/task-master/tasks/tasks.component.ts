@@ -1,14 +1,12 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { Task } from '../../../model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TaskService } from '../../../service/task.service';
 import { ActivatedRoute } from '@angular/router';
-import { DbStore } from '../../../service/db.store';
 import { Observable, firstValueFrom, map } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectUserDetails } from '../../../state/user/user.selectors';
 import { addTask, changeCompleteStatus, loadAllTasks } from '../../../state/tasks/task.actions';
-import { selectAllTasks, selectTask } from '../../../state/tasks/task.selector';
+import { selectTask } from '../../../state/tasks/task.selector';
 
 interface Column {
   field: string;
@@ -23,21 +21,22 @@ interface Column {
 export class TasksComponent implements OnInit {
 
   private fb = inject(FormBuilder)
-  private taskSvc = inject(TaskService)
   private activatedRoute = inject(ActivatedRoute)
-  private store = inject(DbStore)
   private ngrxStore = inject(Store)
 
-  currentWorkspace!: string
-  uid!: string
-
   taskForm!: FormGroup
-
-  tasks!: Observable<Task[]>
   minDate!: Date
 
-  visible: boolean = false
+  // details
+  currentWorkspace!: string
+  uid!: string
+  tasks!: Observable<Task[]>
 
+  // dialog
+  visible: boolean = false
+  editVisible: boolean = false
+
+  // dropdown options
   priorities: string[] = ['Low', 'Medium', 'High']
   status: string[] = ['In Progress', 'In Review', 'On Hold', 'Completed']
 
@@ -49,13 +48,6 @@ export class TasksComponent implements OnInit {
 
     // get workspace name - get parent path variable {workspace}/tasks
     this.currentWorkspace = this.activatedRoute.parent?.snapshot.params['w']
-    // get user id
-    // firstValueFrom(this.store.getUser).then((value) => {
-    //   this.uid = value.id
-    //   // retrieve task from mongodb
-    //   this.tasks = this.taskSvc.getTasksOfWorkspace(this.uid, this.currentWorkspace)
-    //   firstValueFrom(this.tasks).then((value) => console.info(value))
-    // })
 
     firstValueFrom(this.ngrxStore.select(selectUserDetails)).then((value) => {
       this.uid = value.id
@@ -103,15 +95,12 @@ export class TasksComponent implements OnInit {
     console.info(task.status)
 
     task.completed = false
-    // this.taskSvc.addTasksToWorkspace(this.uid, this.currentWorkspace, task)
-    //   .then(()=>this.tasks = this.taskSvc.getTasksOfWorkspace(this.uid, this.currentWorkspace))
     this.ngrxStore.dispatch(addTask({ task: task }))
     // this.tasks = this.ngrxStore.select(selectAllTasks)
     this.visible = false
   }
 
   completedSwitch(data: Task) {
-    console.info(data)
     var task: Task = {
       id: data.id,
       task: data.task,
@@ -125,5 +114,9 @@ export class TasksComponent implements OnInit {
     console.info(task)
     const taskId = data.id
     this.ngrxStore.dispatch(changeCompleteStatus({id: taskId!, task: task, completed: task.completed}))
+  }
+
+  editForm(){
+
   }
 }
