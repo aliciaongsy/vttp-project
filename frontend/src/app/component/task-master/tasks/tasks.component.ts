@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable, firstValueFrom, map } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectUserDetails } from '../../../state/user/user.selectors';
-import { addTask, changeCompleteStatus, loadAllTasks } from '../../../state/tasks/task.actions';
+import { addTask, changeCompleteStatus, deleteTask, loadAllTasks, updateTask } from '../../../state/tasks/task.actions';
 import { selectTask } from '../../../state/tasks/task.selector';
 
 interface Column {
@@ -35,6 +35,7 @@ export class TasksComponent implements OnInit {
   // dialog
   visible: boolean = false
   editVisible: boolean = false
+  deleteVisible: boolean = false
 
   // dropdown options
   priorities: string[] = ['Low', 'Medium', 'High']
@@ -69,6 +70,7 @@ export class TasksComponent implements OnInit {
       { field: 'start', header: 'Start Date' },
       { field: 'due', header: 'Due Date' },
       { field: 'completed', header: 'Completed' },
+      { field: 'actions', header: 'Actions' }
     ];
   }
 
@@ -109,14 +111,46 @@ export class TasksComponent implements OnInit {
       start: data.start,
       due: data.due,
       completed: !(data.completed)
-
     }
     console.info(task)
     const taskId = data.id
-    this.ngrxStore.dispatch(changeCompleteStatus({id: taskId!, task: task, completed: task.completed}))
+    this.ngrxStore.dispatch(changeCompleteStatus({taskId: taskId!, task: task, completed: task.completed}))
   }
 
-  editForm(){
+  editForm(data: Task){
+    this.editVisible = true
+    this.taskForm = this.fb.group({
+      task: this.fb.control<string>(data.task, [Validators.required]),
+      status: this.fb.control<string>(data.status, [Validators.required]),
+      priority: this.fb.control<string>(data.priority, [Validators.required]),
+      start: this.fb.control<Date>(new Date(data.start)),
+      due: this.fb.control<Date>(new Date(data.due), [Validators.required])
+    })
+  }
 
+  updateTask(taskId: string){
+    const task = this.taskForm.value as Task
+    task.id = taskId
+    task.start = this.taskForm.value.start.getTime()
+    task.due = this.taskForm.value.due.getTime()
+    task.completed = this.taskForm.value.status == "Completed" ? true : false
+    console.info(task)
+
+    this.ngrxStore.dispatch(updateTask({taskId: taskId, task: task}))
+
+    this.editVisible = false
+  }
+
+  deleteDialog(){
+    this.deleteVisible = true
+  }
+
+  deleteTask(data: Task){
+    this.ngrxStore.dispatch(deleteTask({taskId: data.id!, completed: data.completed}))
+    this.deleteVisible = false
+  }
+
+  closeDialog(){
+    this.deleteVisible = false
   }
 }

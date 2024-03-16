@@ -41,11 +41,19 @@ export class TaskService {
     return firstValueFrom(this.http.post<any>(`${URL}/api/${id}/${workspace}/task/new`, task))
   }
 
-  updateCompleteStatus(id: string, workspace: string, taskid: string, completed: boolean){
+  updateCompleteStatus(id: string, workspace: string, taskId: string, completed: boolean){
     const payload = {
-      taskId: taskid,
+      taskId: taskId,
       completed: completed
     }
     return firstValueFrom(this.http.put<any>(`${URL}/api/${id}/${workspace}/task/complete`, payload))
+  }
+
+  deleteTask(id: string, workspace: string, taskId: string){
+    return firstValueFrom(this.http.delete<any>(`${URL}/api/${id}/${workspace}/task/delete/${taskId}`))
+  }
+
+  updateTask(id: string, workspace: string, taskId: string, task: Task){
+    return firstValueFrom(this.http.put<any>(`${URL}/api/${id}/${workspace}/task/update/${taskId}`, task))
   }
 }

@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store"
 import { Task } from "../../model"
-import { addTask, changeCompleteStatus, deleteTask, loadAllTasks, loadAllTasksFromService, resetTaskState } from "./task.actions"
+import { addTask, changeCompleteStatus, deleteTask, loadAllTasks, loadAllTasksFromService, resetTaskState, updateTask } from "./task.actions"
 
 export interface TaskState {
     id: string // user id
@@ -29,36 +29,33 @@ export const taskReducer = createReducer(
         incompletedTask: task.completed == false ? state.completedTask+1 : state.completedTask-1,
         totalTask: state.totalTask + 1
     })),
-    on(deleteTask, (state, { id, completed }) => ({
+    on(deleteTask, (state, { taskId, completed }) => ({
         ...state,
-        tasks: state.tasks.filter((task) => task.id !== id),
+        tasks: state.tasks.filter((task) => task.id !== taskId),
         completedTask: completed == true ? state.completedTask-1 : state.completedTask,
         incompletedTask: completed == false ? state.completedTask-1 : state.completedTask,
         totalTask: state.totalTask - 1
     })),
-    on(changeCompleteStatus, (state, { id, task }) => ({
-        id: state.id,
-        workspace: state.workspace,
-        tasks: state.tasks.map(t => t.id === id ? task : t),
+    on(updateTask, (state, { taskId, task }) => ({
+        ...state,
+        tasks: state.tasks.map(t => t.id === taskId ? task : t),
+    })),
+    on(changeCompleteStatus, (state, { taskId, task }) => ({
+        ...state,
+        tasks: state.tasks.map(t => t.id === taskId ? task : t),
         completedTask: task.completed == true ? state.completedTask+1 : state.completedTask-1,
         incompletedTask: task.completed == false ? state.completedTask+1 : state.completedTask-1,
-        totalTask: state.totalTask
     })),
     on(loadAllTasks, (state, { id, workspace }) => ({
+        ...state,
         id: id,
-        workspace: workspace,
-        tasks: state.tasks,
-        completedTask: state.completedTask,
-        incompletedTask: state.incompletedTask,
-        totalTask: state.totalTask
+        workspace: workspace
     })),
     on(loadAllTasksFromService, (state, { tasks }) => ({
-        id: state.id,
-        workspace: state.workspace,
+        ...state,
         tasks: tasks,
         completedTask: tasks.filter(t => t.completed == true).length,
         incompletedTask: tasks.filter(t=>t.completed==false).length,
-        totalTask: state.totalTask
     })),
     on(resetTaskState, state => ({
         id: '',

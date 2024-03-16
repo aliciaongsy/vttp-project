@@ -57,9 +57,9 @@
                 <tr>
                     <th *ngFor="let col of columns" [pSortableColumn]="col.field">
                         {{ col.header }}
-                        <p-sortIcon [field]="col.field" *ngIf="col.field=='priority'||col.field=='status'||col.field=='due'"></p-sortIcon>
+                        <p-sortIcon [field]="col.field"
+                            *ngIf="col.field=='priority'||col.field=='status'||col.field=='due'"></p-sortIcon>
                     </th>
-                    <th>Actions</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns">
@@ -74,7 +74,7 @@
                                 <p-tag *ngIf="rowData[col.field]=='High'" [value]="rowData[col.field]"
                                     [style]="{'background': 'rgba(255, 98, 83, 0.7)'}"></p-tag>
                             </span>
-                            <span *ngSwitchCase="'status'">                               
+                            <span *ngSwitchCase="'status'">
                                 <p-tag *ngIf="rowData[col.field]=='In Progress'" [value]="rowData[col.field]"
                                     [style]="{'background': 'rgba(207, 217, 246, 0.7)'}"></p-tag>
                                 <p-tag *ngIf="rowData[col.field]=='In Review'" [value]="rowData[col.field]"
@@ -91,16 +91,65 @@
                                 {{ rowData[col.field] | date }}
                             </span>
                             <span *ngSwitchCase="'completed'">
-                                <p-checkbox [binary]="true" (click)="completedSwitch(rowData)" [(ngModel)]="rowData[col.field]"></p-checkbox>
+                                <p-checkbox [binary]="true" (click)="completedSwitch(rowData)"
+                                    [(ngModel)]="rowData[col.field]"></p-checkbox>
+                            </span>
+                            <span *ngSwitchCase="'actions'">
+                                <p-button icon="pi pi-file-edit" (click)="editForm(rowData)"></p-button>
+                                <p-dialog header="Edit Task" [(visible)]="editVisible" [modal]="true"
+                                    [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false">
+                                    <form [formGroup]="taskForm" (submit)="updateTask(rowData.id)">
+                                        <table>
+                                            <tr>
+                                                <td>Task:</td>
+                                                <td><input pInputText type="text" formControlName="task"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Status:</td>
+                                                <td>
+                                                    <p-dropdown [options]="status"
+                                                        formControlName="status"></p-dropdown>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Priority:</td>
+                                                <td>
+                                                    <p-dropdown [options]="priorities"
+                                                        formControlName="priority"></p-dropdown>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Start Date:</td>
+                                                <td><p-calendar formControlName="start" appendTo="body"
+                                                        dateFormat="dd/mm/yy"></p-calendar>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Due Date:</td>
+                                                <td><p-calendar formControlName="due" appendTo="body"
+                                                        dateFormat="dd/mm/yy" [minDate]="minDate"></p-calendar></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td><p-button size="small" type="submit">Update</p-button></td>
+                                            </tr>
+                                        </table>
+                                    </form>
+                                </p-dialog>
+                                <p-button icon="pi pi-trash" (click)="deleteDialog()"></p-button>
+                                <p-dialog header="Delete Task" [(visible)]="deleteVisible" [modal]="true"
+                                    [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false">
+                                    <p style="color: #8B0000; font-weight: 500; padding-bottom: 1ch;">Are you sure you want to delete task?</p>
+                                    <div class="button">
+                                        <p-button [style]="{background: '#8B0000'}" (click)="deleteTask(rowData)">Yes</p-button>
+                                        <p-button (click)="closeDialog()">Cancel</p-button>
+                                    </div>
+                                </p-dialog>
                             </span>
                             <ng-template ngSwitchDefault>
                                 {{ rowData[col.field] }}
                             </ng-template>
                         </container-element>
-                    </td>
-                    <td>
-                        <p-button icon="pi pi-file-edit"></p-button>
-                        <p-button icon="pi pi-trash"></p-button>
                     </td>
                 </tr>
             </ng-template>
