@@ -53,6 +53,16 @@ public class Task {
         this.completed = completed;
     }
 
+    public Task(String id, String task, String status, String priority, long start, long due, boolean completed) {
+        this.id = id;
+        this.task = task;
+        this.status = status;
+        this.priority = priority;
+        this.start = start;
+        this.due = due;
+        this.completed = completed;
+    }
+
     public Document toDocument(Task task){
         Document doc = new Document();
         doc.put("id",task.getId());

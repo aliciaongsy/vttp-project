@@ -70,33 +70,31 @@ public class TaskRepository {
 
     }
 
-    /*
-     * db.tasks.aggregate([
-     * {
-     * $match: {
-     * $and: [
-     * {id: "d73726d8"},
-     * {workspace: "workspace1"}
-     * ]
-     * }
-     * },
-     * {
-     * $unwind: "$tasks"
-     * },
-     * {
-     * $project: {
-     * _id: 0,
-     * id: "$tasks.id",
-     * task:"$tasks.task",
-     * status:"$tasks.status",
-     * priority:"$tasks.priority",
-     * start:"$tasks.start",
-     * due:"$tasks.due",
-     * completed:"$tasks.completed"
-     * }
-     * }
-     * ]);
-     */
+    /* db.tasks.aggregate([
+    {
+        $match: {
+            $and: [
+                {id: "d73726d8"},
+                {workspace: "workspace1"}
+            ]
+        }
+    },
+    {
+        $unwind: "$tasks"
+    },
+    {
+        $project: {
+            _id: 0,
+            id: "$tasks.id",
+            task:"$tasks.task",
+            status:"$tasks.status",
+            priority:"$tasks.priority",
+            start:"$tasks.start",
+            due:"$tasks.due",
+            completed:"$tasks.completed"
+        }
+    }
+    ]); */
     public List<Task> getAllTasks(String id, String workspace) {
 
         System.out.println(id);
@@ -119,7 +117,6 @@ public class TaskRepository {
         Aggregation pipeline = Aggregation.newAggregation(matchOps, unwindOps, projectOps);
 
         AggregationResults<Document> results = template.aggregate(pipeline, "tasks", Document.class);
-        System.out.println(results.toString());
 
         List<Document> docs = results.getMappedResults();
 
@@ -188,6 +185,73 @@ public class TaskRepository {
             .set("tasks.$.completed", completed)
             .set("tasks.$.status", completed ? "Completed" : "In Progress");
 
+        UpdateResult update = template.updateFirst(query, updateOps, "tasks");
+
+        return update.getMatchedCount() > 0;
+    }
+
+    /* db.tasks.updateOne(
+        {
+            id: "d73726d8",
+            workspace: "workspace1"
+        },
+        {
+            $pull:{
+                tasks:{
+                    id: "1ca6eae1"
+                }
+            }
+        }
+    ); */
+    public boolean deleteTaskById(String id, String workspace, String taskId){
+        Criteria criteria = Criteria.where("id").is(id)
+            .andOperator(Criteria.where("workspace").is(workspace));
+
+        Query query = new Query(criteria);
+
+        Update updateOps = new Update()
+            .pull("tasks", new Query(Criteria.where("id").is(taskId)));
+        
+        UpdateResult update = template.updateFirst(query, updateOps, "tasks");
+
+        return update.getMatchedCount() > 0;
+    }
+
+    /* db.tasks.updateMany(
+        {
+            id: "d73726d8",
+            workspace: "workspace1",
+            "tasks": {"$elemMatch": {"id": "b3e8af34"}}
+        },
+        {
+            $set: {
+                "tasks.$":{
+                    "id": "b3e8af34",
+                    "task": "task1",
+                    "status": "In Progress",
+                    "priority": "Low",
+                    "start": NumberLong(1710580014720),
+                    "due": NumberLong(1711728000000),
+                    "completed": false
+                }
+            }
+        }
+    );*/
+    public boolean updateTaskById(String id, String workspace, String taskId, Task task){
+        Criteria criteria = Criteria.where("id").is(id)
+            .andOperator(Criteria.where("workspace").is(workspace), Criteria.where("tasks").elemMatch(Criteria.where("id").is(taskId)));
+        
+        Query query = new Query(criteria);
+
+        Update updateOps = new Update()
+            .set("tasks.$.id", task.getId())
+            .set("tasks.$.task", task.getTask())
+            .set("tasks.$.status", task.getStatus())
+            .set("tasks.$.priority", task.getPriority())
+            .set("tasks.$.start", task.getStart())
+            .set("tasks.$.due", task.getDue())            
+            .set("tasks.$.completed", task.isCompleted());
+        
         UpdateResult update = template.updateFirst(query, updateOps, "tasks");
 
         return update.getMatchedCount() > 0;

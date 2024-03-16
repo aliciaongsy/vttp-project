@@ -81,4 +81,25 @@ public class TaskService {
         JsonObject o = buildJsonObject("error", "error updating completed status");
         return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
     }
+
+    public ResponseEntity<String> deleteTaskById(String id, String workspace, String taskId){
+        boolean deleted = taskRepo.deleteTaskById(id, workspace, taskId);
+        if (deleted){
+            JsonObject o = buildJsonObject("message", "successfully deleted task");
+            return ResponseEntity.ok(o.toString());
+        }
+        JsonObject o = buildJsonObject("error", "error deleting task");
+        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+    }
+
+    public ResponseEntity<String> updateTaskById(String id, String workspace, String taskId, Task task){
+        boolean updated = taskRepo.updateTaskById(id, workspace, taskId, task);
+
+        if (updated){
+            JsonObject o = buildJsonObject("message", "successfully updated task");
+            return ResponseEntity.ok(o.toString());
+        }
+        JsonObject o = buildJsonObject("error", "error updating task");
+        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+    }
 }
