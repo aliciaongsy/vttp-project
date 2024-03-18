@@ -10,6 +10,8 @@
         </div>
     </ng-template>
     <div>
+        <p-toast key="error" position="top-right"></p-toast>
+        <p-toast key="success" position="top-right"></p-toast>
         <p-button size="small" label="Add Task" icon="pi pi-plus" (click)="formDialog()"></p-button>
         <p-dialog header="Add a new task" [(visible)]="visible" [modal]="true" [style]="{ width: 'fit-content'}"
             [draggable]="false" [resizable]="false">
@@ -43,7 +45,9 @@
                     </tr>
                     <tr>
                         <td></td>
-                        <td><p-button size="small" type="submit">Add</p-button></td>
+                        <td>
+                            <p-button size="small" type="submit">Add</p-button>
+                        </td>
                     </tr>
                 </table>
             </form>
@@ -52,6 +56,8 @@
 </div>
 <div *ngIf="tasks | async as tasks" style="padding: 0 2ch;">
     <div *ngIf="tasks.length!=0">
+        <p-toast key="error" position="top-right"></p-toast>
+        <p-toast key="success" position="top-right"></p-toast>
         <p-table [columns]="cols" [value]="tasks" [tableStyle]="{ 'min-width': '50rem' }">
             <ng-template pTemplate="header" let-columns>
                 <tr>
@@ -131,7 +137,9 @@
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td><p-button size="small" type="submit">Update</p-button></td>
+                                                <td>
+                                                    <p-button size="small" type="submit">Update</p-button>
+                                                </td>
                                             </tr>
                                         </table>
                                     </form>
