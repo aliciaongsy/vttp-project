@@ -36,6 +36,7 @@ export class LoginComponent implements OnInit {
 
   login() {
     const details = this.form.value as LoginDetails
+    // can move all to store?
     this.userSvc.checkLoginDetails(details.email, details.password)
       .then((value) => {
         // valid email and password
