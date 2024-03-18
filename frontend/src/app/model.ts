@@ -29,7 +29,7 @@ export interface Task {
     id?: string
     task: string
     status: 'In Progress' | 'In Review' | 'On Hold' | 'Completed'
-    priority: string
+    priority: 'Low' | 'Medium' | 'High'
     start: number
     due: number
     completed: boolean

@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -20,6 +20,7 @@ import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { TaskService } from './service/task.service';
 import { AccountComponent } from './component/account/account.component';
 
+// primeng imports
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { SplitterModule } from 'primeng/splitter';
@@ -34,11 +35,15 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { CheckboxModule } from 'primeng/checkbox';
 import { StoreModule } from '@ngrx/store';
+import { ToastModule } from 'primeng/toast';
+
+// ngrx imports
 import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from './state/user/user.effects';
 import { userReducer } from './state/user/user.reducer';
 import { taskReducer } from './state/tasks/task.reducer';
 import { TaskEffects } from './state/tasks/task.effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 @NgModule({
   declarations: [
@@ -74,8 +79,11 @@ import { TaskEffects } from './state/tasks/task.effects';
     TableModule,
     TagModule,
     CheckboxModule,
+    ToastModule,
     StoreModule.forRoot({user: userReducer, task: taskReducer}),
-    EffectsModule.forRoot([UserEffects, TaskEffects])
+    StoreDevtoolsModule.instrument({maxAge: 25}),
+    EffectsModule.forRoot([UserEffects, TaskEffects]),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
   ],
   providers: [UserService, DbStore, TaskService],
   bootstrap: [AppComponent]
