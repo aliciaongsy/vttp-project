@@ -92,3 +92,8 @@ p-checkbox {
     border-color: #010662;
     background: #010662;
 }
+
+div .button{
+    display: flex;
+    justify-content: space-between;  
+}
