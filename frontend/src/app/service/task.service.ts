@@ -38,7 +38,7 @@ export class TaskService {
 
   addTasksToWorkspace(id: string, workspace: string, task: Task){
     // endpoint: localhost:8080/api/{id}/{workspace}/task/new
-    return firstValueFrom(this.http.post<any>(`${URL}/api/${id}/${workspace}/task/new`, task))
+    return this.http.post<any>(`${URL}/api/${id}/${workspace}/task/new`, task)
   }
 
   updateCompleteStatus(id: string, workspace: string, taskId: string, completed: boolean){
@@ -46,14 +46,14 @@ export class TaskService {
       taskId: taskId,
       completed: completed
     }
-    return firstValueFrom(this.http.put<any>(`${URL}/api/${id}/${workspace}/task/complete`, payload))
+    return this.http.put<any>(`${URL}/api/${id}/${workspace}/task/complete`, payload)
   }
 
   deleteTask(id: string, workspace: string, taskId: string){
-    return firstValueFrom(this.http.delete<any>(`${URL}/api/${id}/${workspace}/task/delete/${taskId}`))
+    return this.http.delete<any>(`${URL}/api/${id}/${workspace}/task/delete/${taskId}`)
   }
 
   updateTask(id: string, workspace: string, taskId: string, task: Task){
-    return firstValueFrom(this.http.put<any>(`${URL}/api/${id}/${workspace}/task/update/${taskId}`, task))
+    return this.http.put<any>(`${URL}/api/${id}/${workspace}/task/update/${taskId}`, task)
   }
 }
