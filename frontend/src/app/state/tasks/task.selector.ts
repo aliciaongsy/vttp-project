@@ -15,6 +15,10 @@ export const selectAllTasks = createSelector(
     selectTask,
     (state: TaskState) => state.tasks
 )
+export const selectActionStatus = createSelector(
+    selectTask,
+    (state: TaskState) => state.actionStatus
+)
 export const selectError = createSelector(
     selectTask,
     (state: TaskState) => state.error
