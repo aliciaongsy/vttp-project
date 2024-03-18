@@ -55,7 +55,7 @@
         <p-table [columns]="cols" [value]="tasks" [tableStyle]="{ 'min-width': '50rem' }">
             <ng-template pTemplate="header" let-columns>
                 <tr>
-                    <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                    <th *ngFor="let col of columns" [pSortableColumn]="col.field" [pSortableColumnDisabled]="col.field=='task' || col.field=='start' || col.field=='completed' || col.field=='actions'">
                         {{ col.header }}
                         <p-sortIcon [field]="col.field"
                             *ngIf="col.field=='priority'||col.field=='status'||col.field=='due'"></p-sortIcon>
