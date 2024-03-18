@@ -16,11 +16,9 @@ export class OverviewComponent implements OnInit, OnDestroy{
   private ngrxstore = inject(Store)
   private activatedRoute = inject(ActivatedRoute)
 
+  // chart 
   data!: any
   options!: any
-
-  currentWorkspace!: string
-  uid!: string
 
   incompletedTask$!: Subscription
   completedTask$!: Subscription
@@ -28,9 +26,11 @@ export class OverviewComponent implements OnInit, OnDestroy{
   incompleted!: number
   completed!: number
 
+  currentWorkspace!: string
+  uid!: string
+  
   ngOnInit(): void {
     console.info('oninit overview')
-    // load task data
     this.currentWorkspace = this.activatedRoute.parent?.snapshot.params['w']
 
     this.activatedRoute.parent?.params
