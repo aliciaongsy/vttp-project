@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store"
 import { Task } from "../../model"
-import { addTask, changeCompleteStatus, deleteTask, loadAllTasks, loadAllTasksFromService, resetTaskState, updateTask } from "./task.actions"
+import { addTask, addTaskError, addTaskSuccess, changeCompleteStatus, changeCompleteStatusSuccess, deleteTask, deleteTaskError, deleteTaskSuccess, loadAllTasks, loadAllTasksFromService, resetTaskState, updateTask, updateTaskError, updateTaskSuccess } from "./task.actions"
 
 export interface TaskState {
     id: string // user id
@@ -9,6 +9,7 @@ export interface TaskState {
     completedTask: number
     incompletedTask: number
     totalTask: number
+    error: any
 }
 
 export const initialState: TaskState = {
@@ -17,30 +18,47 @@ export const initialState: TaskState = {
     tasks: [],
     completedTask: 0,
     incompletedTask: 0,
-    totalTask: 0
+    totalTask: 0,
+    error: null
 }
 
 export const taskReducer = createReducer(
     initialState,
-    on(addTask, (state, { task }) => ({
+    on(addTask, (state) => ({...state})),
+    on(addTaskSuccess, (state, { task }) => ({
         ...state,
         tasks: [...state.tasks, task],
         completedTask: task.completed == true ? state.completedTask+1 : state.completedTask-1,
         incompletedTask: task.completed == false ? state.completedTask+1 : state.completedTask-1,
         totalTask: state.totalTask + 1
     })),
-    on(deleteTask, (state, { taskId, completed }) => ({
+    on(addTaskError, (state, { error }) => ({
+        ...state,
+        error: error
+    })),
+    on(deleteTask, (state) => ({...state})),
+    on(deleteTaskSuccess, (state, { taskId, completed }) => ({
         ...state,
         tasks: state.tasks.filter((task) => task.id !== taskId),
         completedTask: completed == true ? state.completedTask-1 : state.completedTask,
         incompletedTask: completed == false ? state.completedTask-1 : state.completedTask,
         totalTask: state.totalTask - 1
     })),
-    on(updateTask, (state, { taskId, task }) => ({
+    on(deleteTaskError, (state, { error }) => ({
+        ...state,
+        error: error
+    })),
+    on(updateTask, state => ({...state})),
+    on(updateTaskSuccess, (state, { taskId, task }) => ({
         ...state,
         tasks: state.tasks.map(t => t.id === taskId ? task : t),
     })),
-    on(changeCompleteStatus, (state, { taskId, task }) => ({
+    on(updateTaskError, (state, { error }) => ({
+        ...state,
+        error: error
+    })),
+    on(changeCompleteStatus, (state) => ({...state})),
+    on(changeCompleteStatusSuccess, (state, { taskId, task }) => ({
         ...state,
         tasks: state.tasks.map(t => t.id === taskId ? task : t),
         completedTask: task.completed == true ? state.completedTask+1 : state.completedTask-1,
@@ -63,6 +81,7 @@ export const taskReducer = createReducer(
         tasks: [],
         completedTask: 0,
         incompletedTask: 0,
-        totalTask: 0
+        totalTask: 0,
+        error: null
     }))
 )

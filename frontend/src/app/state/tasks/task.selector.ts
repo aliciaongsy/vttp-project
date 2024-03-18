@@ -15,6 +15,10 @@ export const selectAllTasks = createSelector(
     selectTask,
     (state: TaskState) => state.tasks
 )
+export const selectError = createSelector(
+    selectTask,
+    (state: TaskState) => state.error
+)
 export const selectTaskSize = createSelector(
     selectTask,
     (state: TaskState) => state.totalTask
