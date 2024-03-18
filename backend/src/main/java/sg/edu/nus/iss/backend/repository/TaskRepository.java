@@ -187,13 +187,14 @@ public class TaskRepository {
 
         UpdateResult update = template.updateFirst(query, updateOps, "tasks");
 
-        return update.getMatchedCount() > 0;
+        return update.getModifiedCount() > 0;
     }
 
     /* db.tasks.updateOne(
         {
             id: "d73726d8",
-            workspace: "workspace1"
+            workspace: "workspace1",
+            tasks: {"$elemMatch": {"id": "1ca6eae1"}}
         },
         {
             $pull:{
@@ -205,7 +206,9 @@ public class TaskRepository {
     ); */
     public boolean deleteTaskById(String id, String workspace, String taskId){
         Criteria criteria = Criteria.where("id").is(id)
-            .andOperator(Criteria.where("workspace").is(workspace));
+            .andOperator(Criteria.where("workspace").is(workspace), Criteria.where("tasks").elemMatch(Criteria.where("id").is(taskId)));
+
+        System.out.println("delete id:" + taskId);
 
         Query query = new Query(criteria);
 
@@ -214,7 +217,7 @@ public class TaskRepository {
         
         UpdateResult update = template.updateFirst(query, updateOps, "tasks");
 
-        return update.getMatchedCount() > 0;
+        return update.getModifiedCount() > 0;
     }
 
     /* db.tasks.updateMany(
@@ -254,7 +257,7 @@ public class TaskRepository {
         
         UpdateResult update = template.updateFirst(query, updateOps, "tasks");
 
-        return update.getMatchedCount() > 0;
+        return update.getModifiedCount() > 0;
     }
 
 }
