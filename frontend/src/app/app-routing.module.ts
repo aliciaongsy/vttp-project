@@ -9,11 +9,12 @@ import { AttributionsComponent } from './component/attributions/attributions.com
 import { OverviewComponent } from './component/task-master/overview/overview.component';
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { AccountComponent } from './component/account/account.component';
+import { canLeave } from './guard';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  { path: 'register', component: RegisterComponent, canDeactivate: [canLeave] },
   { path: 'tasktracker', component: TaskMasterComponent },
   { path: 'workspace/:w', 
     component: TaskMasterComponent,
