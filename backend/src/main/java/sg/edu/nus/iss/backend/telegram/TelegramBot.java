@@ -2,39 +2,38 @@ package sg.edu.nus.iss.backend.telegram;
 
 import static org.telegram.abilitybots.api.objects.Locality.USER;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
-// import static org.telegram.abilitybots.api.util.AbilityUtils.getChatId;
+import static org.telegram.abilitybots.api.util.AbilityUtils.getChatId;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.util.function.BiConsumer;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
+import org.telegram.abilitybots.api.bot.BaseAbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
+import org.telegram.abilitybots.api.objects.Flag;
+import org.telegram.abilitybots.api.objects.Reply;
+import org.telegram.telegrambots.meta.api.objects.Update;
+
+import sg.edu.nus.iss.backend.service.TelegramService;
 
 @Component
 public class TelegramBot extends AbilityBot {
 
     private final ResponseHandler responseHandler;
 
-    @Value("${telegram.bot.token}")
-    private String botToken;
+    // @Value("${telegram.bot.token}")
+    // private String botToken;
 
-    public TelegramBot(Environment env) {
-        super(env.getProperty("telegram.bot.token"), "tasks_sync_bot");
+    @Autowired
+    private TelegramService teleSvc;
+
+    public TelegramBot(Environment environment) {
+        super(environment.getProperty("telegram.bot.token"), "tasks_sync_bot");
         responseHandler = new ResponseHandler(silent, db);
     }
 
-    @Override
-    public String getBotToken() {
-        System.out.println(botToken);
-        return botToken;
-    }
-
-    @Override
-    public long creatorId() {
-        return 1L;
-    }
-
-    // when start command is pressed
     public Ability startBot() {
         System.out.println("start bot");
         return Ability
@@ -47,8 +46,8 @@ public class TelegramBot extends AbilityBot {
                 .build();
     }
 
-    public Ability loginBot() {
-        System.out.println("login bot");
+    public Ability linkBot() {
+        System.out.println("link bot");
         return Ability
                 .builder()
                 .name("linkaccount")
@@ -59,12 +58,38 @@ public class TelegramBot extends AbilityBot {
                 .build();
     }
 
-    // handle replies
-    // public Reply replyToButtons() {
-    //     BiConsumer<BaseAbilityBot, Update> action = (abilityBot, upd) -> responseHandler.replyToButtons(getChatId(upd),
-    //             upd.getMessage());
-    //     return Reply.of(action, Flag.TEXT, upd -> responseHandler.userIsActive(getChatId(upd)));
-    // }
+    public Ability workspaceBot() {
+        System.out.println("link bot");
+        return Ability
+                .builder()
+                .name("workspaces")
+                .info("get all workspaces")
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> responseHandler.replyToWorkspaces(ctx.chatId()))
+                .build();
+    }
 
+    public Reply replyToButtons() {
+        System.out.println("enter reply");
+        BiConsumer<BaseAbilityBot, Update> action = (abilityBot, upd) -> {
+            if (upd.getMessage().getText().contains("@") && upd.getMessage().getText().length() > 5) {
+                System.out.println("email check here?");
+                boolean existingUser = this.teleSvc.checkUserExistInDatabase(upd.getMessage().getText());
+                System.out.println(existingUser);
+                if(!existingUser){
+                    responseHandler.checkEmail(getChatId(upd));
+                    return;
+                }
+            }
+            responseHandler.replyToButtons(getChatId(upd), upd.getMessage());
+        };
+        return Reply.of(action, Flag.TEXT, upd -> responseHandler.userIsActive(getChatId(upd)));
+    }
+
+    @Override
+    public long creatorId() {
+        return 1L;
+    }
 
 }
