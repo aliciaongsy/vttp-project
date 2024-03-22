@@ -14,5 +14,17 @@ create table user_details (
    primary key(id)
 );
 
+create table telegram_bot (
+   chatid varchar(64) not null,
+   username varchar(64) not null,
+   email varchar(128) not null unique,
+   id char(8) not null,
+   insertdate timestamp default current_timestamp,
+   
+   primary key(chatid),
+   foreign key (email) references user_details(email),
+   foreign key (id) references user_details(id)
+);
+
 grant all privileges on tasksync.* to fred@'%';
 flush privileges;
