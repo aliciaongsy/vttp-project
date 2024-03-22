@@ -1,6 +1,10 @@
 package sg.edu.nus.iss.backend.telegram;
 
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.telegram.abilitybots.api.db.DBContext;
 import org.telegram.abilitybots.api.sender.SilentSender;
@@ -8,16 +12,22 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 
+import sg.edu.nus.iss.backend.model.Task;
+
 public class ResponseHandler {
 
     private final SilentSender sender;
     private final Map<Long, State> chatStates;
-    private boolean verified = false;
     private String email;
+    private List<Task> tasks = new LinkedList<>();
 
     public ResponseHandler(SilentSender sender, DBContext db) {
         this.sender = sender;
         chatStates = db.getMap("chatStates");
+    }
+
+    public Map<Long, State> getChatStates() {
+        return chatStates;
     }
 
     public void replyToStart(long chatId, String user) {
@@ -28,14 +38,20 @@ public class ResponseHandler {
         message.setText(
                 "hello %s,\nwelcome to task sync bot!\nto start, link to task application account".formatted(user));
 
-        // InlineKeyboardButton button = InlineKeyboardButton.builder().text("link
-        // account").callbackData("linkaccount").build();
-        // InlineKeyboardMarkup keyboard =
-        // InlineKeyboardMarkup.builder().keyboardRow(List.of(button)).build();
+        // InlineKeyboardButton button = InlineKeyboardButton.builder().text("link account").callbackData("linkaccount").build();
+        // InlineKeyboardMarkup keyboard = InlineKeyboardMarkup.builder().keyboardRow(List.of(button)).build();
 
         message.setReplyMarkup(KeyboardFactory.linkAccount());
         sender.execute(message);
-        // chatStates.put(chatId, AWAITING_NAME);
+    }
+
+    public void accountLinked(long chatId, String user) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(
+                "hello %s, welcome back!\nhere are the list of commands:\n/workspaces - get all workspaces\n/edittask - edit task by workspace and task name\n/markcompleted - mark task as completed"
+                        .formatted(user));
+        sender.execute(message);
     }
 
     public void replyToLinkAccount(long chatId) {
@@ -47,25 +63,32 @@ public class ResponseHandler {
         chatStates.put(chatId, State.AWAITING_EMAIL);
     }
 
-    public void replyToWorkspaces(long chatId) {
+    public void replyToWorkspaces(long chatId, boolean linked, List<String> workspaces) {
         SendMessage message = new SendMessage();
         // check if user has been verified
-        if (!verified) {
+        if (!linked) {
             message.setChatId(chatId);
             message.setText("please link account to proceed");
             message.setReplyMarkup(KeyboardFactory.linkAccount());
             sender.execute(message);
-            // chatStates.put(chatId, AWAITING_EMAIL);
             return;
         }
+
+        if (workspaces.isEmpty()) {
+            message.setChatId(chatId);
+            message.setText("no existing workspace");
+            sender.execute(message);
+            return;
+        }
+
         message.setChatId(chatId);
         message.setText("select workspace");
-        message.setReplyMarkup(KeyboardFactory.getWorkspaces());
+        message.setReplyMarkup(KeyboardFactory.getWorkspaces(workspaces));
         sender.execute(message);
         chatStates.put(chatId, State.AWAITING_WORKSPACE_SELECTION);
     }
 
-    public void replyToButtons(long chatId, Message message) {
+    public void replyToButtons(long chatId, Message message, Optional<List<Task>> opt) {
         System.out.println("reply");
         if (message.getText().equalsIgnoreCase("/stop")) {
             stopChat(chatId);
@@ -75,9 +98,7 @@ public class ResponseHandler {
         switch (chatStates.get(chatId)) {
             case AWAITING_EMAIL -> replyToEmail(chatId, message);
             case AWAITING_ID -> replyToId(chatId, message);
-            // case VERIFYING_EMAIL -> checkDatabase(chatId);
-            // case AWAITING_ID -> replyToId(chatId, message);
-            case AWAITING_WORKSPACE_SELECTION -> replyToSelectedWorkspace(chatId, message);
+            case AWAITING_WORKSPACE_SELECTION -> replyToSelectedWorkspace(chatId, message, opt.get());
             case AWAITING_TASK_SELECTION -> replyToSelectedTask(chatId, message);
             default -> unexpectedMessage(chatId);
         }
@@ -102,8 +123,9 @@ public class ResponseHandler {
     public void completeVerification(long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setText(
-                "successfully linked to task application\n/workspaces - get all workspaces\n/edittask - edit task by workspace and task name\n/markcompleted - mark task as completed");
+        sendMessage.setText("successfully linked to task application\n/workspaces - get all workspaces\n" + //
+                "/edittask - edit task by workspace and task name\n" + //
+                "/markcompleted - mark task as completed");
         chatStates.remove(chatId);
         sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
         sender.execute(sendMessage);
@@ -146,43 +168,57 @@ public class ResponseHandler {
             sendMsg.setChatId(chatId);
             sendMsg.setText("invalid id format: id has 8 characters.\nplease try again");
             sender.execute(sendMsg);
-            chatStates.put(chatId, State.VERIFYING_EMAIL);
+            chatStates.put(chatId, State.AWAITING_ID);
             return;
         }
 
         SendMessage sendMsg = new SendMessage();
         sendMsg.setChatId(chatId);
-        sendMsg.setText("verifying id %s ... please wait".formatted(id));
+        sendMsg.setText("user verification completed!\nwelcome user!");
         sender.execute(sendMsg);
-
-        SendMessage sendMsg2 = new SendMessage();
-        sendMsg2.setChatId(chatId);
-        sendMsg2.setText("user verification completed!\nwelcome user!");
-        sender.execute(sendMsg2);
         chatStates.put(chatId, State.COMPLETE_VERIFICATION);
-        verified = true;
         completeVerification(chatId);
+
     }
 
-    public void replyToSelectedWorkspace(long chatId, Message message) {
-        String workspace = message.getText().trim();
-        System.out.printf("selected workspace: %s\n", workspace);
+    public void checkId(long chatId) {
+        System.out.println("sending error message");
+        SendMessage sendMsg2 = new SendMessage();
+        sendMsg2.setChatId(chatId);
+        sendMsg2.setText("incorrect id\nplease try again");
+        sender.execute(sendMsg2);
+        chatStates.put(chatId, State.AWAITING_EMAIL);
+        return;
+    }
+
+    public void replyToSelectedWorkspace(long chatId, Message message, List<Task> tasks) {
+        this.tasks = tasks;
+
         SendMessage msg = new SendMessage();
         msg.setChatId(chatId);
         msg.setText("select task");
-        msg.setReplyMarkup(KeyboardFactory.getTasks());
+        msg.setReplyMarkup(KeyboardFactory.getTasks(tasks));
         sender.execute(msg);
         chatStates.put(chatId, State.AWAITING_TASK_SELECTION);
     }
 
     public void replyToSelectedTask(long chatId, Message message) {
-        String task = message.getText().trim();
+        String selectedTask = message.getText().trim();
+
+        Task task = new Task();
+        for(Task t:tasks){
+            if(t.getTask().equals(selectedTask)){
+                task = t;
+            }
+        }
+
         SendMessage msg = new SendMessage();
         msg.setChatId(chatId);
-        msg.setText("display task");
-        msg.setReplyMarkup(new ReplyKeyboardRemove(true));
+        msg.setText("task details:\nname: %s\npriority: %s\nstatus: %s\nstart date: %s\ndue date: %s\ncompleted: %b"
+            .formatted(task.getTask(), task.getPriority(), task.getStatus(), new Date(task.getStart()).toString(), new Date(task.getDue()).toString(), task.isCompleted()));
+        msg.setReplyMarkup(KeyboardFactory.taskActions());
         sender.execute(msg);
-        chatStates.put(chatId, State.AWAITING_TASK_SELECTION);
+        chatStates.put(chatId, State.DISPLAY_TASK);
     }
 
     public boolean userIsActive(Long chatId) {
