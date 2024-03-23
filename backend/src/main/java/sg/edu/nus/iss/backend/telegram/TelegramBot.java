@@ -135,6 +135,19 @@ public class TelegramBot extends AbilityBot {
 
                     break;
 
+                // edit task details
+                case "name":
+                case "status":
+                case "priority":
+                case "start":
+                case "due":
+                case "complete":
+                case "back":
+                    String toEdit = update.getCallbackQuery().getData();
+                    int msgId = update.getCallbackQuery().getMessage().getMessageId();
+                    responseHandler.replyToEditVariable(getChatId(update), toEdit, msgId);
+                    break;
+
                 default:
                     break;
             }
