@@ -46,7 +46,7 @@ public class KeyboardFactory {
         return ReplyKeyboardMarkup.builder().keyboard(keyboardRows).build();
     }
 
-    public static ReplyKeyboard taskActions() {
+    public static InlineKeyboardMarkup taskActions() {
         InlineKeyboardButton edit = InlineKeyboardButton.builder().text("edit").callbackData("edit").build();
         InlineKeyboardButton complete = InlineKeyboardButton.builder().text("mark as complete")
                 .callbackData("markcomplete").build();
@@ -58,16 +58,51 @@ public class KeyboardFactory {
         InlineKeyboardButton status = InlineKeyboardButton.builder().text("status").callbackData("status").build();
         InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { name, status };
 
-        InlineKeyboardButton priority = InlineKeyboardButton.builder().text("priority").callbackData("priority").build();
+        InlineKeyboardButton priority = InlineKeyboardButton.builder().text("priority").callbackData("priority")
+                .build();
         InlineKeyboardButton start = InlineKeyboardButton.builder().text("start").callbackData("start").build();
         InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { priority, start };
 
         InlineKeyboardButton due = InlineKeyboardButton.builder().text("due").callbackData("due").build();
-        InlineKeyboardButton complete = InlineKeyboardButton.builder().text("complete").callbackData("complete").build();
+        InlineKeyboardButton complete = InlineKeyboardButton.builder().text("complete").callbackData("complete")
+                .build();
         InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { due, complete };
 
         InlineKeyboardButton back = InlineKeyboardButton.builder().text("back").callbackData("back").build();
 
-        return InlineKeyboardMarkup.builder().keyboardRow(List.of(row1)).keyboardRow(List.of(row2)).keyboardRow(List.of(row3)).keyboardRow(List.of(back)).build();
+        return InlineKeyboardMarkup.builder().keyboardRow(List.of(row1)).keyboardRow(List.of(row2))
+                .keyboardRow(List.of(row3)).keyboardRow(List.of(back)).build();
     }
+
+    public static ReplyKeyboard getStatusKeyboard() {
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("In Progress");
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("In Review");
+        KeyboardRow row3 = new KeyboardRow();
+        row3.add("On Hold");
+        KeyboardRow row4 = new KeyboardRow();
+        row4.add("Completed");
+        return ReplyKeyboardMarkup.builder().keyboardRow(row1).keyboardRow(row2).keyboardRow(row3).keyboardRow(row4).build();
+    }
+
+    public static ReplyKeyboard getPriorityKeyboard(){
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Low");
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Medium");
+        KeyboardRow row3 = new KeyboardRow();
+        row3.add("High");
+        return ReplyKeyboardMarkup.builder().keyboardRow(row1).keyboardRow(row2).keyboardRow(row3).build();
+    }
+
+    public static ReplyKeyboard getTrueOrFalse() {
+        KeyboardRow t = new KeyboardRow();
+        t.add("true");
+        KeyboardRow f = new KeyboardRow();
+        f.add("false");
+        return ReplyKeyboardMarkup.builder().keyboardRow(t).keyboardRow(f).build();
+    }
+
+    
 }
