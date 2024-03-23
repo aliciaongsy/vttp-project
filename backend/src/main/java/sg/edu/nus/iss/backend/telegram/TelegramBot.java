@@ -80,8 +80,9 @@ public class TelegramBot extends AbilityBot {
                 .privacy(PUBLIC)
                 .action(ctx -> {
                     boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
-                    if (linked){
+                    if (linked) {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
+                        System.out.println(id);
                     }
                     List<String> workspaces = teleSvc.getWorkspacesById(id);
                     responseHandler.replyToWorkspaces(ctx.chatId(), linked, workspaces);
@@ -89,29 +90,61 @@ public class TelegramBot extends AbilityBot {
                 .build();
     }
 
+    public Ability stopBot() {
+        return Ability
+                .builder()
+                .name("stop")
+                .info("stop bot")
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> responseHandler.replyToStop(ctx.chatId()))
+                .build();
+    }
+
     @Override
     public void onUpdateReceived(Update update) {
         super.onUpdateReceived(update);
-        if(update.hasCallbackQuery()){
+        if (update.hasCallbackQuery()) {
             switch (update.getCallbackQuery().getData()) {
                 case "edit":
-                    
+                    int messageId = update.getCallbackQuery().getMessage().getMessageId();
+                    responseHandler.replyToEditTask(getChatId(update), messageId);
                     break;
 
                 case "markcomplete":
+                    // get task details
+                    String text = update.getCallbackQuery().getMessage().getText();
+
+                    String[] split = text.split("\n");
+
+                    // get task id
+                    String id = split[1];
+                    String taskId = id.split(":")[1].trim();
+
+                    // get complete boolean
+                    String complete = split[7];
+                    boolean completeStatus = Boolean.valueOf(complete.split(":")[1].trim());
+                    System.out.println(completeStatus);
+
+                    if (completeStatus) {
+                        responseHandler.replyToCompletedTask(getChatId(update), completeStatus, false);
+                    } else {
+                        boolean updated = teleSvc.updateCompleteStatus(this.id, selectedWorkspace, taskId, true);
+                        responseHandler.replyToCompletedTask(getChatId(update), completeStatus, updated);
+                    }
 
                     break;
-            
+
                 default:
                     break;
             }
-                
+
         }
     }
 
     public Reply replyToButtons() {
         BiConsumer<BaseAbilityBot, Update> action = (abilityBot, upd) -> {
-            
+
             State state = responseHandler.getChatStates().get(getChatId(upd));
             System.out.println(state);
 
@@ -138,7 +171,7 @@ public class TelegramBot extends AbilityBot {
                     teleSvc.addTelegramDetails(getChatId(upd), upd.getMessage().getFrom().getUserName(), email,
                             upd.getMessage().getText());
                     responseHandler.replyToButtons(getChatId(upd), upd.getMessage(), Optional.empty());
-                    break;      
+                    break;
 
                 case State.AWAITING_WORKSPACE_SELECTION:
                     selectedWorkspace = upd.getMessage().getText();
