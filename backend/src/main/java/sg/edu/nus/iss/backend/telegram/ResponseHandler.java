@@ -214,11 +214,12 @@ public class ResponseHandler {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
         msg.setText(
-                "task details:\nid: %s\nname: %s\npriority: %s\nstatus: %s\nstart date: %s\ndue date: %s\ncompleted: %b"
+                "*task details:*\n*id:* %s\n*name:* %s\n*priority:* %s\n*status:* %s\n*start date:* %s\n*due date:* %s\n*completed:* _%b_"
                         .formatted(task.getId(), task.getTask(), task.getPriority(), task.getStatus(),
                                 simpleDateFormat.format(new Date(task.getStart())), simpleDateFormat.format(new Date(task.getDue())),
                                 task.isCompleted()));
         msg.setReplyMarkup(new ReplyKeyboardRemove(true));
+        msg.setParseMode("Markdown");
         msg.setReplyMarkup(KeyboardFactory.taskActions());
         sender.execute(msg);
         chatStates.put(chatId, State.DISPLAY_TASK);
