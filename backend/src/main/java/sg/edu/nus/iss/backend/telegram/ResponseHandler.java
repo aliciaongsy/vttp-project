@@ -1,5 +1,6 @@
 package sg.edu.nus.iss.backend.telegram;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -208,18 +209,23 @@ public class ResponseHandler {
 
         SendMessage msg = new SendMessage();
         msg.setChatId(chatId);
+
+        String pattern = "dd/MM/yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
         msg.setText(
-                "task details:\nid:%s\nname: %s\npriority: %s\nstatus: %s\nstart date: %s\ndue date: %s\ncompleted: %b"
+                "task details:\nid: %s\nname: %s\npriority: %s\nstatus: %s\nstart date: %s\ndue date: %s\ncompleted: %b"
                         .formatted(task.getId(), task.getTask(), task.getPriority(), task.getStatus(),
-                                new Date(task.getStart()).toString(), new Date(task.getDue()).toString(),
+                                simpleDateFormat.format(new Date(task.getStart())), simpleDateFormat.format(new Date(task.getDue())),
                                 task.isCompleted()));
+        msg.setReplyMarkup(new ReplyKeyboardRemove(true));
         msg.setReplyMarkup(KeyboardFactory.taskActions());
         sender.execute(msg);
         chatStates.put(chatId, State.DISPLAY_TASK);
     }
 
     // --- task actions ---
-    public void replyToEditTask(long chatId, int messageId){
+    public void replyToEditTask(long chatId, int messageId) {
 
         EditMessageReplyMarkup message = new EditMessageReplyMarkup();
         message.setChatId(chatId);
@@ -242,7 +248,7 @@ public class ResponseHandler {
         }
 
         // successful update
-        if (updateStatus){
+        if (updateStatus) {
             message.setChatId(chatId);
             message.setText("successfully marked task as complete");
             message.setReplyMarkup(new ReplyKeyboardRemove(true));
@@ -251,12 +257,60 @@ public class ResponseHandler {
         }
 
         // error updating
-        if (!updateStatus){
+        if (!updateStatus) {
             message.setChatId(chatId);
             message.setText("error marking task as complete");
             message.setReplyMarkup(new ReplyKeyboardRemove(true));
             sender.execute(message);
             return;
+        }
+
+    }
+
+    public void replyToEditVariable(long chatId, String variable, int messageId) {
+        SendMessage message = new SendMessage();
+
+        switch (variable) {
+            case "status":
+                message.setChatId(chatId);
+                message.setText("select status");
+                message.setReplyMarkup(KeyboardFactory.getStatusKeyboard());
+                sender.execute(message);
+                break;
+
+            case "priority":
+                message.setChatId(chatId);
+                message.setText("select priority");
+                message.setReplyMarkup(KeyboardFactory.getPriorityKeyboard());
+                sender.execute(message);
+                break;
+
+            case "complete":
+                message.setChatId(chatId);
+                message.setText("select true or false");
+                message.setReplyMarkup(KeyboardFactory.getTrueOrFalse());
+                sender.execute(message);
+                break;
+
+            case "start":
+            case "due":
+                message.setChatId(chatId);
+                message.setText("input new date in dd/MM/yyyy format");
+                sender.execute(message);
+
+            case "back":
+                EditMessageReplyMarkup msg = new EditMessageReplyMarkup();
+                msg.setChatId(chatId);
+                msg.setMessageId(messageId);
+                msg.setReplyMarkup(KeyboardFactory.taskActions());
+                sender.execute(msg);
+                break;
+
+            default:
+                message.setChatId(chatId);
+                message.setText("input new value for task's %s".formatted(variable));
+                sender.execute(message);
+                break;
         }
 
     }
