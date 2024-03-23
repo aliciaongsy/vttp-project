@@ -20,6 +20,7 @@ public class TelegramService {
     @Autowired
     private TaskRepository taskRepo;
 
+    // --- user repository ---
     public boolean checkLinkedAccount(long chatid){
         return userRepo.checkIfAccountIsLinked(Long.toString(chatid));
     }
@@ -41,6 +42,7 @@ public class TelegramService {
         return userRepo.addTelegramDetails(Long.toString(chatid), username, email, id);
     }
 
+    // --- task repository ---
     public List<String> getWorkspacesById(String id){
         return taskRepo.getWorkspacesById(id);
     }
@@ -49,4 +51,9 @@ public class TelegramService {
         Comparator<Task> comparator = Comparator.comparing(t -> t.getTask());
         return taskRepo.getAllTasks(id, workspace).stream().sorted(comparator).collect(Collectors.toList());
     }
+
+    public boolean updateCompleteStatus(String id, String workspace, String taskId, boolean complete){
+        return taskRepo.updateCompleteStatus(id, workspace, taskId, complete);
+    }
+
 }
