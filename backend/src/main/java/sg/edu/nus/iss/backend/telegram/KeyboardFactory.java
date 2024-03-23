@@ -25,14 +25,6 @@ public class KeyboardFactory {
             row.add(w);
             keyboardRows.add(row);
         }
-        // KeyboardRow row1 = new KeyboardRow();
-        // row1.add("workspace 1");
-        // KeyboardRow row2 = new KeyboardRow();
-        // row2.add("workspace 2");
-        // KeyboardRow row3 = new KeyboardRow();
-        // row3.add("workspace 3");
-        // KeyboardRow row4 = new KeyboardRow();
-        // row4.add("workspace 4");
         return ReplyKeyboardMarkup.builder().keyboard(keyboardRows).build();
     }
 
