@@ -46,9 +46,28 @@ public class KeyboardFactory {
         return ReplyKeyboardMarkup.builder().keyboard(keyboardRows).build();
     }
 
-    public static ReplyKeyboard taskActions(){
+    public static ReplyKeyboard taskActions() {
         InlineKeyboardButton edit = InlineKeyboardButton.builder().text("edit").callbackData("edit").build();
-        InlineKeyboardButton complete = InlineKeyboardButton.builder().text("mark as complete").callbackData("markcomplete").build();
+        InlineKeyboardButton complete = InlineKeyboardButton.builder().text("mark as complete")
+                .callbackData("markcomplete").build();
         return InlineKeyboardMarkup.builder().keyboardRow(List.of(edit)).keyboardRow(List.of(complete)).build();
+    }
+
+    public static InlineKeyboardMarkup editTasks() {
+        InlineKeyboardButton name = InlineKeyboardButton.builder().text("name").callbackData("name").build();
+        InlineKeyboardButton status = InlineKeyboardButton.builder().text("status").callbackData("status").build();
+        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { name, status };
+
+        InlineKeyboardButton priority = InlineKeyboardButton.builder().text("priority").callbackData("priority").build();
+        InlineKeyboardButton start = InlineKeyboardButton.builder().text("start").callbackData("start").build();
+        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { priority, start };
+
+        InlineKeyboardButton due = InlineKeyboardButton.builder().text("due").callbackData("due").build();
+        InlineKeyboardButton complete = InlineKeyboardButton.builder().text("complete").callbackData("complete").build();
+        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { due, complete };
+
+        InlineKeyboardButton back = InlineKeyboardButton.builder().text("back").callbackData("back").build();
+
+        return InlineKeyboardMarkup.builder().keyboardRow(List.of(row1)).keyboardRow(List.of(row2)).keyboardRow(List.of(row3)).keyboardRow(List.of(back)).build();
     }
 }
