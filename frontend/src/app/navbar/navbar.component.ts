@@ -45,8 +45,8 @@ export class NavbarComponent implements OnInit{
             // this.store.signOut()
             this.ngrx.dispatch(resetState())
             this.ngrx.dispatch(resetTaskState())
-            this.router.navigate(['/home'])
-          }
+          },
+          routerLink: ['/']
       }
   ];
   }
