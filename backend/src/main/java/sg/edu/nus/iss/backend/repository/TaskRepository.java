@@ -1,6 +1,9 @@
 package sg.edu.nus.iss.backend.repository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -255,6 +258,53 @@ public class TaskRepository {
             .set("tasks.$.due", task.getDue())            
             .set("tasks.$.completed", task.isCompleted());
         
+        UpdateResult update = template.updateFirst(query, updateOps, "tasks");
+
+        return update.getModifiedCount() > 0;
+    }
+
+        /* db.tasks.updateOne(
+        {
+            "id": "d73726d8",
+            "workspace":"workspace1",
+            "tasks": {"$elemMatch": {"id": "618d9d7b"}}
+        },
+        {
+            "$set": {"tasks.$.completed": false}
+            "$set": {"tasks.$.status": }
+        }
+    ); */
+    public boolean updateTaskByAttribute(String id, String workspace, String taskId, String variable, String value){
+        Criteria criteria = Criteria.where("id").is(id)
+            .andOperator(Criteria.where("workspace").is(workspace), Criteria.where("tasks").elemMatch(Criteria.where("id").is(taskId)));
+        
+        Query query = new Query(criteria);
+
+        Update updateOps = new Update();
+        // updating status
+        if (variable.equals("status")){
+            updateOps.set("tasks.$.status", value);
+            // if value of status change is "Completed", update complete variable
+            if (value.equals("Completed")){
+                updateOps.set("tasks.$.completed", true);
+            }
+        }
+        else if (variable.equals("start") || variable.equals("due")){
+            // convert string "dd/MM/yyyy" to long
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                Date date = format.parse(value);
+                long milliseconds = date.getTime();
+                updateOps.set("tasks.$.%s".formatted(variable), milliseconds);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            updateOps.set("tasks.$.%s".formatted(variable), value);
+        }
+        
+    
         UpdateResult update = template.updateFirst(query, updateOps, "tasks");
 
         return update.getModifiedCount() > 0;
