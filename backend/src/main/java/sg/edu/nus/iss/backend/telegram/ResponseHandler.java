@@ -71,7 +71,36 @@ public class ResponseHandler {
     }
 
     // workspaces
-    public void replyToWorkspaces(long chatId, boolean linked, List<String> workspaces) {
+     public void replyToWorkspaces(long chatId, boolean linked, List<String> workspaces) {
+        SendMessage message = new SendMessage();
+        // check if user has been verified
+        if (!linked) {
+            message.setChatId(chatId);
+            message.setText("please link account to proceed");
+            message.setReplyMarkup(KeyboardFactory.linkAccount());
+            sender.execute(message);
+            return;
+        }
+
+        if (workspaces.isEmpty()) {
+            message.setChatId(chatId);
+            message.setText("no existing workspace");
+            sender.execute(message);
+            return;
+        }
+
+        String text = "";
+        for (String w: workspaces){
+            text += w+"\n";
+        }
+        message.setChatId(chatId);
+        message.setText("*list of workspaces:*\n"+text);
+        message.setParseMode("Markdown");
+        sender.execute(message);
+    }
+
+    // edittask
+    public void replyToEditTask(long chatId, boolean linked, List<String> workspaces) {
         SendMessage message = new SendMessage();
         // check if user has been verified
         if (!linked) {
@@ -250,8 +279,39 @@ public class ResponseHandler {
         
     }
 
+    public void replyToValidationError(long chatId, String error){
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        switch (error) {
+            case "task length":
+                message.setText("name must contain at least 3 characters\nplease input name again");
+                message.setReplyMarkup(new ReplyKeyboardRemove(true));
+                sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
+                
+                break;
+
+            case "date format":
+                message.setText("incorrect date format\nplease input date in \"dd/MM/yyyy\" format");
+                message.setReplyMarkup(new ReplyKeyboardRemove(true));
+                sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
+                break;
+
+            case "past date":
+                message.setText("due date cannot be earlier than today\nplease input the correct date");
+                message.setReplyMarkup(new ReplyKeyboardRemove(true));
+                sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
+                break;
+        
+            default:
+                break;
+        }
+    }
+
     // --- task actions ---
-    public void replyToEditTask(long chatId, int messageId) {
+    public void replyToEdit(long chatId, int messageId) {
 
         EditMessageReplyMarkup message = new EditMessageReplyMarkup();
         message.setChatId(chatId);
@@ -297,6 +357,13 @@ public class ResponseHandler {
         SendMessage message = new SendMessage();
 
         switch (variable) {
+            case "task":
+                message.setChatId(chatId);
+                message.setText("input new task name (min 3 characters)");
+                sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
+                break;
+
             case "status":
                 message.setChatId(chatId);
                 message.setText("select status");
@@ -360,8 +427,9 @@ public class ResponseHandler {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText("successfully linked to task application\n/workspaces - get all workspaces\n" + //
-                "/edittask - edit task by workspace and task name\n" + //
-                "/markcompleted - mark task as completed");
+                "/edit - edit task by workspace and task name\n" + //
+                "/duesoon - get task with earliest due date\n" + //
+                "/outstandingtask - get all outstanding tasks");
         chatStates.remove(chatId);
         sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
         sender.execute(sendMessage);
