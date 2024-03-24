@@ -119,6 +119,7 @@ public class ResponseHandler {
             case AWAITING_ID -> replyToId(chatId, message);
             case AWAITING_WORKSPACE_SELECTION -> replyToSelectedWorkspace(chatId, message, opt.get());
             case AWAITING_TASK_SELECTION -> replyToSelectedTask(chatId, message);
+            case AWAITING_EDIT -> replyToEdit(chatId, message, opt.get());
             default -> unexpectedMessage(chatId);
         }
     }
@@ -198,6 +199,7 @@ public class ResponseHandler {
     }
 
     public void replyToSelectedTask(long chatId, Message message) {
+
         String selectedTask = message.getText().trim();
 
         Task task = new Task();
@@ -216,13 +218,36 @@ public class ResponseHandler {
         msg.setText(
                 "*task details:*\n*id:* %s\n*name:* %s\n*priority:* %s\n*status:* %s\n*start date:* %s\n*due date:* %s\n*completed:* _%b_"
                         .formatted(task.getId(), task.getTask(), task.getPriority(), task.getStatus(),
-                                simpleDateFormat.format(new Date(task.getStart())), simpleDateFormat.format(new Date(task.getDue())),
+                                simpleDateFormat.format(new Date(task.getStart())),
+                                simpleDateFormat.format(new Date(task.getDue())),
                                 task.isCompleted()));
         msg.setReplyMarkup(new ReplyKeyboardRemove(true));
         msg.setParseMode("Markdown");
         msg.setReplyMarkup(KeyboardFactory.taskActions());
         sender.execute(msg);
         chatStates.put(chatId, State.DISPLAY_TASK);
+    }
+
+    public void replyToEdit(long chatId, Message message, List<Task> tasks) {
+
+        SendMessage msg = new SendMessage();
+        // only update tasks list on successful edit
+        if (!tasks.isEmpty()) {
+            this.tasks = tasks;
+            msg.setChatId(chatId);
+            msg.setText("successfully updated task details!\nchoose another task to view or press /stop to cancel");
+            msg.setReplyMarkup(KeyboardFactory.getTasks(tasks));
+            
+        }
+        else{
+            msg.setChatId(chatId);
+            msg.setText("error updating task! select task and try again.");
+            msg.setReplyMarkup(KeyboardFactory.getTasks(this.tasks));
+        }
+
+        sender.execute(msg);
+        chatStates.put(chatId, State.AWAITING_TASK_SELECTION);
+        
     }
 
     // --- task actions ---
@@ -277,6 +302,7 @@ public class ResponseHandler {
                 message.setText("select status");
                 message.setReplyMarkup(KeyboardFactory.getStatusKeyboard());
                 sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
                 break;
 
             case "priority":
@@ -284,6 +310,7 @@ public class ResponseHandler {
                 message.setText("select priority");
                 message.setReplyMarkup(KeyboardFactory.getPriorityKeyboard());
                 sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
                 break;
 
             case "complete":
@@ -291,6 +318,7 @@ public class ResponseHandler {
                 message.setText("select true or false");
                 message.setReplyMarkup(KeyboardFactory.getTrueOrFalse());
                 sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
                 break;
 
             case "start":
@@ -298,6 +326,8 @@ public class ResponseHandler {
                 message.setChatId(chatId);
                 message.setText("input new date in dd/MM/yyyy format");
                 sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
+                break;
 
             case "back":
                 EditMessageReplyMarkup msg = new EditMessageReplyMarkup();
@@ -311,6 +341,7 @@ public class ResponseHandler {
                 message.setChatId(chatId);
                 message.setText("input new value for task's %s".formatted(variable));
                 sender.execute(message);
+                chatStates.put(chatId, State.AWAITING_EDIT);
                 break;
         }
 
