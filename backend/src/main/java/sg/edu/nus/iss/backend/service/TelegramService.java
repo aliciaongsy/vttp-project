@@ -56,4 +56,8 @@ public class TelegramService {
         return taskRepo.updateCompleteStatus(id, workspace, taskId, complete);
     }
 
+    public boolean updateTaskDetails(String id, String workspace, String taskId, String variable, String value){
+        return taskRepo.updateTaskByAttribute(id, workspace, taskId, variable, value);
+    }
+
 }
