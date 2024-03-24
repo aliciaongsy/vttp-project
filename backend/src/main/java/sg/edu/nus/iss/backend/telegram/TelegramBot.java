@@ -35,6 +35,8 @@ public class TelegramBot extends AbilityBot {
 
     // tasks detail
     private String selectedWorkspace;
+    private String taskId;
+    private String varToEdit;
 
     public TelegramBot(Environment environment) {
         super(environment.getProperty("telegram.bot.token"), "tasks_sync_bot");
@@ -119,7 +121,7 @@ public class TelegramBot extends AbilityBot {
 
                     // get task id
                     String id = split[1];
-                    String taskId = id.split(":")[1].trim();
+                    this.taskId = id.split(":")[1].trim();
 
                     // get complete boolean
                     String complete = split[7];
@@ -129,23 +131,25 @@ public class TelegramBot extends AbilityBot {
                     if (completeStatus) {
                         responseHandler.replyToCompletedTask(getChatId(update), completeStatus, false);
                     } else {
-                        boolean updated = teleSvc.updateCompleteStatus(this.id, selectedWorkspace, taskId, true);
+                        boolean updated = teleSvc.updateCompleteStatus(this.id, selectedWorkspace, this.taskId, true);
                         responseHandler.replyToCompletedTask(getChatId(update), completeStatus, updated);
                     }
 
                     break;
 
                 // edit task details
-                case "name":
+                case "task":
                 case "status":
                 case "priority":
                 case "start":
                 case "due":
                 case "complete":
                 case "back":
-                    String toEdit = update.getCallbackQuery().getData();
+                    // variable chosen to make edit
+                    this.varToEdit = update.getCallbackQuery().getData();
+                    this.taskId = update.getCallbackQuery().getMessage().getText().split("\n")[1].split(":")[1].trim();
                     int msgId = update.getCallbackQuery().getMessage().getMessageId();
-                    responseHandler.replyToEditVariable(getChatId(update), toEdit, msgId);
+                    responseHandler.replyToEditVariable(getChatId(update), this.varToEdit, msgId);
                     break;
 
                 default:
@@ -190,6 +194,34 @@ public class TelegramBot extends AbilityBot {
                     selectedWorkspace = upd.getMessage().getText();
                     List<Task> tasks = teleSvc.getAllTasks(id, selectedWorkspace);
                     responseHandler.replyToButtons(getChatId(upd), upd.getMessage(), Optional.ofNullable(tasks));
+                    break;
+
+                case State.AWAITING_EDIT:
+                    String value = upd.getMessage().getText();
+                    boolean updated = false;
+                    System.out.println(this.varToEdit);
+                    switch (this.varToEdit) {
+                        case "complete":
+                            updated = teleSvc.updateCompleteStatus(this.id, selectedWorkspace, this.taskId,
+                                    Boolean.valueOf(value));
+                            break;
+
+                        default:
+                            updated = teleSvc.updateTaskDetails(this.id, selectedWorkspace, this.taskId, this.varToEdit,
+                                    value);
+                            break;
+                    }
+                    System.out.println(updated);
+                    // successful update
+                    if (updated) {
+                        // get updated tasks after making edits
+                        List<Task> tasksList = teleSvc.getAllTasks(id, selectedWorkspace);
+                        responseHandler.replyToButtons(getChatId(upd), upd.getMessage(), Optional.ofNullable(tasksList));
+                    } 
+                    // unsuccessful update
+                    else {
+                        responseHandler.replyToButtons(getChatId(upd), upd.getMessage(), Optional.empty());
+                    }
                     break;
 
                 default:
