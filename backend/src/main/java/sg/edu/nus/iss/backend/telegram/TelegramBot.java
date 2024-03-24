@@ -4,6 +4,9 @@ import static org.telegram.abilitybots.api.objects.Locality.USER;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 import static org.telegram.abilitybots.api.util.AbilityUtils.getChatId;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -92,6 +95,25 @@ public class TelegramBot extends AbilityBot {
                 .build();
     }
 
+    public Ability editTasksAbility(){
+        return Ability
+                .builder()
+                .name("edit")
+                .info("edit task")
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    if (linked) {
+                        id = teleSvc.getUserIdByChatId(ctx.chatId());
+                        System.out.println(id);
+                    }
+                    List<String> workspaces = teleSvc.getWorkspacesById(id);
+                    responseHandler.replyToEditTask(ctx.chatId(), linked, workspaces);
+                })
+                .build();
+    }
+
     public Ability stopBot() {
         return Ability
                 .builder()
@@ -110,7 +132,7 @@ public class TelegramBot extends AbilityBot {
             switch (update.getCallbackQuery().getData()) {
                 case "edit":
                     int messageId = update.getCallbackQuery().getMessage().getMessageId();
-                    responseHandler.replyToEditTask(getChatId(update), messageId);
+                    responseHandler.replyToEdit(getChatId(update), messageId);
                     break;
 
                 case "markcomplete":
@@ -162,6 +184,10 @@ public class TelegramBot extends AbilityBot {
     public Reply replyToButtons() {
         BiConsumer<BaseAbilityBot, Update> action = (abilityBot, upd) -> {
 
+            if (upd.getMessage().getText().equals("/stop")) {
+                responseHandler.replyToButtons(getChatId(upd), upd.getMessage(), Optional.empty());
+            }
+
             State state = responseHandler.getChatStates().get(getChatId(upd));
             System.out.println(state);
 
@@ -170,6 +196,7 @@ public class TelegramBot extends AbilityBot {
                     if (upd.getMessage().getText().length() > 5) {
                         email = upd.getMessage().getText();
                         boolean existingUser = teleSvc.checkUserExistInDatabase(email);
+                        // user does not exist in db
                         if (!existingUser) {
                             responseHandler.checkEmail(getChatId(upd));
                             break;
@@ -181,6 +208,7 @@ public class TelegramBot extends AbilityBot {
                 case State.AWAITING_ID:
                     id = upd.getMessage().getText();
                     boolean validId = teleSvc.checkUserId(email, upd.getMessage().getText());
+                    // invalid id
                     if (!validId) {
                         responseHandler.checkId(getChatId(upd));
                         break;
@@ -206,6 +234,56 @@ public class TelegramBot extends AbilityBot {
                                     Boolean.valueOf(value));
                             break;
 
+                        // validation
+                        case "task":
+                            if (value.length() < 3) {
+                                System.out.println("minimum 3 characters!");
+                                responseHandler.replyToValidationError(getChatId(upd), "task length");
+
+                            } else {
+                                updated = teleSvc.updateTaskDetails(this.id, selectedWorkspace, this.taskId,
+                                        this.varToEdit, value);
+                            }
+                            break;
+
+                        case "start":
+                        case "due":
+                            // validation check 1 - check if value matches "dd/MM/yyyy" format
+                            if (!value.matches("\\d{2}/\\d{2}/\\d{4}")) {
+                                // failed validation check 1
+                                System.out.println("pattern mismatched");
+                                responseHandler.replyToValidationError(getChatId(upd), "date format");
+                            }
+                            // passed validation check 1
+                            else {
+                                if (this.varToEdit.equals("due")) {
+                                    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                                    try {
+                                        Date date = format.parse(value);
+                                        // validation check 2 - check if due date is earlier than today
+                                        if (date.getTime() < new Date().getTime()) {
+                                            // failed validation check 2
+                                            System.out.println("due date cannot be before today");
+                                            responseHandler.replyToValidationError(getChatId(upd), "past date");
+
+                                        }
+                                        // passed validation check 2
+                                        else {
+                                            // only update repo if both validation passed
+                                            updated = teleSvc.updateTaskDetails(this.id, selectedWorkspace, this.taskId,
+                                                    this.varToEdit, value);
+                                        }
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    // for the case of "start" - only need to pass validation check 1
+                                    updated = teleSvc.updateTaskDetails(this.id, selectedWorkspace, this.taskId,
+                                            this.varToEdit, value);
+                                }
+                            }
+                            break;
+
                         default:
                             updated = teleSvc.updateTaskDetails(this.id, selectedWorkspace, this.taskId, this.varToEdit,
                                     value);
@@ -216,8 +294,9 @@ public class TelegramBot extends AbilityBot {
                     if (updated) {
                         // get updated tasks after making edits
                         List<Task> tasksList = teleSvc.getAllTasks(id, selectedWorkspace);
-                        responseHandler.replyToButtons(getChatId(upd), upd.getMessage(), Optional.ofNullable(tasksList));
-                    } 
+                        responseHandler.replyToButtons(getChatId(upd), upd.getMessage(),
+                                Optional.ofNullable(tasksList));
+                    }
                     // unsuccessful update
                     else {
                         responseHandler.replyToButtons(getChatId(upd), upd.getMessage(), Optional.empty());
