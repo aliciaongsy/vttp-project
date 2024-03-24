@@ -46,7 +46,7 @@ public class KeyboardFactory {
     }
 
     public static InlineKeyboardMarkup editTasks() {
-        InlineKeyboardButton name = InlineKeyboardButton.builder().text("name").callbackData("name").build();
+        InlineKeyboardButton name = InlineKeyboardButton.builder().text("name").callbackData("task").build();
         InlineKeyboardButton status = InlineKeyboardButton.builder().text("status").callbackData("status").build();
         InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { name, status };
 
