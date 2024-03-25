@@ -42,11 +42,6 @@ public class ResponseHandler {
         message.setText(
                 "hello %s,\nwelcome to task sync bot!\nto start, link to task application account".formatted(user));
 
-        // InlineKeyboardButton button = InlineKeyboardButton.builder().text("link
-        // account").callbackData("linkaccount").build();
-        // InlineKeyboardMarkup keyboard =
-        // InlineKeyboardMarkup.builder().keyboardRow(List.of(button)).build();
-
         message.setReplyMarkup(KeyboardFactory.linkAccount());
         sender.execute(message);
     }
@@ -55,7 +50,7 @@ public class ResponseHandler {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(
-                "hello %s, welcome back!\nhere are the list of commands:\n/workspaces - get all workspaces\n/edittask - edit task by workspace and task name\n/markcompleted - mark task as completed"
+                "hello %s, welcome back!\nhere are the list of commands:\n/workspaces - get all workspaces\n/edit - edit task by workspace and task name\n/duesoon - get task with earliest due date\n/outstandingtask - get all outstanding tasks"
                         .formatted(user));
         sender.execute(message);
     }
@@ -123,6 +118,28 @@ public class ResponseHandler {
         message.setReplyMarkup(KeyboardFactory.getWorkspaces(workspaces));
         sender.execute(message);
         chatStates.put(chatId, State.AWAITING_WORKSPACE_SELECTION);
+    }
+
+    // duesoon
+    public void replyToDueSoon(long chatId, boolean linked, Task task, String workspace){
+        SendMessage message = new SendMessage();
+        if (!linked) {
+            message.setChatId(chatId);
+            message.setText("please link account to proceed");
+            message.setReplyMarkup(KeyboardFactory.linkAccount());
+            sender.execute(message);
+            return;
+        }
+        String pattern = "dd/MM/yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        message.setChatId(chatId);
+        message.setText("task due soon:\n*workspace:* %s\n*name:* %s\n*priority:* %s\n*status:* %s\n*start date:* %s\n*due date:* %s\n*completed:* _%b_\n"
+            .formatted(workspace, task.getTask(), task.getPriority(), 
+                task.getStatus(), simpleDateFormat.format(new Date(task.getStart())), 
+                simpleDateFormat.format(new Date(task.getDue())),task.isCompleted()));
+        message.setParseMode("Markdown");
+        sender.execute(message);
     }
 
     // stop
