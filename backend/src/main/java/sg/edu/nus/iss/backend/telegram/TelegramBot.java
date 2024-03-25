@@ -114,6 +114,24 @@ public class TelegramBot extends AbilityBot {
                 .build();
     }
 
+    public Ability dueSoonAbility(){
+        return Ability
+                .builder()
+                .name("duesoon")
+                .info("task due soon")
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    if (linked) {
+                        id = teleSvc.getUserIdByChatId(ctx.chatId());
+                        System.out.println(id);
+                    }
+                    responseHandler.replyToDueSoon(ctx.chatId(), linked, teleSvc.getTaskDueSoon(), teleSvc.getTaskDueSoonWorkspace());
+                })
+                .build();
+    }
+
     public Ability stopBot() {
         return Ability
                 .builder()
