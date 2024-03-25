@@ -156,7 +156,7 @@ public class ResponseHandler {
         // no overdue task
         if (tasks.isEmpty()){
             message.setChatId(chatId);
-            message.setText("no overdue task! („• ֊ •„)੭");
+            message.setText("no overdue task!");
             sender.execute(message);
             return;
         }
