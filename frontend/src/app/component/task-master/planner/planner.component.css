@@ -1,0 +1,24 @@
+.row{
+    display: flex;
+    padding: 1ch 2ch;
+    height: min-content;
+}
+
+div #draggable{
+    padding-right: 1ch;
+    height: min-content;
+}
+
+#draggable .fc-event {
+    cursor: move;
+}
+
+div #calendar-container{
+    padding-left: 1ch;
+    width: 100%;
+    height: min-content;
+}
+
+.fc-view-harness.fc-view-harness-active {
+    height: 80vh;
+}
