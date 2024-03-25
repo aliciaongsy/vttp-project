@@ -31,9 +31,9 @@ export class TaskMasterComponent implements OnInit {
   tab: string = 'Overview'
 
   menuItems: MenuItem[] = [
-    { label: 'Overview', routerLink: 'overview' },
-    { label: 'Projects' },
-    { label: 'Tasks', routerLink: 'tasks' }
+    { label: 'Overview', routerLink: 'overview' },  
+    { label: 'Tasks', routerLink: 'tasks' },
+    { label: 'Planner', routerLink: 'planner' }
   ]
   activeTab = this.menuItems[0]
 

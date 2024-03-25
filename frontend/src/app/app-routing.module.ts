@@ -10,6 +10,7 @@ import { OverviewComponent } from './component/task-master/overview/overview.com
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { AccountComponent } from './component/account/account.component';
 import { canLeave } from './guard';
+import { PlannerComponent } from './component/task-master/planner/planner.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -20,7 +21,8 @@ const routes: Routes = [
     component: TaskMasterComponent,
     children: [
       { path: 'overview', component: OverviewComponent },
-      { path: 'tasks', component: TasksComponent }
+      { path: 'tasks', component: TasksComponent },
+      { path: 'planner', component: PlannerComponent }
     ]
    }, 
   { path: 'features', component: FeaturesComponent },
