@@ -1,1 +1,13 @@
-<p>planner works!</p>
+<div>
+    <div *ngIf="tasks | async as tasks" id="draggable">
+        <p>
+            <strong>Draggable Events</strong>
+        </p>
+        <div *ngFor="let t of tasks" class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
+            <div class='fc-event-main'>{{t.task}}</div>
+        </div>
+    </div>
+    <div>
+        <full-calendar [options]="calendarOptions"></full-calendar>
+    </div>
+</div>
