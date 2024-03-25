@@ -15,6 +15,10 @@ export const selectAllTasks = createSelector(
     selectTask,
     (state: TaskState) => state.tasks
 )
+export const selectAllOutstandingTasks = createSelector(
+    selectTask,
+    (state: TaskState) => state.tasks.filter(t => t.completed==false)
+)
 export const selectActionStatus = createSelector(
     selectTask,
     (state: TaskState) => state.actionStatus
