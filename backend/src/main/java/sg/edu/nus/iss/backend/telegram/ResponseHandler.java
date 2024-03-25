@@ -50,7 +50,7 @@ public class ResponseHandler {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(
-                "hello %s, welcome back!\nhere are the list of commands:\n/workspaces - get all workspaces\n/edit - edit task by workspace and task name\n/duesoon - get incomplete task with earliest due date\n/overduetask - get incomplete task that is overdue\n/outstandingtask - get all outstanding tasks"
+                "hello %s, welcome back!\nhere are the list of commands:\n/workspaces - get all workspaces\n/edit - edit task by workspace and task name\n/duesoon - get incomplete task with earliest due date\n/overduetask - get incomplete task that is overdue\n/outstandingtasks - get all outstanding tasks"
                         .formatted(user));
         sender.execute(message);
     }
@@ -174,6 +174,54 @@ public class ResponseHandler {
 
         message.setChatId(chatId);
         message.setText("*task(s) overdue:*\n"+text);
+        message.setParseMode("Markdown");
+        sender.execute(message);
+    }
+
+    // outstandingtasks
+    public void replyToOutstandingTasks(long chatId, boolean linked, List<Task> tasks, List<String> workspaces){
+        SendMessage message = new SendMessage();
+        if (!linked) {
+            message.setChatId(chatId);
+            message.setText("please link account to proceed");
+            message.setReplyMarkup(KeyboardFactory.linkAccount());
+            sender.execute(message);
+            return;
+        }
+
+        // no outstanding task
+        if (tasks.isEmpty()){
+            message.setChatId(chatId);
+            message.setText("no outstanding task!");
+            sender.execute(message);
+            return;
+        }
+
+        String pattern = "dd/MM/yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        String text = "";
+        String prevWs = workspaces.get(0);
+        for (int i = 0; i < tasks.size(); i++){
+            String currWs = workspaces.get(i);
+            if (i == 0 || !prevWs.equals(currWs)){
+                String msg = "\\[%s]\nname: %s\npriority: %s\nstatus: %s\nstart date: %s\ndue date: %s\ncompleted: %b\n"
+                .formatted(workspaces.get(i),tasks.get(i).getTask(), tasks.get(i).getPriority(), tasks.get(i).getStatus(), simpleDateFormat.format(new Date(tasks.get(i).getStart())), 
+                    simpleDateFormat.format(new Date(tasks.get(i).getDue())), tasks.get(i).isCompleted());
+                text += msg + "\n";
+                prevWs = currWs;
+            }
+            else {
+                String msg = "name: %s\npriority: %s\nstatus: %s\nstart date: %s\ndue date: %s\ncompleted: %b\n"
+                .formatted(tasks.get(i).getTask(), tasks.get(i).getPriority(), tasks.get(i).getStatus(), simpleDateFormat.format(new Date(tasks.get(i).getStart())), 
+                    simpleDateFormat.format(new Date(tasks.get(i).getDue())), tasks.get(i).isCompleted());
+                text += msg + "\n";
+                prevWs = currWs;
+            }
+        }
+
+        message.setChatId(chatId);
+        message.setText("*task(s) outstanding:*\n"+text);
         message.setParseMode("Markdown");
         sender.execute(message);
     }
@@ -483,7 +531,7 @@ public class ResponseHandler {
                 "/edit - edit task by workspace and task name\n" + //
                 "/duesoon - get incomplete task with earliest due date\n" + //
                 "/overduetask - get incomplete task that is overdue\n" + //
-                "/outstandingtask - get all outstanding tasks");
+                "/outstandingtasks - get all outstanding tasks");
         chatStates.remove(chatId);
         sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
         sender.execute(sendMessage);

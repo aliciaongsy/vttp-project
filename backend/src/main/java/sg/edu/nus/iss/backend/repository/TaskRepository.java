@@ -325,8 +325,7 @@ public class TaskRepository {
         {
             $sort: 
                 {
-                    "tasks.completed": 1,
-                    "tasks.due": 1,
+                    "tasks.due": 1
                 }
         },
         {
@@ -350,8 +349,7 @@ public class TaskRepository {
 
         MatchOperation matchOps = Aggregation.match(Criteria.where("tasks.due").gte(currentTime).andOperator(Criteria.where("tasks.completed").is(false)));
 
-        SortOperation sortOps = Aggregation.sort(Sort.by(Direction.ASC, "tasks.completed"))
-	        .and(Sort.by(Direction.ASC, "tasks.due"));
+        SortOperation sortOps = Aggregation.sort(Sort.by(Direction.ASC, "tasks.due"));
 
         ProjectionOperation projectOps = Aggregation.project()
                 .andExclude("_id")
@@ -392,8 +390,7 @@ public class TaskRepository {
         {
             $sort: 
                 {
-                    "tasks.completed": 1,
-                    "tasks.due": 1,
+                    "tasks.due": 1
                 }
         },
         {
@@ -417,7 +414,67 @@ public class TaskRepository {
 
         MatchOperation matchOps = Aggregation.match(Criteria.where("tasks.due").lt(currentTime).andOperator(Criteria.where("tasks.completed").is(false)));
 
-        SortOperation sortOps = Aggregation.sort(Sort.by(Direction.ASC, "tasks.completed"))
+        SortOperation sortOps = Aggregation.sort(Sort.by(Direction.ASC, "tasks.due"));
+
+        ProjectionOperation projectOps = Aggregation.project()
+                .andExclude("_id")
+                .and("workspace").as("workspace")
+                .and("tasks.id").as("id")
+                .and("tasks.task").as("task")
+                .and("tasks.status").as("status")
+                .and("tasks.priority").as("priority")
+                .and("tasks.start").as("start")
+                .and("tasks.due").as("due")
+                .and("tasks.completed").as("completed");
+
+        Aggregation pipeline = Aggregation.newAggregation(unwindOps, matchOps, sortOps, projectOps);
+
+        AggregationResults<Document> results = template.aggregate(pipeline, "tasks", Document.class);
+
+        List<Document> docs = results.getMappedResults();
+
+        return docs;
+    }
+
+    /*db.tasks.aggregate([
+        {
+            $unwind: "$tasks"
+        },
+        {
+            $match: {
+                "tasks.due": { $gte: 1711641600000 },
+                "tasks.completed": false
+            }
+        },
+        {
+            $sort: 
+                {
+                    "workspace": 1,
+                    "tasks.due": 1,
+                }
+        },
+        {
+            $project: {
+                _id: 0,
+                workspace: 1,
+                id: "$tasks.id",
+                task: "$tasks.task",
+                status: "$tasks.status",
+                priority: "$tasks.priority",
+                start: "$tasks.start",
+                due: "$tasks.due",
+                completed: "$tasks.completed"
+            }
+        }
+    ]); */
+    public List<Document> getOutstandingTasks(){
+        long currentTime = new Date().getTime();
+
+        AggregationOperation unwindOps = Aggregation.unwind("tasks");
+
+        MatchOperation matchOps = Aggregation.match(Criteria.where("tasks.due").gte(currentTime).andOperator(Criteria.where("tasks.completed").is(false)));
+
+        SortOperation sortOps = Aggregation.sort(Sort.by(Direction.ASC, "workspace"))
 	        .and(Sort.by(Direction.ASC, "tasks.due"));
 
         ProjectionOperation projectOps = Aggregation.project()
@@ -439,5 +496,6 @@ public class TaskRepository {
 
         return docs;
     }
+
 
 }

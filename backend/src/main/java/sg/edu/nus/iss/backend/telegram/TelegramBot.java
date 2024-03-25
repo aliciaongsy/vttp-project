@@ -150,6 +150,24 @@ public class TelegramBot extends AbilityBot {
                 .build();
     }
 
+    public Ability outstandingTaskAbility(){
+        return Ability
+                .builder()
+                .name("outstandingtasks")
+                .info("outstanding tasks")
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    if (linked) {
+                        id = teleSvc.getUserIdByChatId(ctx.chatId());
+                        System.out.println(id);
+                    }
+                    responseHandler.replyToOutstandingTasks(ctx.chatId(), linked, teleSvc.getOutstandingTasks(), teleSvc.getOutstandingTasksWorkspace());
+                })
+                .build();
+    }
+
     public Ability stopBot() {
         return Ability
                 .builder()

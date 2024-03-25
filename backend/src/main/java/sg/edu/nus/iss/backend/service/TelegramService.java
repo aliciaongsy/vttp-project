@@ -110,4 +110,35 @@ public class TelegramService {
         return workspaces;
     }
 
+    public List<Task> getOutstandingTasks(){
+        List<Document> docs = taskRepo.getOutstandingTasks();
+        if (docs.isEmpty()) {
+            return new LinkedList<>();
+        }
+
+        List<Task> tasks = new LinkedList<>();
+        docs.forEach(d -> {
+            Task t = new Task();
+            t = t.convertDocToTask(d);
+            tasks.add(t);
+        });
+
+        return tasks;
+    }
+
+     public List<String> getOutstandingTasksWorkspace(){
+        List<Document> docs = taskRepo.getOutstandingTasks();
+        if (docs.isEmpty()) {
+            return new LinkedList<>();
+        }
+
+        List<String> workspaces = new LinkedList<>();
+        docs.forEach(d -> {
+            String w = d.getString("workspace");
+            workspaces.add(w);
+        });
+
+        return workspaces;
+    }
+
 }
