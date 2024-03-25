@@ -37,6 +37,7 @@ input{
     padding-left: 20px;
     width: 250px;
     color: #010662;
+    font-family: 'Lora', sans-serif;
 }
 
 input:focus{
