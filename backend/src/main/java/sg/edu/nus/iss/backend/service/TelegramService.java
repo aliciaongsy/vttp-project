@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +59,23 @@ public class TelegramService {
 
     public boolean updateTaskDetails(String id, String workspace, String taskId, String variable, String value){
         return taskRepo.updateTaskByAttribute(id, workspace, taskId, variable, value);
+    }
+
+    public Task getTaskDueSoon(){
+        Document doc = taskRepo.getIncompleteTaskDueSoon();
+        Task task = new Task();
+        if (!doc.isEmpty()){
+            task = task.convertDocToTask(doc);
+        }
+        return task;
+    }
+
+    public String getTaskDueSoonWorkspace(){
+        Document doc = taskRepo.getIncompleteTaskDueSoon();
+        if (doc.isEmpty()){
+            return "";
+        }
+        return doc.getString("workspace");
     }
 
 }
