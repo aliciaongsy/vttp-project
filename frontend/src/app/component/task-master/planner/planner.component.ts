@@ -34,7 +34,7 @@ export class PlannerComponent implements OnInit {
     droppable: true,
     editable: true,
     headerToolbar: {
-      left: 'prev,next',
+      left: 'prev,next today',
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     }
