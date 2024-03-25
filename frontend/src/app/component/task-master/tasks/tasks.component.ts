@@ -113,7 +113,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   createForm(): FormGroup {
     return this.fb.group({
-      task: this.fb.control<string>('', [Validators.required]),
+      task: this.fb.control<string>('', [Validators.required, Validators.minLength(3)]),
       status: this.fb.control<string>('In Progress', [Validators.required]),
       priority: this.fb.control<string>('Low', [Validators.required]),
       start: this.fb.control<Date>(new Date()),
