@@ -44,6 +44,7 @@ import { userReducer } from './state/user/user.reducer';
 import { taskReducer } from './state/tasks/task.reducer';
 import { TaskEffects } from './state/tasks/task.effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { PlannerComponent } from './component/task-master/planner/planner.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     FeaturesComponent,
     OverviewComponent,
     TasksComponent,
-    AccountComponent
+    AccountComponent,
+    PlannerComponent
   ],
   imports: [
     BrowserModule,
