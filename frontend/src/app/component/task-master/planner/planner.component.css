@@ -4,6 +4,7 @@
     height: min-content;
 }
 
+/* draggable */
 div #draggable{
     padding-right: 1ch;
     height: min-content;
@@ -13,6 +14,15 @@ div #draggable{
     cursor: move;
 }
 
+.fc-h-event {
+    background-color: #010662;
+    border: 1px solid #010662;
+    padding: 1mm 1mm;
+    margin: 1ch 0;
+    display: block;
+}
+
+/* calendar */
 div #calendar-container{
     padding-left: 1ch;
     width: 100%;
@@ -22,3 +32,4 @@ div #calendar-container{
 .fc-view-harness.fc-view-harness-active {
     height: 80vh;
 }
+
