@@ -1,6 +1,7 @@
 package sg.edu.nus.iss.backend.service;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,6 +77,37 @@ public class TelegramService {
             return "";
         }
         return doc.getString("workspace");
+    }
+
+    public List<Task> getOverdueTask(){
+        List<Document> docs = taskRepo.getOverdueTask();
+        if (docs.isEmpty()) {
+            return new LinkedList<>();
+        }
+
+        List<Task> tasks = new LinkedList<>();
+        docs.forEach(d -> {
+            Task t = new Task();
+            t = t.convertDocToTask(d);
+            tasks.add(t);
+        });
+
+        return tasks;
+    }
+
+    public List<String> getOverdueTaskWorkspace(){
+        List<Document> docs = taskRepo.getOverdueTask();
+        if (docs.isEmpty()) {
+            return new LinkedList<>();
+        }
+
+        List<String> workspaces = new LinkedList<>();
+        docs.forEach(d -> {
+            String w = d.getString("workspace");
+            workspaces.add(w);
+        });
+
+        return workspaces;
     }
 
 }

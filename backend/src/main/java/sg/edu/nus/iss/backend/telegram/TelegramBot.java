@@ -132,6 +132,24 @@ public class TelegramBot extends AbilityBot {
                 .build();
     }
 
+    public Ability overdueTaskAbility(){
+        return Ability
+                .builder()
+                .name("overduetask")
+                .info("overdue task")
+                .locality(USER)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    if (linked) {
+                        id = teleSvc.getUserIdByChatId(ctx.chatId());
+                        System.out.println(id);
+                    }
+                    responseHandler.replyToOverdueTask(ctx.chatId(), linked, teleSvc.getOverdueTask(), teleSvc.getOverdueTaskWorkspace());
+                })
+                .build();
+    }
+
     public Ability stopBot() {
         return Ability
                 .builder()
