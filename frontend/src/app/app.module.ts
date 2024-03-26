@@ -46,6 +46,8 @@ import { taskReducer } from './state/tasks/task.reducer';
 import { TaskEffects } from './state/tasks/task.effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { PlannerComponent } from './component/task-master/planner/planner.component';
+import { PlannerEffects } from './state/planner/planner.effects';
+import { plannerReducer } from './state/planner/planner.reducer';
 
 @NgModule({
   declarations: [
@@ -83,9 +85,9 @@ import { PlannerComponent } from './component/task-master/planner/planner.compon
     TagModule,
     CheckboxModule,
     ToastModule,
-    StoreModule.forRoot({user: userReducer, task: taskReducer}),
+    StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer}),
     StoreDevtoolsModule.instrument({maxAge: 25}),
-    EffectsModule.forRoot([UserEffects, TaskEffects]),
+    EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
     FullCalendarModule
   ],
