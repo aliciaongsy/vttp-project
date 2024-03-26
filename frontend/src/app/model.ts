@@ -45,3 +45,10 @@ export interface UserTask {
     id: string // user id
     task: Task[]
 }
+
+export interface Event {
+    title: string
+    start: string
+    end?: string
+    allDay?: boolean
+}
