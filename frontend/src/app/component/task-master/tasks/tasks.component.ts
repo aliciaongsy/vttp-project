@@ -48,8 +48,6 @@ export class TasksComponent implements OnInit, OnDestroy {
   sortableCols: string[] = ['status', 'priority', 'due']
 
   // store data
-  error$!: Subscription
-  error!: string
   actionStatus$!: Subscription
   actionStatus!: string
 
@@ -108,7 +106,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.error$.unsubscribe()
+    this.actionStatus$.unsubscribe()
   }
 
   createForm(): FormGroup {
