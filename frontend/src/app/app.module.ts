@@ -20,6 +20,8 @@ import { OverviewComponent } from './component/task-master/overview/overview.com
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { TaskService } from './service/task.service';
 import { AccountComponent } from './component/account/account.component';
+import { PlannerComponent } from './component/task-master/planner/planner.component';
+import { FocusComponent } from './component/task-master/focus/focus.component';
 
 // primeng imports
 import { DialogModule } from 'primeng/dialog';
@@ -45,7 +47,6 @@ import { userReducer } from './state/user/user.reducer';
 import { taskReducer } from './state/tasks/task.reducer';
 import { TaskEffects } from './state/tasks/task.effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { PlannerComponent } from './component/task-master/planner/planner.component';
 import { PlannerEffects } from './state/planner/planner.effects';
 import { plannerReducer } from './state/planner/planner.reducer';
 
@@ -62,7 +63,8 @@ import { plannerReducer } from './state/planner/planner.reducer';
     OverviewComponent,
     TasksComponent,
     AccountComponent,
-    PlannerComponent
+    PlannerComponent,
+    FocusComponent
   ],
   imports: [
     BrowserModule,
