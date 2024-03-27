@@ -1,18 +1,17 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
+import timeGridPlugin from '@fullcalendar/timegrid';
 import { Store } from '@ngrx/store';
-import { selectAllOutstandingTasks } from '../../../state/tasks/task.selector';
-import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
-import { selectUserDetails } from '../../../state/user/user.selectors';
-import { loadAllTasks } from '../../../state/tasks/task.actions';
 import { Event, Task } from '../../../model';
 import { addEvent, loadAllEvents } from '../../../state/planner/planner.actions';
-import { selectAllEvents } from '../../../state/planner/planner.selector';
-import { resetState } from '../../../state/user/user.actions';
+import { selectAllEvents, selectLoadStatus } from '../../../state/planner/planner.selector';
+import { loadAllTasks } from '../../../state/tasks/task.actions';
+import { selectAllOutstandingTasks } from '../../../state/tasks/task.selector';
+import { selectUserDetails } from '../../../state/user/user.selectors';
 
 @Component({
   selector: 'app-planner',
@@ -31,8 +30,8 @@ export class PlannerComponent implements OnInit, OnDestroy {
 
   calendar!: Calendar
   events: Event[] = []
-  draggable!: Draggable
   events$!: Subscription
+  loadStatus$!: Subscription
 
   ngOnInit(): void {
 
@@ -44,21 +43,42 @@ export class PlannerComponent implements OnInit, OnDestroy {
       this.ngrxStore.dispatch(loadAllTasks({ id: value.id, workspace: this.currentWorkspace }))
       this.ngrxStore.dispatch(loadAllEvents({ id: value.id, workspace: this.currentWorkspace }))
     })
+
     this.tasks$ = this.ngrxStore.select(selectAllOutstandingTasks).pipe(
       map((value) => {
         return [...value]
       })
     )
+
     firstValueFrom(this.tasks$)
-      .then(() => {
+      .then((task) => {
         this.events$ = this.ngrxStore.select(selectAllEvents).subscribe(
           value => {
             this.events = value
             this.loadCalendar()
           }
         )
+
+        this.loadStatus$ = this.ngrxStore.select(selectLoadStatus).subscribe(
+          value => {
+            if (value==="complete"){
+              for (var t of task) {
+                const event: Event = {
+                  title: t.task,
+                  start: new Date(t.due).toISOString(),
+                  end: '',
+                  allDay: true,
+                  backgroundColor: '#8B0000'
+                }
+                this.events = [...this.events, event]
+              }
+            }
+            console.info(this.events)
+            this.loadCalendar()
+          }
+        )
       })
-      .then(() => {
+      .then(()=> {
         this.loadCalendar();
 
         var draggableEl = document.getElementById('draggable')
@@ -69,33 +89,35 @@ export class PlannerComponent implements OnInit, OnDestroy {
               title: eventEl.innerText
             };
           }
-        });
-
+        })  
       })
   }
 
   ngOnDestroy(): void {
     const events: any[] = this.calendar.getEvents()
-    if (events.length != 0) {
+    if(events.length != 0) {
       var eventsToAdd: Event[] = []
       for (var e of events) {
-        const event: Event = {
+        if (e.backgroundColor==""){
+          const event: Event = {
           title: e.title,
           start: e.start,
           end: e.end == null ? '' : e.end,
           allDay: e.allDay
+          }
+          console.info(event)
+          eventsToAdd.push(event)
         }
-        console.info(event)
-        eventsToAdd.push(event)
       }
       // persist to planner state
       this.ngrxStore.dispatch(addEvent({ events: eventsToAdd }))
     }
-
     this.events$.unsubscribe()
+    this.loadStatus$.unsubscribe()
   }
 
   loadCalendar() {
+    console.info('load calendar')
     var calendarEl = document.getElementById('calendar')
     this.calendar = new Calendar(calendarEl!, {
       initialView: 'timeGridWeek',
@@ -108,10 +130,11 @@ export class PlannerComponent implements OnInit, OnDestroy {
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
       events: this.events,
+      eventColor: '#010662'
     })
     this.calendar.render()
 
-    this.calendar.on('eventClick', (info) =>{
+    this.calendar.on('eventClick', (info) => {
       this.calendar.getEventById(info.event.id)?.remove()
     })
   }
