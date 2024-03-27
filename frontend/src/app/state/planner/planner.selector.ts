@@ -7,3 +7,7 @@ export const selectAllEvents = createSelector(
     selectPlanner,
     (state: PlannerState) => state.events
 )
+export const selectLoadStatus = createSelector(
+    selectPlanner,
+    (state: PlannerState) => state.loadStatus
+)
