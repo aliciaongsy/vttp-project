@@ -51,4 +51,5 @@ export interface Event {
     start: string
     end?: string
     allDay?: boolean
+    backgroundColor?: string
 }
