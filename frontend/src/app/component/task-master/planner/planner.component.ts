@@ -110,6 +110,10 @@ export class PlannerComponent implements OnInit, OnDestroy {
       events: this.events,
     })
     this.calendar.render()
+
+    this.calendar.on('eventClick', (info) =>{
+      this.calendar.getEventById(info.event.id)?.remove()
+    })
   }
 
 }
