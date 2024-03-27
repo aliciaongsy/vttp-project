@@ -69,15 +69,17 @@ public class PlannerRepository {
 
     public boolean addEventsToWorkspace(String id, String workspace, List<Event> events) {
 
-        List<Event> e = getAllEvents(id, workspace);
+        Query query = new Query(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
+
+        List<Document> result = template.find(query, Document.class, "planner");
 
         List<Document> docList = new ArrayList<>();
         for (Event event: events){
             docList.add(event.toDocument(event));
         }
 
-        // if task object does not exist - insert
-        if (e.isEmpty()) {
+        // if planner object does not exist - insert
+        if (result.isEmpty()) {
 
             Document doc = new Document();
             doc.put("id", id);
@@ -88,8 +90,6 @@ public class PlannerRepository {
         }
 
         // else - override
-        Query query = new Query(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
-
         Update updateOps = new Update().set("events", docList);
 
         UpdateResult updateResult = template.updateFirst(query, updateOps, Document.class, "planner");

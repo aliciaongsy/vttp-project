@@ -145,10 +145,12 @@ public class TaskRepository {
 
     public boolean addTaskToWorkspace(String id, String workspace, Task task) {
 
-        List<Task> tasks = getAllTasks(id, workspace);
+        Query query = new Query(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
+
+        List<Document> result = template.find(query, Document.class, "tasks");
 
         // if task object does not exist - insert
-        if (tasks.isEmpty()) {
+        if (result.isEmpty()) {
             List<Document> t = new ArrayList<>();
             t.add(task.toDocument(task));
 
@@ -161,8 +163,6 @@ public class TaskRepository {
         }
 
         // else - update
-        Query query = new Query(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
-
         Update updateOps = new Update().push("tasks").value(task.toDocument(task));
 
         UpdateResult updateResult = template.updateFirst(query, updateOps, Document.class, "tasks");
