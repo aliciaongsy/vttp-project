@@ -104,8 +104,6 @@ public class TaskRepository {
     ]); */
     public List<Task> getAllTasks(String id, String workspace) {
 
-        System.out.println(id);
-        System.out.println(workspace);
         MatchOperation matchOps = Aggregation
                 .match(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
 
