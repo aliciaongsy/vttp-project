@@ -5,6 +5,10 @@ div{
     color: #010662;
 }
 
+.card{
+    height: 90vh
+}
+
 div #tabmenu{
     width: 100%;
 }
@@ -22,13 +26,14 @@ div #tabmenu{
     padding-left: 1ch;
     width: 100%;
     border: dashed;
-    height: 100vh;
+    /* height: 90vh; */
 }
+
 
 #rightpanel{
     margin: auto;
     padding-top: 1cm;
-    height: 100vh;
+    /* height: 90vh; */
 }
 
 #rightpanel div{
