@@ -51,7 +51,9 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { PlannerEffects } from './state/planner/planner.effects';
 import { plannerReducer } from './state/planner/planner.reducer';
 import { focusReducer } from './state/focus/focus.reducer';
-import { FocusEffects } from './state/focus/focus.events';
+import { FocusEffects } from './state/focus/focus.effects';
+import { PlannerService } from './service/planner.service';
+import { FocusService } from './service/focus.service';
 
 @NgModule({
   declarations: [
@@ -97,7 +99,7 @@ import { FocusEffects } from './state/focus/focus.events';
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
     FullCalendarModule
   ],
-  providers: [UserService, DbStore, TaskService],
+  providers: [UserService, DbStore, TaskService, PlannerService, FocusService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

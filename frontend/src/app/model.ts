@@ -53,3 +53,8 @@ export interface Event {
     allDay?: boolean
     backgroundColor?: string
 }
+
+export interface FocusSession {
+    date: string
+    duration: number
+}
