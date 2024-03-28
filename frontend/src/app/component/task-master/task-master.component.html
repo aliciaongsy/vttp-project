@@ -1,6 +1,6 @@
 <!-- <div *ngIf="loginStatus | async else noAccess"> -->
 <div class="card" *ngIf="currentWorkspace==undefined">
-    <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
+    <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '90vh', background: '#FFF9F4', border: 'none'}"
         styleClass="mb-5">
         <ng-template pTemplate>
             <div class="col flex align-items-center justify-content-center" id="leftpanel">
@@ -34,7 +34,7 @@
     </p-splitter>
 </div>
 <div class="card" *ngIf="currentWorkspace!=undefined">
-    <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100vh', background: '#FFF9F4', border: 'none'}"
+    <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '90vh', background: '#FFF9F4', border: 'none'}"
         styleClass="mb-5">
         <ng-template pTemplate>
             <div class="col flex align-items-center justify-content-center" id="leftpanel">
