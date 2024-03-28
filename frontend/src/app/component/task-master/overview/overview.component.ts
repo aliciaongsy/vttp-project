@@ -5,6 +5,8 @@ import { selectCompletedTaskSize, selectIncompletedTaskSize, selectTask } from '
 import { ActivatedRoute } from '@angular/router';
 import { selectUserDetails } from '../../../state/user/user.selectors';
 import { loadAllTasks } from '../../../state/tasks/task.actions';
+import { loadAllSessions } from '../../../state/focus/focus.actions';
+import { selectFocus, selectSessions } from '../../../state/focus/focus.selector';
 
 @Component({
   selector: 'app-overview',
@@ -19,12 +21,17 @@ export class OverviewComponent implements OnInit, OnDestroy{
   // chart 
   data!: any
   options!: any
+  barData!: any
+  barOptions!: any
 
   incompletedTask$!: Subscription
   completedTask$!: Subscription
+  session$!: Subscription
 
   incompleted!: number
   completed!: number
+  date: string[] = []
+  duration: number[] = []
 
   currentWorkspace!: string
   uid!: string
@@ -38,27 +45,33 @@ export class OverviewComponent implements OnInit, OnDestroy{
         this.currentWorkspace = value['w']
         console.info('curr: ', this.currentWorkspace)
         this.setChartData()
+        this.setBarChartData()
         this.loadData()
       })
 
     this.loadData()
     this.setChartData()
+    this.setBarChartData()
   }
 
   ngOnDestroy(): void {
     console.info('ondestroy overview')
     this.incompletedTask$.unsubscribe()
     this.completedTask$.unsubscribe()
+    this.session$.unsubscribe()
   }
 
   loadData(){
     firstValueFrom(this.ngrxstore.select(selectUserDetails))
       .then((value) => {
+        console.info('dispatch action')
         this.uid = value.id
         // retrieve task from mongodb
         this.ngrxstore.dispatch(loadAllTasks({ id: this.uid, workspace: this.currentWorkspace }))
+        this.ngrxstore.dispatch(loadAllSessions({ id: this.uid, workspace: this.currentWorkspace }))
       })
     this.ngrxstore.select(selectTask)
+    this.ngrxstore.select(selectFocus)
 
     this.incompletedTask$ = this.ngrxstore.select(selectIncompletedTaskSize)
       .subscribe({
@@ -75,6 +88,18 @@ export class OverviewComponent implements OnInit, OnDestroy{
         this.completed = value
         this.setChartData()
       })
+    
+    this.session$ = this.ngrxstore.select(selectSessions)
+      .subscribe((value) => {
+        for (var v of value){
+          if (this.date.indexOf(v.date)==-1){
+            this.date.push(v.date)
+            this.duration.push(v.duration)
+          }
+        }
+        this.setBarChartData()
+      })
+    
   }
 
   setChartData(){
@@ -103,6 +128,56 @@ export class OverviewComponent implements OnInit, OnDestroy{
         }
       }
     };
+  }
+
+  setBarChartData(){
+    this.barData = {
+      labels: this.date,
+      datasets: [
+          {
+              label: 'Focus Sessions',
+              barThickness: 70,
+              data: this.duration,
+              backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 205, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(201, 203, 207, 0.2)' ],
+              borderColor: ['rgb(255, 99, 132)', 'rgb(255, 159, 64)', 'rgb(255, 205, 86)', 'rgb(75, 192, 192)', 'rgb(54, 162, 235)', 'rgb(153, 102, 255)', 'rgb(201, 203, 207)'],
+              borderWidth: 1
+          }
+      ]
+    };
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+    this.barOptions = {
+      plugins: {
+          legend: {
+              labels: {
+                  color: '#010662'
+              }
+          }
+      },
+      scales: {
+          y: {
+              beginAtZero: true,
+              ticks: {
+                  color: textColorSecondary
+              },
+              grid: {
+                  color: surfaceBorder,
+                  drawBorder: false
+              }
+          },
+          x: {
+              ticks: {
+                  color: textColorSecondary
+              },
+              grid: {
+                  color: surfaceBorder,
+                  drawBorder: false
+              }
+          }
+      }
+  };
   }
 
 }
