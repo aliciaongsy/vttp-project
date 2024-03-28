@@ -16,6 +16,9 @@
                 <div *ngIf="timerStatus=='stop'" class="button">
                     <p-button icon="pi pi-stop" size="small" [rounded]="true" (click)="stopCountdown()"></p-button>
                 </div>
+                <div *ngIf="timerStatus=='restart'" class="button">
+                    <p-button icon="pi pi-refresh" size="small" [rounded]="true" (click)="restartCountdown()"></p-button>
+                </div>
             </div>
             <div *ngIf="timerMode=='custom'">
                 <div *ngIf="timerStatus=='start'">
@@ -31,6 +34,12 @@
                     <div class="center" style="font-size: 150px;">{{display}}</div>
                     <div class="button">
                         <p-button icon="pi pi-stop" size="small" [rounded]="true" (click)="stopCountdown()"></p-button>
+                    </div>
+                </div>
+                <div *ngIf="timerStatus=='restart'">
+                    <div class="center" style="font-size: 150px;">{{display}}</div>
+                    <div class="button">
+                        <p-button icon="pi pi-refresh" size="small" [rounded]="true" (click)="restartCountdown()"></p-button>
                     </div>
                 </div>
             </div>
