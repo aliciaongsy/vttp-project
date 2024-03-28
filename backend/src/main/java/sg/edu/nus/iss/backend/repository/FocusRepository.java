@@ -70,6 +70,7 @@ public class FocusRepository {
 
         List<Session> sessions = new LinkedList<>();
         docs.forEach(d -> {
+            System.out.println(d.toJson());
             Session sess = new Session();
             sess.setDate(d.getString("date"));
             sess.setDuration(d.getInteger("duration"));

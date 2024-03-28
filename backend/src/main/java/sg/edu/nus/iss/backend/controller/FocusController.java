@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
-import sg.edu.nus.iss.backend.model.Task;
 import sg.edu.nus.iss.backend.service.FocusService;
 
 @Controller
