@@ -1,17 +1,17 @@
 import { createSelector } from "@ngrx/store";
 import { AppState } from "../app.state";
-import { state } from "@angular/animations";
+import { FocusState } from "./focus.reducer";
 
 export const selectFocus = (state: AppState) => state.focus
 export const selectCurrentDate = createSelector(
     selectFocus,
-    (state) => state.currentDate
-)
-export const selectSessions = createSelector(
-    selectFocus,
-    (state) => state.session
+    (state: FocusState) => state.currentDate
 )
 export const selectDuration = createSelector(
     selectFocus,
-    (state) => state.todayFocusDuration
+    (state: FocusState) => state.todayFocusDuration
+)
+export const selectSessions = createSelector(
+    selectFocus,
+    (state: FocusState) => state.sessions
 )

@@ -1,11 +1,11 @@
 import { createReducer, on } from "@ngrx/store"
 import { FocusSession } from "../../model"
-import { incFocusDuration, persistData, resetState } from "./focus.actions"
+import { incFocusDuration, loadAllSessions, loadAllSessionsFromService, persistData, resetState } from "./focus.actions"
 
 export interface FocusState {
     id: string,
     workspace: string,
-    session: FocusSession[]
+    sessions: FocusSession[]
     loadStatus: 'NA' | 'pending' | 'complete'
     currentDate: string,
     todayFocusDuration: number
@@ -14,7 +14,7 @@ export interface FocusState {
 export const initialState: FocusState = {
     id: '',
     workspace: '',
-    session: [],
+    sessions: [],
     loadStatus: 'NA',
     currentDate: new Date().toISOString().split('T')[0],
     todayFocusDuration: 0
@@ -31,10 +31,21 @@ export const focusReducer = createReducer(
         ...state,
         todayFocusDuration: state.todayFocusDuration+duration
     })),
+    on(loadAllSessions, (state, {id, workspace})=> ({
+        ...state,
+        id: id,
+        workspace: workspace,
+        loadStatus: 'pending' as const
+    })),
+    on(loadAllSessionsFromService, (state, {sessions})=> ({
+        ...state,
+        sessions: sessions,
+        loadStatus: 'complete' as const
+    })),
     on(resetState, (state)=>({
         id: '',
         workspace: '',
-        session: [],
+        sessions: [],
         loadStatus: 'NA' as const,
         currentDate: new Date().toISOString().split('T')[0],
         todayFocusDuration: 0
