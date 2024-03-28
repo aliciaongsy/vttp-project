@@ -63,6 +63,7 @@ export class PlannerComponent implements OnInit, OnDestroy {
           value => {
             if (value==="complete"){
               for (var t of task) {
+                console.info('for loop')
                 const event: Event = {
                   title: t.task,
                   start: new Date(t.due).toISOString(),
@@ -72,9 +73,10 @@ export class PlannerComponent implements OnInit, OnDestroy {
                 }
                 this.events = [...this.events, event]
               }
+              console.info(this.events)
+              this.loadCalendar()
             }
-            console.info(this.events)
-            this.loadCalendar()
+            
           }
         )
       })
@@ -98,6 +100,7 @@ export class PlannerComponent implements OnInit, OnDestroy {
     if(events.length != 0) {
       var eventsToAdd: Event[] = []
       for (var e of events) {
+        // only persist non due date event
         if (e.backgroundColor==""){
           const event: Event = {
           title: e.title,
@@ -117,8 +120,9 @@ export class PlannerComponent implements OnInit, OnDestroy {
   }
 
   loadCalendar() {
-    console.info('load calendar')
     var calendarEl = document.getElementById('calendar')
+
+    // load calendar
     this.calendar = new Calendar(calendarEl!, {
       initialView: 'timeGridWeek',
       plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
@@ -134,6 +138,7 @@ export class PlannerComponent implements OnInit, OnDestroy {
     })
     this.calendar.render()
 
+    // delete event
     this.calendar.on('eventClick', (info) => {
       this.calendar.getEventById(info.event.id)?.remove()
     })
