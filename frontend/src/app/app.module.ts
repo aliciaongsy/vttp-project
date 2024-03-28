@@ -39,6 +39,7 @@ import { TagModule } from 'primeng/tag';
 import { CheckboxModule } from 'primeng/checkbox';
 import { StoreModule } from '@ngrx/store';
 import { ToastModule } from 'primeng/toast';
+import { KnobModule } from 'primeng/knob';
 
 // ngrx imports
 import { EffectsModule } from '@ngrx/effects';
@@ -49,6 +50,8 @@ import { TaskEffects } from './state/tasks/task.effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { PlannerEffects } from './state/planner/planner.effects';
 import { plannerReducer } from './state/planner/planner.reducer';
+import { focusReducer } from './state/focus/focus.reducer';
+import { FocusEffects } from './state/focus/focus.events';
 
 @NgModule({
   declarations: [
@@ -87,9 +90,10 @@ import { plannerReducer } from './state/planner/planner.reducer';
     TagModule,
     CheckboxModule,
     ToastModule,
-    StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer}),
+    KnobModule,
+    StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer, focus: focusReducer}),
     StoreDevtoolsModule.instrument({maxAge: 25}),
-    EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects]),
+    EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects, FocusEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
     FullCalendarModule
   ],
