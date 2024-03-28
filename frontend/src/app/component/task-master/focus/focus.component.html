@@ -1,1 +1,40 @@
-<p>focus works!</p>
+
+<div class="base">
+    <div style="width: 100%;">
+        <div class="tab">
+            <p-button (click)="changeToPomodoro()" id='pomodoro'>Pomodoro</p-button>
+            <p-button (click)="changeToCustom()" id='custom'>Custom</p-button>
+            <p-button (click)="changeToShortBreak()" id="shortbreak">Short Break</p-button>
+            <p-button (click)="changeToLongBreak()" id="longbreak">Long Break</p-button>
+        </div>
+        <div class="content">
+            <div *ngIf="timerMode=='pomodoro'|| timerMode=='shortbreak' || timerMode=='longbreak'">
+                <div class="center" style="font-size: 150px;">{{display}}</div>
+                <div *ngIf="timerStatus=='start'" class="button">
+                    <p-button icon="pi pi-play" size="small" [rounded]="true" (click)="startCountdown()"></p-button>
+                </div>
+                <div *ngIf="timerStatus=='stop'" class="button">
+                    <p-button icon="pi pi-stop" size="small" [rounded]="true" (click)="stopCountdown()"></p-button>
+                </div>
+            </div>
+            <div *ngIf="timerMode=='custom'">
+                <div *ngIf="timerStatus=='start'">
+                    <p-knob [(ngModel)]="value" [min]="0" [max]="60" [size]="200" [strokeWidth]="10" valueColor="#010662"
+                    textColor="#010662"></p-knob>
+                    <div class="buttons">
+                        <p-button icon="pi pi-plus" (click)="value = value+1" [disabled]="value >= 60" size="small" [rounded]="true"/>
+                        <p-button icon="pi pi-minus" (click)="value = value-1" [disabled]="value <= 0" size="small" [rounded]="true"/>
+                        <p-button icon="pi pi-play" [disabled]="value == 0" size="small" [rounded]="true" (click)="startCustomCountdown()"></p-button>
+                    </div>
+                </div>
+                <div *ngIf="timerStatus=='stop'">
+                    <div class="center" style="font-size: 150px;">{{display}}</div>
+                    <div class="button">
+                        <p-button icon="pi pi-stop" size="small" [rounded]="true" (click)="stopCountdown()"></p-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>

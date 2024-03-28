@@ -1,0 +1,66 @@
+.base{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+    width: 100%;
+}
+
+.tab{
+    padding-bottom: 2ch;
+    display: flex;
+    justify-content: center;
+}
+
+.active{
+    border: 1px solid #010662;
+    border-radius: 5px;
+}
+
+.content{
+    height: 30vh;
+}
+
+.center{
+    display: flex;
+    justify-content: center;
+    color:#010662;
+}
+
+.button{
+    /* padding-top: 1ch; */
+    display: flex;
+    justify-content: center;
+}
+
+.button p-button{
+    border: 1px solid #010662;
+    border-radius: 50%;
+}
+
+.buttons{
+    display: flex;
+    justify-content: center;
+}
+
+:host ::ng-deep .p-knob{
+    display: flex;
+    justify-content: center;
+}
+
+:host ::ng-deep .p-button{
+    /* margin: 0 1ch; */
+    background: #FFF9F4;
+    color: #010662;
+    border: 1px solid #FFF9F4;
+}
+
+/* :host ::ng-deep .p-button:hover{
+    border: 1px solid #010662;
+    background: #d4dbe3;
+} */
+
+/* :host ::ng-deep .p-button:focus{
+    border: 1px solid #010662;
+} */
+
