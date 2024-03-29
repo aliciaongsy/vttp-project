@@ -44,6 +44,9 @@
                 </div>
             </div>
         </div>
-        
+        <p-dialog header="Focus Session" [(visible)]="visible" [style]="{width: '30vw'}" [draggable]="false" [resizable]="false">
+            <p *ngIf="timerMode=='pomodoro'|| timerMode=='custom'">Completed {{durationMinutes}} minutes of focus session!</p>
+            <p *ngIf="timerMode=='longbreak'|| timerMode=='shortbreak'">{{durationMinutes}} minutes break session completed!</p>
+        </p-dialog>
     </div>
 </div>

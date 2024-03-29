@@ -27,6 +27,7 @@ export class FocusComponent implements OnInit, OnDestroy {
   startTime: number = 0;
   isRunning: boolean = false;
   duration!: number // duration in milliseconds
+  durationMinutes!: number
 
   // whether timer is used
   update: boolean = false
@@ -204,6 +205,7 @@ export class FocusComponent implements OnInit, OnDestroy {
         this.stop();
         this.timerStatus = 'restart'
         this.visible = true
+        this.durationMinutes = duration
         console.log("Timer finished");
         firstValueFrom(this.ngrxStore.select(selectCurrentDate)).then(
           value => {
