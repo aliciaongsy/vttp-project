@@ -1,10 +1,8 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { firstValueFrom, map, take, takeWhile, timer } from 'rxjs';
-import { FocusSession } from '../../../model';
+import { firstValueFrom } from 'rxjs';
 import { selectCurrentDate } from '../../../state/focus/focus.selector';
 import { incFocusDuration, persistData, resetState } from '../../../state/focus/focus.actions';
-import { clearInterval, setInterval } from 'worker-timers';
 import { selectUserDetails } from '../../../state/user/user.selectors';
 import { ActivatedRoute } from '@angular/router';
 
@@ -25,11 +23,16 @@ export class FocusComponent implements OnInit, OnDestroy {
 
   display!: any
   timerStatus!: 'start' | 'stop' | 'restart'
-  timer!: any
   timerMode!: 'pomodoro' | 'custom' | 'shortbreak' | 'longbreak'
+  startTime: number = 0;
+  isRunning: boolean = false;
+  duration!: number // duration in milliseconds
 
   // whether timer is used
   update: boolean = false
+
+  // dialog
+  visible: boolean = false
 
   ngOnInit(): void {
     this.changeToPomodoro()
@@ -39,9 +42,9 @@ export class FocusComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if(this.update){
+    if (this.update) {
       firstValueFrom(this.ngrxStore.select(selectUserDetails)).then((value) => {
-        this.ngrxStore.dispatch(persistData({id: value.id, workspace: this.currentWorkspace}))
+        this.ngrxStore.dispatch(persistData({ id: value.id, workspace: this.currentWorkspace }))
       })
     }
   }
@@ -49,10 +52,10 @@ export class FocusComponent implements OnInit, OnDestroy {
   changeToPomodoro() {
     document.querySelector(`#${this.timerMode}`)?.classList.remove('active')
     this.timerMode = 'pomodoro'
-    if(this.timerStatus=='stop'){
-      this.stopCountdown()
+    if (this.timerStatus == 'stop') {
+      this.stop()
     }
-    else{
+    else {
       this.timerStatus = 'start'
       this.display = '25:00'
     }
@@ -62,8 +65,8 @@ export class FocusComponent implements OnInit, OnDestroy {
   changeToCustom() {
     document.querySelector(`#${this.timerMode}`)?.classList.remove('active')
     this.timerMode = 'custom'
-    if(this.timerStatus=='stop'){
-      this.stopCountdown()
+    if (this.timerStatus == 'stop') {
+      this.stop()
     }
     this.timerStatus = 'start'
     document.querySelector(`#${this.timerMode}`)?.classList.add('active')
@@ -72,10 +75,10 @@ export class FocusComponent implements OnInit, OnDestroy {
   changeToLongBreak() {
     document.querySelector(`#${this.timerMode}`)?.classList.remove('active')
     this.timerMode = 'longbreak'
-    if(this.timerStatus=='stop'){
-      this.stopCountdown()
+    if (this.timerStatus == 'stop') {
+      this.stop()
     }
-    else{
+    else {
       this.timerStatus = 'start'
       this.display = '15:00'
     }
@@ -85,10 +88,10 @@ export class FocusComponent implements OnInit, OnDestroy {
   changeToShortBreak() {
     document.querySelector(`#${this.timerMode}`)?.classList.remove('active')
     this.timerMode = 'shortbreak'
-    if(this.timerStatus=='stop'){
-      this.stopCountdown()
+    if (this.timerStatus == 'stop') {
+      this.stop()
     }
-    else{
+    else {
       this.timerStatus = 'start'
       this.display = '05:00'
     }
@@ -99,16 +102,18 @@ export class FocusComponent implements OnInit, OnDestroy {
   startCountdown() {
     switch (this.timerMode) {
       case ('pomodoro'):
-        document.querySelector('#pomodoro')?.classList.add('active')
-        this.countdownTimer(25)
+        this.duration = 25 * 60 * 1000
+        this.start()
         break;
 
       case ('shortbreak'):
-        this.countdownTimer(5)
+        this.duration = 5 * 60 * 1000
+        this.start()
         break;
 
       case ('longbreak'):
-        this.countdownTimer(15)
+        this.duration = 15 * 60 * 1000
+        this.start()
         break;
 
       default:
@@ -135,10 +140,10 @@ export class FocusComponent implements OnInit, OnDestroy {
         break;
     }
     this.timerStatus = 'start'
-    clearInterval(this.timer)
+    this.stop()
   }
 
-  restartCountdown(){
+  restartCountdown() {
     switch (this.timerMode) {
       case ('pomodoro'):
         this.display = '25:00'
@@ -155,6 +160,7 @@ export class FocusComponent implements OnInit, OnDestroy {
       default:
         break;
     }
+    this.value = 0
     this.timerStatus = 'start'
   }
 
@@ -162,51 +168,62 @@ export class FocusComponent implements OnInit, OnDestroy {
   startCustomCountdown() {
     const displayTime = this.value < 10 ? "0" + this.value + ":00" : this.value + ":00"
     this.display = displayTime
-    this.countdownTimer(this.value)
+    this.duration = this.value * 60 * 1000
+    this.start()
     this.timerStatus = 'stop'
   }
 
-  countdownTimer(minute: number) {
-    const date = new Date().toISOString().split('T')[0]
-    const duration = minute
-    let seconds: number = minute * 60;
-    let textSec: any = "0";
-    let statSec: number = 60;
+  start() {
+    if (!this.isRunning) {
+      this.startTime = performance.now();
+      this.isRunning = true;
+      this.countdown();
+    }
+  }
 
-    const prefix = minute < 10 ? "0" : "";
+  stop() {
+    this.isRunning = false;
+  }
 
-    this.timer = setInterval(() => {
-      seconds--;
-      if (statSec != 0) statSec--;
-      else statSec = 59;
+  countdown() {
+    if (this.isRunning) {
+      const date = new Date().toISOString().split('T')[0]
+      const duration = this.duration / (60 * 1000)
 
-      if (statSec < 10) {
-        textSec = "0" + statSec;
-      } else textSec = statSec;
-
-      this.display = `${prefix}${Math.floor(seconds / 60)}:${textSec}`;
-
-      if (seconds == 0) {
-        this.update=true
-        console.log("finished");
-        this.timerStatus='restart'
-        clearInterval(this.timer);
+      const currentTime = performance.now();
+      const elapsedTime = currentTime - this.startTime;
+      const remainingTime = Math.max(0, this.duration - elapsedTime);
+      const seconds = Math.floor(remainingTime / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
+      const displaySeconds = (seconds % 60) < 10 ? "0" + (seconds % 60) : (seconds % 60).toString();
+      this.display = `${displayMinutes}:${displaySeconds}`;
+      if (remainingTime > 0) {
+        requestAnimationFrame(() => this.countdown());
+      } else {
+        this.stop();
+        this.timerStatus = 'restart'
+        this.visible = true
+        console.log("Timer finished");
         firstValueFrom(this.ngrxStore.select(selectCurrentDate)).then(
           value => {
-            if(value==date){
-              console.info(value)
-              this.ngrxStore.dispatch(incFocusDuration({duration}))
-            }
-            // in the event that user use the timer pass midnight
-            else{
-              console.info(date)
-              console.info('reset')
-              this.ngrxStore.dispatch(resetState({duration}))
+            // only persist data if it is in the pomodoro or custom mode
+            if (this.timerMode == 'pomodoro' || this.timerMode == 'custom') {
+              if (value == date) {
+                console.info(value)
+                this.ngrxStore.dispatch(incFocusDuration({ duration }))
+              }
+              // in the event that user use the timer pass midnight
+              else {
+                console.info(date)
+                console.info('reset')
+                this.ngrxStore.dispatch(resetState({ duration }))
+              }
             }
           }
         )
       }
-    }, 1000);
+    }
   }
 
 }
