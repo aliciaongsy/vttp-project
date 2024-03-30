@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DbStore } from '../../service/db.store';
 import { UserService } from '../../service/user.service';
 import { LoginDetails } from '../../model';
 import { Router } from '@angular/router';
@@ -16,7 +15,6 @@ export class LoginComponent implements OnInit {
 
   private fb = inject(FormBuilder)
   private userSvc = inject(UserService)
-  private store = inject(DbStore)
   private router = inject(Router)
   private ngrxStore = inject(Store)
 
@@ -41,7 +39,6 @@ export class LoginComponent implements OnInit {
       .then((value) => {
         // valid email and password
         console.info(value)
-        // this.store.changeStatus(value)
         this.ngrxStore.dispatch(changeStatus({currUser: value}))
         // route to account page
         this.router.navigate(['/account'])

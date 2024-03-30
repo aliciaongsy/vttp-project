@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DbStore } from '../../service/db.store';
 import { Observable, firstValueFrom } from 'rxjs';
 import { MenuItem } from 'primeng/api';
 import { Store } from '@ngrx/store';
@@ -41,11 +40,6 @@ export class TaskMasterComponent implements OnInit {
     this.currentWorkspace = this.activatedRoute.snapshot.params['w']
     console.info(this.activatedRoute.snapshot.params['w'])
 
-    // component store
-    // this.loginStatus = this.store.getStatus
-    // this.workspaces = this.store.getWorkspaces
-
-    // ngrx store
     console.info("retrieve from ngrx store")
     this.loginStatus = this.ngrxStore.select(selectStatus)
     this.workspaces = this.ngrxStore.select(selectWorkspaces)

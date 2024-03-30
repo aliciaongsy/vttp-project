@@ -1,5 +1,4 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { DbStore } from '../service/db.store';
 import { Observable, firstValueFrom } from 'rxjs';
 import { UserDetails } from '../model';
 import { Store } from '@ngrx/store';
@@ -15,7 +14,6 @@ import { Router } from '@angular/router';
 })
 export class NavbarComponent implements OnInit{
 
-  private store = inject(DbStore)
   private ngrx = inject(Store)
   private router = inject(Router)
 
@@ -24,10 +22,6 @@ export class NavbarComponent implements OnInit{
   items!: any
 
   ngOnInit(): void {
-    // this.loginStatus = this.store.getStatus
-    // this.loginStatus.subscribe((value) => console.info(value))
-    // this.user = this.store.getUser
-
     this.loginStatus = this.ngrx.select(selectStatus)
     this.loginStatus.subscribe((value) => console.info(value))
     this.user = this.ngrx.select(selectUserDetails)
