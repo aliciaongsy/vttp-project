@@ -58,3 +58,22 @@ export interface FocusSession {
     date: string
     duration: number
 }
+
+export interface ChatRoom{
+    roomId?: string
+    owner: string
+    name: string
+    type: 'Private' | 'Public'
+}
+
+export interface ChatMessage {
+    content: string
+    sender: string
+    type: 'CHAT' | 'JOIN' | 'LEAVE'
+}
+
+// for displaying chat list
+export interface ChatDetails {
+    chatId: string
+    chatName: string
+}
