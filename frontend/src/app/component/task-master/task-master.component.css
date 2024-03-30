@@ -29,10 +29,15 @@ div #tabmenu{
     /* height: 90vh; */
 }
 
+:host ::ng-deep .p-splitter-panel.p-splitter-panel-nested.ng-star-inserted {
+    justify-content: center;
+}
+
 
 #rightpanel{
-    margin: auto;
-    /* padding-top: 1cm; */
+
+    /* margin: auto; */
+    padding-top: 1cm;
     /* height: 90vh; */
 }
 
