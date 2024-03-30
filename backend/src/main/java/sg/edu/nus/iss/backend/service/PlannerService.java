@@ -12,6 +12,7 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import sg.edu.nus.iss.backend.model.Event;
+import sg.edu.nus.iss.backend.model.Task;
 import sg.edu.nus.iss.backend.repository.PlannerRepository;
 
 @Service
@@ -26,8 +27,8 @@ public class PlannerService {
         return b.build();
     }
 
-    public ResponseEntity<String> getAllEvents(String id, String workspace) {
-        List<Event> events = plannerRepo.getAllEvents(id, workspace);
+    public ResponseEntity<String> getAllEvents(String id) {
+        List<Event> events = plannerRepo.getAllEvents(id);
         if (events.isEmpty()) {
             JsonArrayBuilder b = Json.createArrayBuilder();
             return ResponseEntity.ok(b.build().toString());
@@ -37,13 +38,24 @@ public class PlannerService {
         return ResponseEntity.ok(b.build().toString());
     }
 
-    public ResponseEntity<String> addNewEvent(String id, String workspace, List<Event> events) {
-        boolean added = plannerRepo.addEventsToWorkspace(id, workspace, events);
+    public ResponseEntity<String> addNewEvent(String id, List<Event> events) {
+        boolean added = plannerRepo.addEventsToWorkspace(id, events);
         if (added) {
             JsonObject o = buildJsonObject("message", "successfully added new event to workspace");
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error adding new event to workspace");
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+    }
+
+    public ResponseEntity<String> getAllOutstandingTasks(String id, String[] workspaces){
+        List<Task> tasks = plannerRepo.getAllOutstandingTasks(id, workspaces);
+        if (tasks.isEmpty()) {
+            JsonArrayBuilder b = Json.createArrayBuilder();
+            return ResponseEntity.ok(b.build().toString());
+        }
+        JsonArrayBuilder b = Json.createArrayBuilder();
+        tasks.forEach(t -> b.add(t.taskToJson(t)));
+        return ResponseEntity.ok(b.build().toString());
     }
 }

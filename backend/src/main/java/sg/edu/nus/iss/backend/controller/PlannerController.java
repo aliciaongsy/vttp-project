@@ -30,16 +30,15 @@ public class PlannerController {
     @Autowired
     private PlannerService plannerSvc;
 
-    @GetMapping(path = "/{id}/{workspace}/events")
+    @GetMapping(path = "/{id}/events")
     @ResponseBody
-    public ResponseEntity<String> getEvents(@PathVariable String id, @PathVariable String workspace) {
-        return plannerSvc.getAllEvents(id, workspace);
+    public ResponseEntity<String> getEvents(@PathVariable String id) {
+        return plannerSvc.getAllEvents(id);
     }
 
-    @PostMapping(path = "/{id}/{workspace}/event/new")
+    @PostMapping(path = "/{id}/event/new")
     @ResponseBody
-    public ResponseEntity<String> addNewTask(@PathVariable String id, @PathVariable String workspace,
-            @RequestBody String payload) {
+    public ResponseEntity<String> addNewTask(@PathVariable String id, @RequestBody String payload) {
         JsonReader reader = Json.createReader(new StringReader(payload));
         System.out.println(payload);
         JsonArray a = reader.readArray();
@@ -55,7 +54,13 @@ public class PlannerController {
             events.add(event);
         }
 
-        return plannerSvc.addNewEvent(id, workspace, events);
+        return plannerSvc.addNewEvent(id, events);
+    }
+
+    @GetMapping(path = "/{id}/{workspaces}/outstandingtasks")
+    @ResponseBody
+    public ResponseEntity<String> getAllOutstandingTasks(@PathVariable String id, @PathVariable String[] workspaces) {
+        return plannerSvc.getAllOutstandingTasks(id, workspaces);
     }
 
 }

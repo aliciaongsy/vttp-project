@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import com.mongodb.client.result.UpdateResult;
 
 import sg.edu.nus.iss.backend.model.Event;
+import sg.edu.nus.iss.backend.model.Task;
 
 @Repository
 public class PlannerRepository {
@@ -28,12 +29,11 @@ public class PlannerRepository {
     private MongoTemplate template;
 
     // get all events belonging to a workspace of user
-    public List<Event> getAllEvents(String id, String workspace) {
+    public List<Event> getAllEvents(String id) {
 
         System.out.println(id);
-        System.out.println(workspace);
         MatchOperation matchOps = Aggregation
-                .match(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
+                .match(Criteria.where("id").is(id));
 
         AggregationOperation unwindOps = Aggregation.unwind("events");
 
@@ -67,14 +67,14 @@ public class PlannerRepository {
         return events;
     }
 
-    public boolean addEventsToWorkspace(String id, String workspace, List<Event> events) {
+    public boolean addEventsToWorkspace(String id, List<Event> events) {
 
-        Query query = new Query(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
+        Query query = new Query(Criteria.where("id").is(id));
 
         List<Document> result = template.find(query, Document.class, "planner");
 
         List<Document> docList = new ArrayList<>();
-        for (Event event: events){
+        for (Event event : events) {
             docList.add(event.toDocument(event));
         }
 
@@ -83,7 +83,6 @@ public class PlannerRepository {
 
             Document doc = new Document();
             doc.put("id", id);
-            doc.put("workspace", workspace);
             doc.put("events", docList);
             Document insert = template.insert(doc, "planner");
             return !(insert.isEmpty());
@@ -97,4 +96,48 @@ public class PlannerRepository {
         return updateResult.getModifiedCount() > 0;
     }
 
+    public List<Task> getAllOutstandingTasks(String id, String[] workspaces) {
+        List<Task> tasks = new LinkedList<>();
+
+        for (String workspace : workspaces) {
+
+            MatchOperation matchOps = Aggregation
+                    .match(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
+
+            AggregationOperation unwindOps = Aggregation.unwind("tasks");
+
+            ProjectionOperation projectOps = Aggregation.project()
+                    .andExclude("_id")
+                    .and("tasks.id").as("id")
+                    .and("tasks.task").as("task")
+                    .and("tasks.status").as("status")
+                    .and("tasks.priority").as("priority")
+                    .and("tasks.start").as("start")
+                    .and("tasks.due").as("due")
+                    .and("tasks.completed").as("completed");
+
+            Aggregation pipeline = Aggregation.newAggregation(matchOps, unwindOps, projectOps);
+
+            AggregationResults<Document> results = template.aggregate(pipeline, "tasks", Document.class);
+
+            List<Document> docs = results.getMappedResults();
+
+            // no tasks
+            if (docs.isEmpty()) {
+                break;
+            }
+
+            docs.forEach(d -> {
+                System.out.println(d.toJson());
+                Task t = new Task();
+                t = t.convertDocToTask(d);
+                // only add incompleted task
+                if (!t.isCompleted()){
+                    tasks.add(t);
+                }
+            });
+        }
+
+        return tasks;
+    }
 }
