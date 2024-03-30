@@ -1,33 +1,40 @@
 import { createReducer, on } from "@ngrx/store";
-import { addEvent, loadAllEvents, loadAllEventsFromService, resetPlannerState } from "./planner.actions";
-import { Event } from "../../model";
+import { addEvent, loadAllEvents, loadAllEventsFromService, loadAllOutstandingTasks, loadAllOutstandingTasksFromService, resetPlannerState } from "./planner.actions";
+import { Event, Task } from "../../model";
 
 export interface PlannerState {
     id: string, 
-    workspace: string,
     events: Event[],
-    loadStatus: 'NA' | 'pending' | 'complete'
+    loadStatus: 'NA' | 'pending' | 'complete',
+    outstandingTasks : Task[]
 }
 
 export const initialState: PlannerState = {
     id: '',
-    workspace: '',
     events: [],
-    loadStatus: 'NA'
+    loadStatus: 'NA', 
+    outstandingTasks: []
 }
 
 export const plannerReducer = createReducer(
     initialState,
     on(addEvent, (state, { events }) => ({
         id: state.id,
-        workspace: state.workspace,
         events: events,
-        loadStatus: state.loadStatus
+        loadStatus: state.loadStatus,
+        outstandingTasks: state.outstandingTasks
     })),
-    on(loadAllEvents, (state, { id, workspace}) => ({
+    on(loadAllOutstandingTasks, (state, { id }) => ({
+        ...state,
+       id: id,
+    })),
+    on(loadAllOutstandingTasksFromService, (state, { tasks }) => ({
+        ...state,
+       outstandingTasks: tasks,
+    })),
+    on(loadAllEvents, (state, { id }) => ({
         ...state,
         id: id,
-        workspace: workspace,
         loadStatus: 'pending' as const
     })),
     on(loadAllEventsFromService, (state, { events }) => ({
@@ -37,8 +44,8 @@ export const plannerReducer = createReducer(
     })),
     on(resetPlannerState, (state) => ({
         id: '',
-        workspace: '',
         events: [],
-        loadStatus: 'NA' as const
+        loadStatus: 'NA' as const,
+        outstandingTasks: []
     }))
 )

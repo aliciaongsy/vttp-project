@@ -11,3 +11,7 @@ export const selectLoadStatus = createSelector(
     selectPlanner,
     (state: PlannerState) => state.loadStatus
 )
+export const selectAllOutstandingTasks = createSelector(
+    selectPlanner,
+    (state: PlannerState) => state.outstandingTasks
+)
