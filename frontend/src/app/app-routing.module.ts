@@ -28,6 +28,7 @@ const routes: Routes = [
     ]
    },
   { path: 'collab', component: CollabComponent },
+  { path: 'chat/:roomId', component: CollabComponent },
   { path: 'calendar', component: CalendarComponent },
   { path: 'features', component: FeaturesComponent },
   { path: 'attributions', component: AttributionsComponent },
