@@ -127,7 +127,7 @@ public class TelegramBot extends AbilityBot {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
                         System.out.println(id);
                     }
-                    responseHandler.replyToDueSoon(ctx.chatId(), linked, teleSvc.getTaskDueSoon(), teleSvc.getTaskDueSoonWorkspace());
+                    responseHandler.replyToDueSoon(ctx.chatId(), linked, teleSvc.getTaskDueSoon(id), teleSvc.getTaskDueSoonWorkspace(id));
                 })
                 .build();
     }
@@ -145,7 +145,7 @@ public class TelegramBot extends AbilityBot {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
                         System.out.println(id);
                     }
-                    responseHandler.replyToOverdueTask(ctx.chatId(), linked, teleSvc.getOverdueTask(), teleSvc.getOverdueTaskWorkspace());
+                    responseHandler.replyToOverdueTask(ctx.chatId(), linked, teleSvc.getOverdueTask(id), teleSvc.getOverdueTaskWorkspace(id));
                 })
                 .build();
     }
@@ -163,7 +163,7 @@ public class TelegramBot extends AbilityBot {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
                         System.out.println(id);
                     }
-                    responseHandler.replyToOutstandingTasks(ctx.chatId(), linked, teleSvc.getOutstandingTasks(), teleSvc.getOutstandingTasksWorkspace());
+                    responseHandler.replyToOutstandingTasks(ctx.chatId(), linked, teleSvc.getOutstandingTasks(id), teleSvc.getOutstandingTasksWorkspace(id));
                 })
                 .build();
     }

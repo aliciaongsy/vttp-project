@@ -313,6 +313,9 @@ public class TaskRepository {
 
     /*db.tasks.aggregate([
         {
+            $match: {id: "d73726d8"}
+        },
+        {
             $unwind: "$tasks"
         },
         {
@@ -341,8 +344,10 @@ public class TaskRepository {
             }
         }
     ]); */
-    public Document getIncompleteTaskDueSoon(){
+    public Document getIncompleteTaskDueSoon(String id){
         long currentTime = new Date().getTime();
+
+        MatchOperation match = Aggregation.match(Criteria.where("id").is(id));
 
         AggregationOperation unwindOps = Aggregation.unwind("tasks");
 
@@ -361,7 +366,7 @@ public class TaskRepository {
                 .and("tasks.due").as("due")
                 .and("tasks.completed").as("completed");
 
-        Aggregation pipeline = Aggregation.newAggregation(unwindOps, matchOps, sortOps, projectOps);
+        Aggregation pipeline = Aggregation.newAggregation(match, unwindOps, matchOps, sortOps, projectOps);
 
         AggregationResults<Document> results = template.aggregate(pipeline, "tasks", Document.class);
 
@@ -377,6 +382,9 @@ public class TaskRepository {
     }
 
     /*db.tasks.aggregate([
+        {
+            $match: {id: "d73726d8"}
+        },
         {
             $unwind: "$tasks"
         },
@@ -406,8 +414,10 @@ public class TaskRepository {
             }
         }
     ]); */
-    public List<Document> getOverdueTask(){
+    public List<Document> getOverdueTask(String id){
         long currentTime = new Date().getTime();
+
+        MatchOperation match = Aggregation.match(Criteria.where("id").is(id));
 
         AggregationOperation unwindOps = Aggregation.unwind("tasks");
 
@@ -426,7 +436,7 @@ public class TaskRepository {
                 .and("tasks.due").as("due")
                 .and("tasks.completed").as("completed");
 
-        Aggregation pipeline = Aggregation.newAggregation(unwindOps, matchOps, sortOps, projectOps);
+        Aggregation pipeline = Aggregation.newAggregation(match, unwindOps, matchOps, sortOps, projectOps);
 
         AggregationResults<Document> results = template.aggregate(pipeline, "tasks", Document.class);
 
@@ -436,6 +446,9 @@ public class TaskRepository {
     }
 
     /*db.tasks.aggregate([
+        {
+            $match: {id: "d73726d8"}
+        },
         {
             $unwind: "$tasks"
         },
@@ -466,8 +479,10 @@ public class TaskRepository {
             }
         }
     ]); */
-    public List<Document> getOutstandingTasks(){
+    public List<Document> getOutstandingTasks(String id){
         long currentTime = new Date().getTime();
+
+        MatchOperation match = Aggregation.match(Criteria.where("id").is(id));
 
         AggregationOperation unwindOps = Aggregation.unwind("tasks");
 
@@ -487,7 +502,7 @@ public class TaskRepository {
                 .and("tasks.due").as("due")
                 .and("tasks.completed").as("completed");
 
-        Aggregation pipeline = Aggregation.newAggregation(unwindOps, matchOps, sortOps, projectOps);
+        Aggregation pipeline = Aggregation.newAggregation(match, unwindOps, matchOps, sortOps, projectOps);
 
         AggregationResults<Document> results = template.aggregate(pipeline, "tasks", Document.class);
 

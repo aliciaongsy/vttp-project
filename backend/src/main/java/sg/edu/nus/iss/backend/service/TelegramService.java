@@ -62,8 +62,8 @@ public class TelegramService {
         return taskRepo.updateTaskByAttribute(id, workspace, taskId, variable, value);
     }
 
-    public Task getTaskDueSoon(){
-        Document doc = taskRepo.getIncompleteTaskDueSoon();
+    public Task getTaskDueSoon(String id){
+        Document doc = taskRepo.getIncompleteTaskDueSoon(id);
         Task task = new Task();
         if (!doc.isEmpty()){
             task = task.convertDocToTask(doc);
@@ -71,16 +71,16 @@ public class TelegramService {
         return task;
     }
 
-    public String getTaskDueSoonWorkspace(){
-        Document doc = taskRepo.getIncompleteTaskDueSoon();
+    public String getTaskDueSoonWorkspace(String id){
+        Document doc = taskRepo.getIncompleteTaskDueSoon(id);
         if (doc.isEmpty()){
             return "";
         }
         return doc.getString("workspace");
     }
 
-    public List<Task> getOverdueTask(){
-        List<Document> docs = taskRepo.getOverdueTask();
+    public List<Task> getOverdueTask(String id){
+        List<Document> docs = taskRepo.getOverdueTask(id);
         if (docs.isEmpty()) {
             return new LinkedList<>();
         }
@@ -95,8 +95,8 @@ public class TelegramService {
         return tasks;
     }
 
-    public List<String> getOverdueTaskWorkspace(){
-        List<Document> docs = taskRepo.getOverdueTask();
+    public List<String> getOverdueTaskWorkspace(String id){
+        List<Document> docs = taskRepo.getOverdueTask(id);
         if (docs.isEmpty()) {
             return new LinkedList<>();
         }
@@ -110,8 +110,8 @@ public class TelegramService {
         return workspaces;
     }
 
-    public List<Task> getOutstandingTasks(){
-        List<Document> docs = taskRepo.getOutstandingTasks();
+    public List<Task> getOutstandingTasks(String id){
+        List<Document> docs = taskRepo.getOutstandingTasks(id);
         if (docs.isEmpty()) {
             return new LinkedList<>();
         }
@@ -126,8 +126,8 @@ public class TelegramService {
         return tasks;
     }
 
-     public List<String> getOutstandingTasksWorkspace(){
-        List<Document> docs = taskRepo.getOutstandingTasks();
+     public List<String> getOutstandingTasksWorkspace(String id){
+        List<Document> docs = taskRepo.getOutstandingTasks(id);
         if (docs.isEmpty()) {
             return new LinkedList<>();
         }
