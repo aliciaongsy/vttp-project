@@ -6,14 +6,14 @@ import { ActivatedRoute } from '@angular/router';
 import { selectUserDetails } from '../../../state/user/user.selectors';
 import { loadAllTasks } from '../../../state/tasks/task.actions';
 import { loadAllSessions } from '../../../state/focus/focus.actions';
-import { selectFocus, selectSessions } from '../../../state/focus/focus.selector';
+import { selectFocus, selectLoadStatus, selectSessions } from '../../../state/focus/focus.selector';
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.css'
 })
-export class OverviewComponent implements OnInit, OnDestroy{
+export class OverviewComponent implements OnInit, OnDestroy {
 
   private ngrxstore = inject(Store)
   private activatedRoute = inject(ActivatedRoute)
@@ -35,15 +35,19 @@ export class OverviewComponent implements OnInit, OnDestroy{
 
   currentWorkspace!: string
   uid!: string
-  
+
+  loadStatus$!: Subscription
+
   ngOnInit(): void {
     console.info('oninit overview')
     this.currentWorkspace = this.activatedRoute.parent?.snapshot.params['w']
 
     this.activatedRoute.parent?.params
-      .subscribe((value)=>{
+      .subscribe((value) => {
         this.currentWorkspace = value['w']
         console.info('curr: ', this.currentWorkspace)
+        this.date = []
+        this.duration = []
         this.setChartData()
         this.setBarChartData()
         this.loadData()
@@ -61,7 +65,7 @@ export class OverviewComponent implements OnInit, OnDestroy{
     this.session$.unsubscribe()
   }
 
-  loadData(){
+  loadData() {
     firstValueFrom(this.ngrxstore.select(selectUserDetails))
       .then((value) => {
         console.info('dispatch action')
@@ -84,25 +88,32 @@ export class OverviewComponent implements OnInit, OnDestroy{
 
     this.completedTask$ = this.ngrxstore.select(selectCompletedTaskSize)
       .subscribe((value) => {
-        console.info('completed task',value)
+        console.info('completed task', value)
         this.completed = value
         this.setChartData()
       })
-    
-    this.session$ = this.ngrxstore.select(selectSessions)
-      .subscribe((value) => {
-        for (var v of value){
-          if (this.date.indexOf(v.date)==-1){
-            this.date.push(v.date)
-            this.duration.push(v.duration)
-          }
-        }
-        this.setBarChartData()
-      })
-    
+
+    this.loadStatus$ = this.ngrxstore.select(selectFocus).subscribe(
+      (state) => {
+        this.session$ = this.ngrxstore.select(selectSessions)
+          .subscribe((value) => {
+            if (state.loadStatus == 'complete' && state.workspace == this.currentWorkspace) {
+              for (var v of value) {
+                if (this.date.indexOf(v.date) == -1) {
+                  this.date.push(v.date)
+                  this.duration.push(v.duration)
+                }
+              }
+              this.setBarChartData()
+            }
+          })
+      }
+    )
+
+
   }
 
-  setChartData(){
+  setChartData() {
     console.info('setting chart data')
     this.data = {
       labels: ['completed', 'incompleted'],
@@ -130,18 +141,18 @@ export class OverviewComponent implements OnInit, OnDestroy{
     };
   }
 
-  setBarChartData(){
+  setBarChartData() {
     this.barData = {
       labels: this.date,
       datasets: [
-          {
-              label: 'Focus Sessions',
-              barThickness: 70,
-              data: this.duration,
-              backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 205, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(201, 203, 207, 0.2)' ],
-              borderColor: ['rgb(255, 99, 132)', 'rgb(255, 159, 64)', 'rgb(255, 205, 86)', 'rgb(75, 192, 192)', 'rgb(54, 162, 235)', 'rgb(153, 102, 255)', 'rgb(201, 203, 207)'],
-              borderWidth: 1
-          }
+        {
+          label: 'Focus Sessions',
+          barThickness: 70,
+          data: this.duration,
+          backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 205, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(201, 203, 207, 0.2)'],
+          borderColor: ['rgb(255, 99, 132)', 'rgb(255, 159, 64)', 'rgb(255, 205, 86)', 'rgb(75, 192, 192)', 'rgb(54, 162, 235)', 'rgb(153, 102, 255)', 'rgb(201, 203, 207)'],
+          borderWidth: 1
+        }
       ]
     };
     const documentStyle = getComputedStyle(document.documentElement);
@@ -150,34 +161,34 @@ export class OverviewComponent implements OnInit, OnDestroy{
 
     this.barOptions = {
       plugins: {
-          legend: {
-              labels: {
-                  color: '#010662'
-              }
+        legend: {
+          labels: {
+            color: '#010662'
           }
+        }
       },
       scales: {
-          y: {
-              beginAtZero: true,
-              ticks: {
-                  color: textColorSecondary
-              },
-              grid: {
-                  color: surfaceBorder,
-                  drawBorder: false
-              }
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: textColorSecondary
           },
-          x: {
-              ticks: {
-                  color: textColorSecondary
-              },
-              grid: {
-                  color: surfaceBorder,
-                  drawBorder: false
-              }
+          grid: {
+            color: surfaceBorder,
+            drawBorder: false
           }
+        },
+        x: {
+          ticks: {
+            color: textColorSecondary
+          },
+          grid: {
+            color: surfaceBorder,
+            drawBorder: false
+          }
+        }
       }
-  };
+    };
   }
 
 }
