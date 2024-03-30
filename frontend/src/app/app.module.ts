@@ -15,12 +15,17 @@ import { AttributionsComponent } from './component/attributions/attributions.com
 import { FeaturesComponent } from './component/features/features.component';
 import { HttpClientModule } from '@angular/common/http';
 import { UserService } from './service/user.service';
-import { DbStore } from './service/db.store';
 import { OverviewComponent } from './component/task-master/overview/overview.component';
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { TaskService } from './service/task.service';
 import { AccountComponent } from './component/account/account.component';
 import { FocusComponent } from './component/task-master/focus/focus.component';
+import { PlannerService } from './service/planner.service';
+import { FocusService } from './service/focus.service';
+import { CalendarComponent } from './component/calendar/calendar.component';
+import { CollabComponent } from './component/collab/collab.component';
+import { CollabService } from './service/collab.service';
+import { MessageService } from './service/message.service';
 
 // primeng imports
 import { DialogModule } from 'primeng/dialog';
@@ -39,6 +44,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { StoreModule } from '@ngrx/store';
 import { ToastModule } from 'primeng/toast';
 import { KnobModule } from 'primeng/knob';
+import { DividerModule } from 'primeng/divider';
 
 // ngrx imports
 import { EffectsModule } from '@ngrx/effects';
@@ -51,10 +57,6 @@ import { PlannerEffects } from './state/planner/planner.effects';
 import { plannerReducer } from './state/planner/planner.reducer';
 import { focusReducer } from './state/focus/focus.reducer';
 import { FocusEffects } from './state/focus/focus.effects';
-import { PlannerService } from './service/planner.service';
-import { FocusService } from './service/focus.service';
-import { CalendarComponent } from './component/calendar/calendar.component';
-import { CollabComponent } from './component/collab/collab.component';
 
 @NgModule({
   declarations: [
@@ -95,13 +97,14 @@ import { CollabComponent } from './component/collab/collab.component';
     CheckboxModule,
     ToastModule,
     KnobModule,
+    DividerModule,
     StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer, focus: focusReducer}),
     StoreDevtoolsModule.instrument({maxAge: 25}),
     EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects, FocusEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
     FullCalendarModule
   ],
-  providers: [UserService, DbStore, TaskService, PlannerService, FocusService],
+  providers: [UserService, TaskService, PlannerService, FocusService, CollabService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
