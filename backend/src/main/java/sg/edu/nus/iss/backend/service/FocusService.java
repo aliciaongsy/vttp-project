@@ -44,6 +44,6 @@ public class FocusService {
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error adding new session to workspace");
-        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 }

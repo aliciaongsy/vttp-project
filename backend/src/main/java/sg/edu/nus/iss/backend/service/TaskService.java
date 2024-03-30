@@ -47,7 +47,7 @@ public class TaskService {
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error creating new workspace");
-        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
     // --- tasks ---
@@ -69,7 +69,7 @@ public class TaskService {
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error adding new task to workspace");
-        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
     public ResponseEntity<String> updateCompletedStatus(String id, String workspace, String taskId, boolean completed){
@@ -79,7 +79,7 @@ public class TaskService {
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error updating completed status");
-        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
     public ResponseEntity<String> deleteTaskById(String id, String workspace, String taskId){
@@ -89,7 +89,7 @@ public class TaskService {
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error deleting task");
-        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
     public ResponseEntity<String> updateTaskById(String id, String workspace, String taskId, Task task){
@@ -100,6 +100,6 @@ public class TaskService {
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error updating task");
-        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 }

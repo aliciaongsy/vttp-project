@@ -47,7 +47,7 @@ public class UserService {
             }
 
             JsonObject o = buildJsonObject("error", "failed to log in");
-            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
         }
         // account does not exist
         JsonObject o = buildJsonObject("error", "user does not exists");
@@ -66,7 +66,7 @@ public class UserService {
         }
 
         JsonObject o = buildJsonObject("error", "new user not added");
-        return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
 }
