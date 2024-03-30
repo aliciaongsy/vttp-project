@@ -54,6 +54,7 @@ import { FocusEffects } from './state/focus/focus.effects';
 import { PlannerService } from './service/planner.service';
 import { FocusService } from './service/focus.service';
 import { CalendarComponent } from './component/calendar/calendar.component';
+import { CollabComponent } from './component/collab/collab.component';
 
 @NgModule({
   declarations: [
@@ -69,7 +70,8 @@ import { CalendarComponent } from './component/calendar/calendar.component';
     TasksComponent,
     AccountComponent,
     FocusComponent,
-    CalendarComponent
+    CalendarComponent,
+    CollabComponent
   ],
   imports: [
     BrowserModule,

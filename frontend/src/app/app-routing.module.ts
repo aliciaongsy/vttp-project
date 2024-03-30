@@ -12,6 +12,7 @@ import { AccountComponent } from './component/account/account.component';
 import { canLeave } from './guard';
 import { FocusComponent } from './component/task-master/focus/focus.component';
 import { CalendarComponent } from './component/calendar/calendar.component';
+import { CollabComponent } from './component/collab/collab.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
       { path: 'focus', component: FocusComponent }
     ]
    },
+  { path: 'collab', component: CollabComponent },
   { path: 'calendar', component: CalendarComponent },
   { path: 'features', component: FeaturesComponent },
   { path: 'attributions', component: AttributionsComponent },
