@@ -1,0 +1,64 @@
+.base{
+    padding: 0 2ch;
+}
+
+div{
+    font-family: 'Lora', sans-serif;
+    color: #100662;
+}
+
+td{
+    color: #010662;
+    font-family: 'Lora', sans-serif;
+}
+
+#leftpanel{
+    width: 100%;
+}
+
+#rightpanel{
+    width: 100%;
+}
+
+:host ::ng-deep .p-button{
+    background: #010662;
+    color: #FFF9F4;
+    border: none;
+    font-family: 'Lora', sans-serif;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header{
+    color: #010662;
+    font-family: 'Lora', sans-serif;
+    background: #FFF9F4;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+    background: #FFF9F4;
+}
+
+input{
+    height: 40px;
+    color: #010662;
+    font-family: 'Lora', sans-serif;
+    background: #FFF9F4;
+}
+
+:host ::ng-deep .p-component{
+    font-family: 'Lora', sans-serif;
+}
+
+:host ::ng-deep .p-dropdown{
+    background:#FFF9F4;
+}
+
+/* message */
+.right{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.left{
+    display: flex;
+    justify-content: flex-start;
+}
