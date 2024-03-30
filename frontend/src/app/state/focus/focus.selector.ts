@@ -15,3 +15,7 @@ export const selectSessions = createSelector(
     selectFocus,
     (state: FocusState) => state.sessions
 )
+export const selectLoadStatus = createSelector(
+    selectFocus,
+    (state: FocusState) => state.loadStatus
+)
