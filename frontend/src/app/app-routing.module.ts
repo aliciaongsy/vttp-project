@@ -10,8 +10,8 @@ import { OverviewComponent } from './component/task-master/overview/overview.com
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { AccountComponent } from './component/account/account.component';
 import { canLeave } from './guard';
-import { PlannerComponent } from './component/task-master/planner/planner.component';
 import { FocusComponent } from './component/task-master/focus/focus.component';
+import { CalendarComponent } from './component/calendar/calendar.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -23,10 +23,10 @@ const routes: Routes = [
     children: [
       { path: 'overview', component: OverviewComponent },
       { path: 'tasks', component: TasksComponent },
-      { path: 'focus', component: FocusComponent },
-      { path: 'planner', component: PlannerComponent }
+      { path: 'focus', component: FocusComponent }
     ]
-   }, 
+   },
+  { path: 'calendar', component: CalendarComponent },
   { path: 'features', component: FeaturesComponent },
   { path: 'attributions', component: AttributionsComponent },
   { path: 'account', component: AccountComponent },

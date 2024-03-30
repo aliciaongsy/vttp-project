@@ -20,7 +20,6 @@ import { OverviewComponent } from './component/task-master/overview/overview.com
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { TaskService } from './service/task.service';
 import { AccountComponent } from './component/account/account.component';
-import { PlannerComponent } from './component/task-master/planner/planner.component';
 import { FocusComponent } from './component/task-master/focus/focus.component';
 
 // primeng imports
@@ -54,6 +53,7 @@ import { focusReducer } from './state/focus/focus.reducer';
 import { FocusEffects } from './state/focus/focus.effects';
 import { PlannerService } from './service/planner.service';
 import { FocusService } from './service/focus.service';
+import { CalendarComponent } from './component/calendar/calendar.component';
 
 @NgModule({
   declarations: [
@@ -68,8 +68,8 @@ import { FocusService } from './service/focus.service';
     OverviewComponent,
     TasksComponent,
     AccountComponent,
-    PlannerComponent,
-    FocusComponent
+    FocusComponent,
+    CalendarComponent
   ],
   imports: [
     BrowserModule,
