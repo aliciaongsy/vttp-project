@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Event, Task } from '../model';
 
 const URL = environment.url

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { ChatDetails, ChatRoom } from '../model';
-import { catchError, firstValueFrom, of, tap } from 'rxjs';
+import { ChatRoom } from '../model';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 const URL = environment.url
