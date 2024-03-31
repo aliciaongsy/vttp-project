@@ -28,13 +28,20 @@ export class MessageService {
     const socket = new SockJS('//localhost:8080/socket');
     this.stompClient = Stomp.over(socket);
 
-    // this.stompClient = new Client({
-    //   webSocketFactory: () => socket,
-    //   debug: (msg: string) => console.log(msg)
-    // })
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      // Handle error, such as displaying an error message to the user
+    };
+
+    socket.onclose = (event) => {
+      console.log('WebSocket connection closed:', event);
+      // Perform cleanup tasks, such as resetting UI state or re-establishing the connection
+    };
+
+
   }
 
-  joinRoom(roomId: string){
+  joinRoom(roomId: string) {
     this.stompClient.connect({}, () => {
       this.stompClient.subscribe(`/topic/${roomId}`, (messages: any) => {
         const messageContent = JSON.parse(messages.body)
@@ -45,25 +52,38 @@ export class MessageService {
 
         this.messageSubject.next(currentMessage);
       })
-      // tell your name to the server
-      this.stompClient.send("/app/chat/adduser",
+      // tell your name to the server - send to @MessageMapping path
+      this.stompClient.send(`/app/chat/adduser/${roomId}`,
         {},
-        JSON.stringify({sender: this.name, type: 'JOIN'})
+        JSON.stringify({ sender: this.name, type: 'JOIN' })
       )
+
+      this.stompClient.activate()
     })
   }
 
   sendMessage(roomId: string, chatMessage: ChatMessage) {
-    console.info('send message')
-    this.stompClient.send(`/app/chat/topic/${roomId}`, {}, JSON.stringify(chatMessage));
+    if (this.stompClient && this.stompClient.connected) {
+      // perform operations only if connection is up
+      console.info('send message')
+
+      // send to @MessageMapping path
+      this.stompClient.send(`/app/chat/sendmessage/${roomId}`, {}, JSON.stringify(chatMessage));
+    }
+    
   }
 
-  getMessageSubject(){
+  getMessageSubject() {
+    console.info('message subject')
     return this.messageSubject.asObservable();
   }
 
-  disconnect(){
-    this.stompClient.deactivate()
+  disconnect() {
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.disconnect(() => {
+        console.log('Disconnected from WebSocket');
+      });
+    }
   }
 
 }
