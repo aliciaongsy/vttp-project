@@ -15,3 +15,7 @@ export const selectWorkspaces = createSelector(
     selectUser,
     (state: UserState) => state.workspaces
 )
+export const selectChats = createSelector(
+    selectUser,
+    (state: UserState) => state.chats
+)

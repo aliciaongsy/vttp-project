@@ -1,11 +1,12 @@
 import { createReducer, on } from "@ngrx/store"
-import { UserDetails } from "../../model"
-import { addWorkspace, changeStatus, loadWorkspaces, resetState } from "./user.actions"
+import { ChatDetails, ChatRoom, UserDetails } from "../../model"
+import { addWorkspace, changeStatus, createChatRoom, getChatList, joinChatRoom, loadChats, loadWorkspaces, resetState } from "./user.actions"
 
 export interface UserState {
     login: boolean
     user: UserDetails
     workspaces: string[]
+    chats: ChatDetails[]
 }
 
 export const initialState: UserState = {
@@ -15,7 +16,8 @@ export const initialState: UserState = {
         name: '',
         email: ''
     },
-    workspaces: []
+    workspaces: [],
+    chats: []
 }
 
 export const userReducer = createReducer(
@@ -24,10 +26,13 @@ export const userReducer = createReducer(
         ...state,
         workspaces: [...state.workspaces, workspace]
     })),
+    on(createChatRoom, state => state),
+    on(joinChatRoom, state => state),
+    on(getChatList, state => state),
     on(changeStatus, (state, { currUser }) => ({
+        ...state,
         login: !(state.login),
         user: currUser,
-        workspaces: state.workspaces
     })),
     on(resetState, state => ({
         login: false,
@@ -36,11 +41,15 @@ export const userReducer = createReducer(
             name: '',
             email: ''
         },
-        workspaces: []
+        workspaces: [],
+        chats: []
     })),
     on(loadWorkspaces, (state, {workspaces}) => ({
-        login: state.login,
-        user: state.user,
+        ...state,
         workspaces: workspaces
+    })),
+    on(loadChats, (state, {chats}) => ({
+        ...state,
+        chats: chats
     }))
 )
