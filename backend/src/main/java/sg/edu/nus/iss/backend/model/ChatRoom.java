@@ -120,7 +120,6 @@ public class ChatRoom {
         }
 
         ChatRoom room = new ChatRoom();
-        room.setRoomId(o.getString("roomId"));
         room.setOwnerId(o.getString("ownerId"));
         room.setOwnerName(o.getString("ownerName"));
         room.setName(o.getString("name"));
