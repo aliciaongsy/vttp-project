@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Client, Stomp } from '@stomp/stompjs';
+import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { ChatMessage } from '../model';
 import { BehaviorSubject } from 'rxjs';
@@ -53,9 +53,10 @@ export class MessageService {
         this.messageSubject.next(currentMessage);
       })
       // tell your name to the server - send to @MessageMapping path
+      // only send this when the user FIRST join
       this.stompClient.send(`/app/chat/adduser/${roomId}`,
         {},
-        JSON.stringify({ sender: this.name, type: 'JOIN' })
+        JSON.stringify({ content: `${this.name} has joined the chat`, sender: this.name, type: 'JOIN' })
       )
 
       this.stompClient.activate()
