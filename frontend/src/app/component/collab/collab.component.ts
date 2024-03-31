@@ -4,7 +4,7 @@ import { selectUserDetails } from '../../state/user/user.selectors';
 import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
 import { MessageService } from '../../service/message.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ChatDetails, ChatMessage, ChatRoom } from '../../model';
+import { ChatMessage, ChatRoom } from '../../model';
 import { ActivatedRoute } from '@angular/router';
 import { CollabService } from '../../service/collab.service';
 
@@ -31,6 +31,7 @@ export class CollabComponent implements OnInit, OnDestroy{
   messageForm!: FormGroup
 
   chatList$!: Observable<ChatRoom[]>
+  chatList!: ChatRoom[]
   route$!: Subscription
   messageList: any[] = [];
 
@@ -55,7 +56,12 @@ export class CollabComponent implements OnInit, OnDestroy{
       this.messageSvc.name=value.name
       this.name=value.name
       this.uid=value.id
-      this.chatList$ = this.collabSvc.getChatList(value.id)
+      this.chatList$ = this.collabSvc.getChatList(this.uid).pipe(
+        map((value) => {
+          console.info(value)
+          return [...value]
+        })
+        )
     })
 
     this.form = this.fb.group({
@@ -81,10 +87,27 @@ export class CollabComponent implements OnInit, OnDestroy{
   }
 
   createChannel(){
-    var room = this.form.value as ChatRoom
-    room.owner=this.uid
-    console.info(this.uid)
+    // var room = this.form.value as ChatRoom
+    // room.ownerId=this.uid
+    // room.ownerName=this.name
+    var users: string[] = []
+    users.push(this.name)
+    const room: ChatRoom = {
+      ownerId: this.uid,
+      ownerName: this.name,
+      name: this.form.value['name'],
+      users: users,
+      userCount: 1,
+      createDate: new Date().getTime(),
+      type: this.form.value['type']
+    }
     this.collabSvc.createChatRoom(room)
+      .then(() => 
+        this.chatList$ = this.collabSvc.getChatList(this.uid)
+      )
+      .catch((error) => 
+          alert(`error: ${error.error}`)
+      )
     this.form.reset()
     this.createRoomVisible = false
   }
@@ -98,6 +121,13 @@ export class CollabComponent implements OnInit, OnDestroy{
     this.joinRoomVisible = false
     this.messageSvc.joinRoom(this.roomId);
     this.collabSvc.joinChatRoom(this.uid, this.roomId)
+      .then(() => 
+        this.chatList$ = this.collabSvc.getChatList(this.uid)
+      )
+      .catch((error) => 
+        alert(`error: ${error.error}`)
+      )
+    this.roomId=''
     // if join successfully, add room to list of chats
   }
 
