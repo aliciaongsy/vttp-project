@@ -43,9 +43,10 @@ export class CollabComponent implements OnInit, OnDestroy{
 
     this.route$ = this.activatedRoute.params.subscribe(params=>{
       this.currentChatRoom = params['roomId']
+      // when a chat room is selected
       if (this.currentChatRoom!=undefined){
-        // display chat for particular room
         this.messageSvc.joinRoom(this.currentChatRoom)
+        // display chat for particular room
       }
     })
 
@@ -71,6 +72,7 @@ export class CollabComponent implements OnInit, OnDestroy{
 
   ngOnDestroy(): void {
     this.route$.unsubscribe()
+    this.messageSvc.disconnect()
   }
 
   // create new room
@@ -109,7 +111,6 @@ export class CollabComponent implements OnInit, OnDestroy{
         type: 'CHAT'
       }
       this.messageSvc.sendMessage(this.currentChatRoom, message)
-      this.messageList.push(message)
     }
     
   }
