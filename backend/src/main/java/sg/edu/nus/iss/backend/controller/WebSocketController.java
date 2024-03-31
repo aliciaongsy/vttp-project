@@ -40,11 +40,7 @@ public class WebSocketController {
 
     @PostMapping("/api/chat/join/{roomId}")
     @ResponseBody
-    public ResponseEntity<String> joinChatRoom(@PathVariable String roomId, @RequestBody String payload) {
-        JsonReader reader = Json.createReader(new StringReader(payload));
-        JsonObject o = reader.readObject();
-        String id = o.getString("userId");
-
+    public ResponseEntity<String> joinChatRoom(@PathVariable String roomId, @RequestBody String id) {
         return chatSvc.joinRoom(id, roomId);
     }
 
