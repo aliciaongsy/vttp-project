@@ -24,7 +24,7 @@ import { PlannerService } from './service/planner.service';
 import { FocusService } from './service/focus.service';
 import { CalendarComponent } from './component/calendar/calendar.component';
 import { CollabComponent } from './component/collab/collab.component';
-import { CollabService } from './service/collab.service';
+import { ChatService } from './service/chat.service';
 import { MessageService } from './service/message.service';
 
 // primeng imports
@@ -104,7 +104,7 @@ import { FocusEffects } from './state/focus/focus.effects';
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
     FullCalendarModule
   ],
-  providers: [UserService, TaskService, PlannerService, FocusService, CollabService, MessageService],
+  providers: [UserService, TaskService, PlannerService, FocusService, ChatService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
