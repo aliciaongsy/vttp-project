@@ -60,9 +60,13 @@ export interface FocusSession {
 }
 
 export interface ChatRoom{
-    roomId?: string
-    owner: string
+    roomId?: string // uuid generated in backend
+    ownerId: string
+    ownerName: string
     name: string
+    users: string[]
+    userCount: number
+    createDate: number // milliseconds
     type: 'Private' | 'Public'
 }
 
@@ -70,6 +74,7 @@ export interface ChatMessage {
     content: string
     sender: string
     type: 'CHAT' | 'JOIN' | 'LEAVE'
+    timestamp: number 
 }
 
 // for displaying chat list
