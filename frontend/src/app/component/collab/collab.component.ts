@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectUserDetails } from '../../state/user/user.selectors';
+import { selectChats, selectUserDetails } from '../../state/user/user.selectors';
 import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
 import { MessageService } from '../../service/message.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ChatMessage, ChatRoom } from '../../model';
+import { ChatDetails, ChatMessage, ChatRoom } from '../../model';
 import { ActivatedRoute } from '@angular/router';
-import { CollabService } from '../../service/collab.service';
+import { ChatService } from '../../service/chat.service';
+import { createChatRoom, getChatList, joinChatRoom } from '../../state/user/user.actions';
 
 @Component({
   selector: 'app-collab',
@@ -17,7 +18,7 @@ export class CollabComponent implements OnInit, OnDestroy{
 
   private ngrxStore = inject(Store)
   private messageSvc = inject(MessageService)
-  private collabSvc = inject(CollabService)
+  private chatSvc = inject(ChatService)
   private fb = inject(FormBuilder)
   private activatedRoute = inject(ActivatedRoute)
 
@@ -30,9 +31,10 @@ export class CollabComponent implements OnInit, OnDestroy{
   types: string[] = ['Public', 'Private']
   messageForm!: FormGroup
 
-  chatList$!: Observable<ChatRoom[]>
+  chatList$!: Observable<ChatDetails[]>
   chatList!: ChatRoom[]
   route$!: Subscription
+  messageSub$!: Subscription
   messageList: any[] = [];
 
   uid!: string
@@ -44,10 +46,14 @@ export class CollabComponent implements OnInit, OnDestroy{
 
     this.route$ = this.activatedRoute.params.subscribe(params=>{
       this.currentChatRoom = params['roomId']
-      // when a chat room is selected
-      if (this.currentChatRoom!=undefined){
+
+      if (this.currentChatRoom){
         this.messageSvc.joinRoom(this.currentChatRoom)
-        // display chat for particular room
+        this.messageSub$ = this.chatSvc.getAllMessages(this.currentChatRoom).subscribe(
+          (value) => {
+          console.info(value)
+          this.messageList = value
+        })
       }
     })
 
@@ -56,13 +62,15 @@ export class CollabComponent implements OnInit, OnDestroy{
       this.messageSvc.name=value.name
       this.name=value.name
       this.uid=value.id
-      this.chatList$ = this.collabSvc.getChatList(this.uid).pipe(
-        map((value) => {
-          console.info(value)
-          return [...value]
-        })
-        )
+      // this.chatList$ = this.chatSvc.getChatList(this.uid).pipe(
+      //   map((value) => {
+      //     console.info(value)
+      //     return [...value]
+      //   })
+      // )
     })
+
+    this.chatList$ = this.ngrxStore.select(selectChats)
 
     this.form = this.fb.group({
       name: this.fb.control<string>('', [Validators.required, Validators.minLength(3)]),
@@ -73,12 +81,15 @@ export class CollabComponent implements OnInit, OnDestroy{
       message: this.fb.control<string>('', [Validators.required])
     })
     
-    this.listenerMessage()
+    // this.listenForMessage()
   }
 
   ngOnDestroy(): void {
     this.route$.unsubscribe()
     this.messageSvc.disconnect()
+    if (this.messageSub$) {
+      this.messageSub$.unsubscribe();
+    }
   }
 
   // create new room
@@ -87,9 +98,6 @@ export class CollabComponent implements OnInit, OnDestroy{
   }
 
   createChannel(){
-    // var room = this.form.value as ChatRoom
-    // room.ownerId=this.uid
-    // room.ownerName=this.name
     var users: string[] = []
     users.push(this.name)
     const room: ChatRoom = {
@@ -101,13 +109,14 @@ export class CollabComponent implements OnInit, OnDestroy{
       createDate: new Date().getTime(),
       type: this.form.value['type']
     }
-    this.collabSvc.createChatRoom(room)
-      .then(() => 
-        this.chatList$ = this.collabSvc.getChatList(this.uid)
-      )
-      .catch((error) => 
-          alert(`error: ${error.error}`)
-      )
+    this.ngrxStore.dispatch(createChatRoom({chat: room}))
+    // this.chatSvc.createChatRoom(room)
+    //   // .then(() => 
+    //   //   this.chatList$ = this.chatSvc.getChatList(this.uid)
+    //   // )
+    //   .catch((error) => 
+    //       alert(`error: ${error.error}`)
+    //   )
     this.form.reset()
     this.createRoomVisible = false
   }
@@ -120,15 +129,18 @@ export class CollabComponent implements OnInit, OnDestroy{
   joinRoom(){
     this.joinRoomVisible = false
     this.messageSvc.joinRoom(this.roomId);
-    this.collabSvc.joinChatRoom(this.uid, this.roomId)
-      .then(() => 
-        this.chatList$ = this.collabSvc.getChatList(this.uid)
-      )
-      .catch((error) => 
-        alert(`error: ${error.error}`)
-      )
+    this.ngrxStore.dispatch(joinChatRoom({id: this.uid, roomId: this.roomId}))
+    // this.chatSvc.joinChatRoom(this.uid, this.roomId)
+    //   .then(() => {
+    //     // if join successfully, add room to list of chats
+    //     // this.chatList$ = this.chatSvc.getChatList(this.uid)
+    //     this.ngrxStore.dispatch(getChatList())
+    //     this.messageSvc.firstJoined(this.roomId)
+    //   })
+    //   .catch((error) => 
+    //     alert(`error: ${error.error}`)
+    //   )
     this.roomId=''
-    // if join successfully, add room to list of chats
   }
 
   sendMessage(){
@@ -138,21 +150,24 @@ export class CollabComponent implements OnInit, OnDestroy{
       const message: ChatMessage = {
         content: data,
         sender: this.name,
-        type: 'CHAT'
+        type: 'CHAT',
+        timestamp: new Date().getTime()
       }
       this.messageSvc.sendMessage(this.currentChatRoom, message)
     }
-    
+    this.messageForm.reset()
   }
 
-  listenerMessage() {
-    this.messageSvc.getMessageSubject().subscribe((messages: any) => {
-      console.info(messages)
-      this.messageList = messages.map((item: any)=> ({
-        ...item,
-        message_side: item.user === this.name ? 'sender': 'receiver'
-      }))
-    });
-  }
+  // listenForMessage() {
+  //   this.messageSvc.getMessageSubject().subscribe((messages: ChatMessage[]) => {
+  //     for (var m of messages){
+  //       this.messageList.push(m)
+  //     }
+  //     this.messageList = messages.map((item: any)=> ({
+  //       ...item,
+  //       // message_side: item.user === this.name ? 'sender': 'receiver'
+  //     }))
+  //   });
+  // }
 
 }
