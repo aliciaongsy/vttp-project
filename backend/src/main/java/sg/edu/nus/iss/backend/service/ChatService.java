@@ -43,7 +43,7 @@ public class ChatService {
 
     @Transactional(rollbackFor = {ChatRoomException.class, ChatListException.class})
     public void joinRoom(String id, String name, String roomId) throws ChatListException, ChatRoomException{
-        chatRepo.addNewUser(roomId, name);
+        chatRepo.addNewUser(roomId, id);
         chatRepo.joinChatRoom(id, roomId);
     }
 

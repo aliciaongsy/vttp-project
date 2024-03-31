@@ -99,7 +99,7 @@ export class CollabComponent implements OnInit, OnDestroy{
 
   createChannel(){
     var users: string[] = []
-    users.push(this.name)
+    users.push(this.uid)
     const room: ChatRoom = {
       ownerId: this.uid,
       ownerName: this.name,

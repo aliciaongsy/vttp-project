@@ -144,11 +144,11 @@ public class ChatRepository {
         }
     }
 
-    public void addNewUser(String roomId, String name) throws ChatListException {
+    public void addNewUser(String roomId, String id) throws ChatListException {
         Criteria criteria = Criteria.where("roomId").is(roomId);
         Query query = new Query(criteria);
 
-        Update updateOps = new Update().push("users").value(name).inc("userCount", 1);
+        Update updateOps = new Update().push("users").value(id).inc("userCount", 1);
 
         UpdateResult updateResult = template.updateFirst(query, updateOps, Document.class, "chatlist");
 
