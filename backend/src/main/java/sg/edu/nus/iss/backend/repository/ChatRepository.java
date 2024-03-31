@@ -19,6 +19,8 @@ import org.springframework.stereotype.Repository;
 
 import com.mongodb.client.result.UpdateResult;
 
+import sg.edu.nus.iss.backend.exception.ChatListException;
+import sg.edu.nus.iss.backend.exception.ChatRoomException;
 import sg.edu.nus.iss.backend.model.ChatRoom;
 
 @Repository
@@ -72,8 +74,12 @@ public class ChatRepository {
         ProjectionOperation projectOps = Aggregation.project()
                 .andExclude("_id")
                 .and("chats.roomId").as("roomId")
-                .and("chats.owner").as("owner")
+                .and("chats.ownerId").as("ownerId")
+                .and("chats.ownerName").as("ownerName")
                 .and("chats.name").as("name")
+                .and("chats.users").as("users")
+                .and("chats.userCount").as("userCount")
+                .and("chats.createDate").as("createDate")
                 .and("chats.type").as("type");
 
         Aggregation pipeline = Aggregation.newAggregation(matchOps, unwindOps, projectOps);
@@ -97,10 +103,16 @@ public class ChatRepository {
         return rooms;
     }
 
-    public boolean createChatRoom(String id, ChatRoom room){
-
+    public void addChatRoom(String id, ChatRoom room) throws ChatRoomException{
         // add into collection that contains all chatroom details
-        template.insert(room.toDoc(room), "chatroom");
+        Document insert = template.insert(room.toDoc(room), "chatroom");
+        
+        if (insert.isEmpty()){
+            throw new ChatRoomException("error adding chatroom details into chatroom collection");
+        }
+    }
+
+    public void createChatRoom(String id, ChatRoom room) throws ChatListException{
 
         Criteria criteria = Criteria.where("id").is(id);
         Query query = new Query(criteria);
@@ -115,14 +127,19 @@ public class ChatRepository {
             doc.put("id", id);
             doc.put("chats", chats);
             Document insert = template.insert(doc, "chatlist");
-            return !(insert.isEmpty());
+
+            if (insert.isEmpty()){
+                throw new ChatListException("error adding chatroom details into chatlist collection");
+            }
         }
 
         Update updateOps = new Update().push("chats").value(room.toDoc(room));
 
         UpdateResult updateResult = template.updateFirst(query, updateOps, Document.class, "chatlist");
 
-        return updateResult.getModifiedCount() > 0;
+        if (updateResult.getModifiedCount() == 0){
+            throw new ChatListException("error adding chatroom details into chatlist collection");
+        }
     }
 
     public boolean joinChatRoom(String id, String roomId){

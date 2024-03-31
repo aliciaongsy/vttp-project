@@ -3,6 +3,7 @@ package sg.edu.nus.iss.backend.controller;
 import java.io.StringReader;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
+import sg.edu.nus.iss.backend.exception.ChatListException;
+import sg.edu.nus.iss.backend.exception.ChatRoomException;
 import sg.edu.nus.iss.backend.model.ChatMessage;
 import sg.edu.nus.iss.backend.model.ChatRoom;
 import sg.edu.nus.iss.backend.service.ChatService;
@@ -52,11 +56,29 @@ public class WebSocketController {
         JsonObject o = reader.readObject();
 
         ChatRoom room = new ChatRoom();
-        room.setOwner(o.getString("owner"));
-        room.setName(o.getString("name"));
-        room.setType(o.getString("type"));
+        room = room.jsonToChatRoom(o);
 
-        return chatSvc.createRoom(room.getOwner(), room);
+        try {
+            chatSvc.createRoom(room.getOwnerId(), room);
+        } catch (ChatRoomException e) {
+
+            e.printStackTrace();
+            JsonObjectBuilder b = Json.createObjectBuilder();
+            b.add("error", e.getMessage());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
+
+        } catch (ChatListException e) {
+
+            e.printStackTrace();
+            JsonObjectBuilder b = Json.createObjectBuilder();
+            b.add("error", e.getMessage());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
+
+        }
+
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        b.add("message", "successfully created new chat room");
+        return ResponseEntity.ok().body(b.build().toString());
     }
 
     // web socket

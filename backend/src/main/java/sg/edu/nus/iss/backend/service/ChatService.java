@@ -6,11 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import sg.edu.nus.iss.backend.exception.ChatListException;
+import sg.edu.nus.iss.backend.exception.ChatRoomException;
 import sg.edu.nus.iss.backend.model.ChatRoom;
 import sg.edu.nus.iss.backend.repository.ChatRepository;
 
@@ -47,14 +50,11 @@ public class ChatService {
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
-     public ResponseEntity<String> createRoom(String id, ChatRoom room){
-        boolean created = chatRepo.createChatRoom(id, room);
-        if (created) {
-            JsonObject o = buildJsonObject("message", "successfully created chat room");
-            return ResponseEntity.ok(o.toString());
-        }
-        JsonObject o = buildJsonObject("error", "error creating chat room");
-        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+    @Transactional(rollbackFor = {ChatRoomException.class, ChatListException.class})
+    public void createRoom(String id, ChatRoom room) throws ChatRoomException, ChatListException{
+        
+        chatRepo.addChatRoom(id, room);
+        chatRepo.createChatRoom(id, room);
     }
     
 }
