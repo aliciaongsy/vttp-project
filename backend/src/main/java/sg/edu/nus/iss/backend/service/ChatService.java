@@ -14,6 +14,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import sg.edu.nus.iss.backend.exception.ChatListException;
 import sg.edu.nus.iss.backend.exception.ChatRoomException;
+import sg.edu.nus.iss.backend.model.ChatMessage;
 import sg.edu.nus.iss.backend.model.ChatRoom;
 import sg.edu.nus.iss.backend.repository.ChatRepository;
 
@@ -36,25 +37,43 @@ public class ChatService {
             return ResponseEntity.ok(b.build().toString());
         }
         JsonArrayBuilder b = Json.createArrayBuilder();
-        chats.forEach(c -> b.add(c.toJson(c)));
+        chats.forEach(c -> b.add(c.toJson2(c)));
         return ResponseEntity.ok(b.build().toString());
     }
 
-    public ResponseEntity<String> joinRoom(String id, String roomId){
-        boolean joined = chatRepo.joinChatRoom(id, roomId);
-        if (joined) {
-            JsonObject o = buildJsonObject("message", "successfully joined chat room");
-            return ResponseEntity.ok(o.toString());
-        }
-        JsonObject o = buildJsonObject("error", "error joining chat room");
-        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+    @Transactional(rollbackFor = {ChatRoomException.class, ChatListException.class})
+    public void joinRoom(String id, String name, String roomId) throws ChatListException, ChatRoomException{
+        chatRepo.addNewUser(roomId, name);
+        chatRepo.joinChatRoom(id, roomId);
     }
 
     @Transactional(rollbackFor = {ChatRoomException.class, ChatListException.class})
     public void createRoom(String id, ChatRoom room) throws ChatRoomException, ChatListException{
-        
         chatRepo.addChatRoom(id, room);
         chatRepo.createChatRoom(id, room);
     }
     
+    // --- chat messages ---
+    public ResponseEntity<String> getAllChatMessages(String roomId){
+        List<ChatMessage> messages = chatRepo.getAllMessagesByRoomId(roomId);
+
+        if (messages.isEmpty()){
+            JsonArrayBuilder b = Json.createArrayBuilder();
+            return ResponseEntity.ok(b.build().toString());
+        }
+        JsonArrayBuilder b = Json.createArrayBuilder();
+        messages.forEach(m -> b.add(m.toJson(m)));
+        return ResponseEntity.ok(b.build().toString());
+    }
+
+    public ResponseEntity<String> saveMessages(String roomId, ChatMessage message){
+        boolean added = chatRepo.saveMessages(roomId, message);
+
+        if (added){
+        JsonObject o = buildJsonObject("message", "successfully added messages");
+            return ResponseEntity.ok(o.toString());
+        }
+        JsonObject o = buildJsonObject("error", "error adding messages");
+        return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+    }
 }
