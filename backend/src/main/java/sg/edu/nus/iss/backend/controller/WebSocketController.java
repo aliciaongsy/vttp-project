@@ -35,7 +35,7 @@ public class WebSocketController {
     @Autowired
     private ChatService chatSvc;
 
-    // retrieving chat list and data
+    // --- chat list and data ---
     @GetMapping("/api/{id}/chats")
     @ResponseBody
     public ResponseEntity<String> getAllChats(@PathVariable String id) {
@@ -44,8 +44,32 @@ public class WebSocketController {
 
     @PostMapping("/api/chat/join/{roomId}")
     @ResponseBody
-    public ResponseEntity<String> joinChatRoom(@PathVariable String roomId, @RequestBody String id) {
-        return chatSvc.joinRoom(id, roomId);
+    public ResponseEntity<String> joinChatRoom(@PathVariable String roomId, @RequestBody String payload) {
+        JsonReader reader = Json.createReader(new StringReader(payload));
+        JsonObject o = reader.readObject();
+        String name = o.getString("name");
+        String id = o.getString("id");
+        try {
+            chatSvc.joinRoom(id, name, roomId);
+        } catch (ChatListException e) {
+
+            e.printStackTrace();
+            JsonObjectBuilder b = Json.createObjectBuilder();
+            b.add("error", e.getMessage());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
+
+        } catch (ChatRoomException e) {
+           
+            e.printStackTrace();
+            JsonObjectBuilder b = Json.createObjectBuilder();
+            b.add("error", e.getMessage());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
+
+        }
+
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        b.add("message", "successfully joined new chat room");
+        return ResponseEntity.ok().body(b.build().toString());
     }
 
     @PostMapping("/api/chat/create")
@@ -81,14 +105,19 @@ public class WebSocketController {
         return ResponseEntity.ok().body(b.build().toString());
     }
 
-    // web socket
+    // --- websocket ---
+    // sending message
     @MessageMapping("/chat/sendmessage/{roomId}")
     @SendTo("/topic/{roomId}") // messages sent to @MessageMapping endpoint will be dispatched to this @SendTo endpoint
     public ChatMessage sendMessage(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
         System.out.println(chatMessage.getContent());
+
+        chatSvc.saveMessages(roomId, chatMessage);
+        // persist messages into db
         return chatMessage;
     }
 
+    // new user join the chat
     @MessageMapping("/chat/adduser/{roomId}")
     @SendTo("/topic/{roomId}")
     public ChatMessage addUser(@DestinationVariable String roomId, @Payload ChatMessage chatMessage,
@@ -96,6 +125,12 @@ public class WebSocketController {
         // add username in websocket session
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
         return chatMessage;
+    }
+
+    @GetMapping("/api/chat/messages/{roomId}")
+    @ResponseBody
+    public ResponseEntity<String> getChatRoomMessages(@PathVariable String roomId){
+        return chatSvc.getAllChatMessages(roomId);
     }
 
 }
