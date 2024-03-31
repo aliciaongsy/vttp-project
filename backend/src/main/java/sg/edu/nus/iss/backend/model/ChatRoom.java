@@ -129,5 +129,26 @@ public class ChatRoom {
         room.setType(o.getString("type"));
         return room;
     }
+
+    public ChatRoom docToChatRoom2(Document doc){
+        ChatRoom room = new ChatRoom();
+        room.setRoomId(doc.getString("roomId"));
+        room.setName(doc.getString("name"));
+        return room;
+    }
+
+    public Document toDoc2(ChatRoom room){
+        Document doc = new Document();
+        doc.put("roomId", room.getRoomId());
+        doc.put("name", room.getName());
+        return doc;
+    }
+
+    public JsonObject toJson2(ChatRoom room){
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        return b.add("roomId", room.getRoomId())
+            .add("name", room.getName())
+            .build();
+    }
     
 }
