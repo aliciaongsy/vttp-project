@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NewUser } from '../../model';
 import { UserService } from '../../service/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -12,6 +13,7 @@ export class RegisterComponent {
 
   private fb = inject(FormBuilder)
   private userSvc = inject(UserService)
+  private router = inject(Router)
 
   form!: FormGroup
   userExist: boolean = false
@@ -48,6 +50,7 @@ export class RegisterComponent {
           this.userSvc.createUser(user)
           alert("new user created successfully")
           this.form.reset()
+          this.router.navigate(['/login'])
         }
         else {
           alert("field(s) have error")
