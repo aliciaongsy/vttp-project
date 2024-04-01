@@ -1,40 +1,42 @@
 <div class="base">
-    <h2>Welcome to collaborative space!</h2>
-    <div>
-        <p-button icon="pi pi-plus" label="Create Room" size="small" (click)="create()"
-            [style]="{ margin: '0 1ch 0 0'}"></p-button>
-        <p-dialog header="Create new room" [(visible)]="createRoomVisible" [modal]="true" [style]="{ width: '40vw'}"
-            [draggable]="false" [resizable]="false"
-            [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
-            <form [formGroup]="form">
-                <table>
-                    <tr>
-                        <td>Room Name:</td>
-                        <td><input pInputText type="text" formControlName="name"></td>
-                    </tr>
-                    <tr>
-                        <td>Room Type:</td>
-                        <td><p-dropdown formControlName="type" [options]="types" appendTo="body"></p-dropdown></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><p-button (onClick)="createChannel()" size="small" height="40px">Create</p-button></td>
-                    </tr>
-                </table>
-            </form>
-        </p-dialog>
-        <p-button icon="pi pi-plus" label="Join Room" size="small" (click)="join()"></p-button>
-        <p-dialog header="Join existing room" [(visible)]="joinRoomVisible" [modal]="true" [style]="{ width: '40vw'}"
-            [draggable]="false" [resizable]="false"
-            [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
-            <p class="m-0" style="color: #010662;">
-                Room ID: <input pInputText type="text" [(ngModel)]="roomId">
-                <p-button (onClick)="joinRoom()" size="small" height="40px">Join</p-button>
-            </p>
-        </p-dialog>
+    <div class="row">
+        <h2>Welcome to collaborative space!</h2>
+        <div>
+            <p-button icon="pi pi-plus" label="Create Room" size="small" (click)="create()"
+                [style]="{ margin: '0 1ch'}"></p-button>
+            <p-dialog header="Create new room" [(visible)]="createRoomVisible" [modal]="true" [style]="{ width: '40vw'}"
+                [draggable]="false" [resizable]="false"
+                [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+                <form [formGroup]="form">
+                    <table>
+                        <tr>
+                            <td>Room Name:</td>
+                            <td><input pInputText type="text" formControlName="name"></td>
+                        </tr>
+                        <tr>
+                            <td>Room Type:</td>
+                            <td><p-dropdown formControlName="type" [options]="types" appendTo="body"></p-dropdown></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><p-button (onClick)="createChannel()" size="small" height="40px">Create</p-button></td>
+                        </tr>
+                    </table>
+                </form>
+            </p-dialog>
+            <p-button icon="pi pi-plus" label="Join Room" size="small" (click)="join()"></p-button>
+            <p-dialog header="Join existing room" [(visible)]="joinRoomVisible" [modal]="true"
+                [style]="{ width: '40vw'}" [draggable]="false" [resizable]="false"
+                [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+                <p class="m-0" style="color: #010662;">
+                    Room ID: <input pInputText type="text" [(ngModel)]="roomId">
+                    <p-button (onClick)="joinRoom()" size="small" height="40px">Join</p-button>
+                </p>
+            </p-dialog>
+        </div>
     </div>
     <div class="card">
-        <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '90vh', background: '#FFF9F4', border: 'none'}"
+        <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '80vh', background: '#FFF9F4', border: 'none'}"
             styleClass="mb-5">
             <ng-template pTemplate>
                 <div class="col flex align-items-center justify-content-center" id="leftpanel">
@@ -42,24 +44,37 @@
                         <p>Chats</p>
                     </div>
                     <div *ngIf="chatList$ | async as chatList">
-                        <p *ngFor="let c of chatList" width="max" id="ws" [routerLink]="['/chat', c.roomId]">{{c.name}}
-                        </p>
+                        <p *ngFor="let c of chatList" width="max" [routerLink]="['/chat', c.roomId]"
+                            (click)="selectedChat(c.name)">{{c.name}}</p>
                     </div>
                 </div>
             </ng-template>
             <ng-template pTemplate>
                 <div class="col flex align-items-center justify-content-center" id="rightpanel">
-                    <div *ngIf="this.currentChatRoom==undefined">
+                    <div *ngIf="this.currentChatRoomId==undefined">
                         select chat!
                     </div>
-                    <div *ngIf="this.currentChatRoom!=undefined" class="card">
-                            <div class="message" *ngFor="let message of messageList"
-                                [ngClass]="{'left': message.sender !== name, 'right': message.sender === name}">
-                                    <p>{{message.content}}</p>                                
-                            </div>
+                    <div *ngIf="this.currentChatRoomId!=undefined" class="chat">
+                        <div *ngIf="chatName$ | async as name" class="chatName">
+                            <h2>{{name}}</h2>
+                        </div>
+                        <p-scroller #sc [items]="messageList" [itemSize]="10" scrollHeight="450px"
+                            [style]="{'height': '450px'}">
+                            <ng-template pTemplate="item" let-item>
+                                <div class="message"
+                                    [ngClass]="{'left': item.sender !== name, 'right': item.sender === name}">
+                                    <div class="bubble">
+                                        <p *ngIf="item.sender !== name" style="border-bottom: 1px solid #010662;">
+                                            {{item.sender}}:</p>
+                                        <p>{{item.content}}</p>
+                                        <p class="date">{{ item.timestamp | date: 'short' }}</p>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-scroller>
                         <form [formGroup]="messageForm">
-                            <input pInputText type="text" formControlName="message">
-                            <p-button (onClick)="sendMessage()" size="small" height="40px">Send</p-button>
+                            <input pInputText type="text" formControlName="message" style="width: 95%; padding-top: 1ch;">
+                            <p-button (onClick)="sendMessage()" size="small" height="40px" icon="pi pi-send" [style]="{'width': '5%'}"></p-button>
                         </form>
                     </div>
                 </div>

@@ -1,5 +1,16 @@
 .base{
     padding: 0 2ch;
+    height: 90vh;
+}
+
+.row{
+    display: flex;
+    justify-content: space-between;  
+    align-items: center;
+}
+
+.row h2{
+    margin: 1ch 0;
 }
 
 div{
@@ -53,6 +64,25 @@ input{
 }
 
 /* message */
+.chat{
+    padding-left: 2ch;
+}
+
+.chatName{
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #010662;
+    margin-bottom: 1ch;
+}
+
+.chatName h2{
+    margin: 1ch 0;
+}
+
+.message{
+    padding-bottom: 1ch;
+}
+
 .right{
     display: flex;
     justify-content: flex-end;
@@ -62,3 +92,22 @@ input{
     display: flex;
     justify-content: flex-start;
 }
+
+.bubble{
+    padding: 0 10px;
+    border: 1px solid #010662;
+    border-radius: 10px;
+}
+
+.bubble p{
+    margin: 1mm 0;
+}
+
+.date{
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* :host ::ng-deep .p-scroller{
+    transform: none;
+} */
