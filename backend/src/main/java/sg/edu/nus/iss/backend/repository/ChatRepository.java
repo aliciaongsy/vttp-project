@@ -150,7 +150,7 @@ public class ChatRepository {
 
         Update updateOps = new Update().push("users").value(id).inc("userCount", 1);
 
-        UpdateResult updateResult = template.updateFirst(query, updateOps, Document.class, "chatlist");
+        UpdateResult updateResult = template.updateFirst(query, updateOps, Document.class, "chatroom");
 
         if (updateResult.getModifiedCount() == 0) {
             throw new ChatListException("error adding chatroom details into chatlist collection");
