@@ -7,6 +7,10 @@ export const selectRoomId = createSelector(
     selectChat,
     (state: ChatState) => state.roomId
 )
+export const selectName = createSelector(
+    selectChat,
+    (state: ChatState) => state.name
+)
 export const selectMessages = createSelector(
     selectChat,
     (state: ChatState) => state.messages
