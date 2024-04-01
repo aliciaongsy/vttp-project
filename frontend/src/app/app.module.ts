@@ -57,6 +57,8 @@ import { PlannerEffects } from './state/planner/planner.effects';
 import { plannerReducer } from './state/planner/planner.reducer';
 import { focusReducer } from './state/focus/focus.reducer';
 import { FocusEffects } from './state/focus/focus.effects';
+import { chatReducer } from './state/chat/chat.reducer';
+import { ChatEffects } from './state/chat/chat.effects';
 
 @NgModule({
   declarations: [
@@ -98,9 +100,9 @@ import { FocusEffects } from './state/focus/focus.effects';
     ToastModule,
     KnobModule,
     DividerModule,
-    StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer, focus: focusReducer}),
+    StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer, focus: focusReducer, chat: chatReducer}),
     StoreDevtoolsModule.instrument({maxAge: 25}),
-    EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects, FocusEffects]),
+    EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects, FocusEffects, ChatEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
     FullCalendarModule
   ],
