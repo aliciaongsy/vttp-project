@@ -52,6 +52,17 @@ public class ChatService {
         chatRepo.addChatRoom(id, room);
         chatRepo.createChatRoom(id, room);
     }
+
+    public ResponseEntity<String> getPublicChats(String name){
+        List<ChatRoom> chats = chatRepo.getAllPublicChatRoom(name);
+        if (chats.isEmpty()){
+            JsonArrayBuilder b = Json.createArrayBuilder();
+            return ResponseEntity.ok(b.build().toString());
+        }
+        JsonArrayBuilder b = Json.createArrayBuilder();
+        chats.forEach(c -> b.add(c.toJson2(c)));
+        return ResponseEntity.ok(b.build().toString());
+    }
     
     // --- chat messages ---
     public ResponseEntity<String> getAllChatMessages(String roomId){

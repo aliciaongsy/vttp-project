@@ -211,6 +211,52 @@ public class ChatRepository {
         }
     }
 
+    /* db.chatroom.aggregate([
+    {
+        $match: {
+            name: {$regex: "Chat", $options: "i"},
+            type: "Public"
+        }
+    },
+    {
+        $project: {
+            _id:0,
+            roomId: 1,
+            name: 1
+        }
+    }
+    ]);*/
+    // search for public chatroom by name
+    public List<ChatRoom> getAllPublicChatRoom(String name){
+        MatchOperation matchOps = Aggregation.match(Criteria.where("name").regex(name, "i"));
+
+        ProjectionOperation projectOps = Aggregation.project()
+                .andExclude("_id")
+                .andInclude("roomId")
+                .andInclude("name");
+
+        Aggregation pipeline = Aggregation.newAggregation(matchOps, projectOps); 
+
+        AggregationResults<Document> results = template.aggregate(pipeline, "chatroom", Document.class);
+
+        List<Document> docs = results.getMappedResults();
+
+        if(docs.isEmpty()){
+            return new LinkedList<>();
+        }
+
+        List<ChatRoom> rooms = new LinkedList<>();
+        docs.forEach(d -> {
+        System.out.println(d.toJson());
+        ChatRoom c = new ChatRoom();
+        c = c.docToChatRoom2(d);
+        rooms.add(c);
+        });
+
+        return rooms;
+
+    }
+
     // --- chat messages ---
     /*  db.chatmessage.aggregate([
     {

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.json.Json;
@@ -103,6 +104,12 @@ public class WebSocketController {
         JsonObjectBuilder b = Json.createObjectBuilder();
         b.add("message", "successfully created new chat room");
         return ResponseEntity.ok().body(b.build().toString());
+    }
+
+    @GetMapping("/api/chats/public")
+    @ResponseBody
+    public ResponseEntity<String> getPublicChats(@RequestParam String name){
+        return chatSvc.getPublicChats(name);
     }
 
     // --- websocket ---
