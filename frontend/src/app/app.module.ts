@@ -45,6 +45,7 @@ import { StoreModule } from '@ngrx/store';
 import { ToastModule } from 'primeng/toast';
 import { KnobModule } from 'primeng/knob';
 import { DividerModule } from 'primeng/divider';
+import { ScrollerModule } from 'primeng/scroller';
 
 // ngrx imports
 import { EffectsModule } from '@ngrx/effects';
@@ -100,6 +101,7 @@ import { ChatEffects } from './state/chat/chat.effects';
     ToastModule,
     KnobModule,
     DividerModule,
+    ScrollerModule,
     StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer, focus: focusReducer, chat: chatReducer}),
     StoreDevtoolsModule.instrument({maxAge: 25}),
     EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects, FocusEffects, ChatEffects]),

@@ -63,6 +63,19 @@ input{
     background:#FFF9F4;
 }
 
+form{
+    color: #010662;
+}
+
+/* search public chats results */
+.results{
+    margin: 1ch 0;
+    padding: 1ch;
+    border: 1px solid #010662;
+    /* display: flex;
+    justify-content: space-between;   */
+}
+
 /* message */
 .chat{
     padding-left: 2ch;
