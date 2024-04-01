@@ -79,6 +79,6 @@ export interface ChatMessage {
 
 // for displaying chat list
 export interface ChatDetails {
-    chatId: string
-    chatName: string
+    roomId: string
+    name: string
 }
