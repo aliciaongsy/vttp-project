@@ -19,34 +19,44 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td><p-button (onClick)="createChannel()" size="small" height="40px" [disabled]="form.invalid">Create</p-button></td>
+                            <td><p-button (onClick)="createChannel()" size="small" height="40px"
+                                    [disabled]="form.invalid">Create</p-button></td>
                         </tr>
                     </table>
                 </form>
             </p-dialog>
             <p-button icon="pi pi-plus" label="Join Room" size="small" (click)="join()"></p-button>
-            <p-dialog header="Join existing room" [(visible)]="joinRoomVisible" [modal]="true"
-                [draggable]="false" [resizable]="false"
-                [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+            <p-dialog header="Join existing room" [(visible)]="joinRoomVisible" [modal]="true" [draggable]="false"
+                [resizable]="false" [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
                 <p-button size="small" (click)="findPublicChatRoom()">Find Public ChatRooms</p-button>
                 <form [formGroup]="joinForm" style="padding-top: 1ch;">
                     Room ID: <input pInputText type="text" formControlName="id">
-                    <p-button (onClick)="joinRoom()" size="small" height="40px" [disabled]="joinForm.invalid">Join</p-button>
+                    <p-button (onClick)="joinRoom()" size="small" height="40px"
+                        [disabled]="joinForm.invalid">Join</p-button>
                 </form>
             </p-dialog>
             <p-dialog header="Search for public chatrooms" [(visible)]="publicChatVisible" [modal]="true"
                 [draggable]="false" [resizable]="false"
                 [style]="{ width: '40vw', color: '#010662', background: '#FFF9F4', border:'none' }">
-                    <form [formGroup]="searchForm">
-                        <input pInputText type="text" placeholder="Search topics, eg. productivity" style="width: 90%;" formControlName="search">
-                        <p-button (onClick)="searchRoom()" size="small" height="40px" icon="pi pi-search" [style]="{'width': '10%'}" [disabled]="searchForm.invalid"></p-button>
-                    </form>
-                    <div *ngIf="searchResult$ | async as results" class="results">
-                        <div *ngFor="let result of results" class="row">
-                            {{result.name}}
-                            <p-button [style]="{'height': '10px'}" (onClick)="joinPublicRoom(result.roomId)">+</p-button>
-                        </div>
+                <form [formGroup]="searchForm">
+                    <input pInputText type="text" placeholder="Search topics, eg. productivity" style="width: 90%;"
+                        formControlName="search">
+                    <p-button (onClick)="searchRoom()" size="small" height="40px" icon="pi pi-search"
+                        [style]="{'width': '10%'}" [disabled]="searchForm.invalid"></p-button>
+                </form>
+                <div *ngIf="searchResult$ | async as results" class="results">
+                    <div *ngIf="results.length==0">
+                        no search results
                     </div>
+                    <div *ngFor="let result of results" class="result">
+                        {{result.name}}
+                        <p-button [style]="{'height': '10px'}" (onClick)="joinPublicRoom(result.roomId)">+</p-button>
+                    </div>
+                    <div *ngIf="results.length>5">
+                        <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows"
+                        [totalRecords]="results.length"></p-paginator>
+                    </div>
+                </div>
             </p-dialog>
         </div>
     </div>
@@ -71,7 +81,7 @@
                     </div>
                     <div *ngIf="this.currentChatRoomId!=undefined" class="chat">
                         <div *ngIf="chatName$ | async as name" class="chatName">
-                            <h2>{{name}}</h2>
+                            <h2>{{name}} <span><p-button icon="pi pi-ellipsis-v" size="small" [style]="{'background': '#FFF9F4', 'color': '#010662', 'float': 'right'}"></p-button></span></h2>
                         </div>
                         <p-scroller #sc [items]="messageList" [itemSize]="10" scrollHeight="450px"
                             [style]="{'height': '450px'}">
@@ -88,8 +98,10 @@
                             </ng-template>
                         </p-scroller>
                         <form [formGroup]="messageForm">
-                            <input pInputText type="text" formControlName="message" style="width: 95%; padding-top: 1ch;" placeholder="enter a message...">
-                            <p-button (onClick)="sendMessage()" size="small" height="40px" icon="pi pi-send" [style]="{'width': '5%'}" [disabled]="messageForm.invalid"></p-button>
+                            <input pInputText type="text" formControlName="message"
+                                style="width: 95%; padding-top: 1ch;" placeholder="enter a message...">
+                            <p-button (onClick)="sendMessage()" size="small" height="40px" icon="pi pi-send"
+                                [style]="{'width': '5%'}" [disabled]="messageForm.invalid"></p-button>
                         </form>
                     </div>
                 </div>

@@ -11,13 +11,21 @@ import { enterChatRoom, loadAllMessages, sendMessage } from '../../state/chat/ch
 import { selectChat, selectMessages, selectName } from '../../state/chat/chat.selector';
 import { Scroller } from 'primeng/scroller';
 import { ChatService } from '../../service/chat.service';
+import { MenuItem } from 'primeng/api';
+
+interface PageEvent {
+  first: number;
+  rows: number;
+  page: number;
+  pageCount: number;
+}
 
 @Component({
   selector: 'app-collab',
   templateUrl: './collab.component.html',
   styleUrl: './collab.component.css'
 })
-export class CollabComponent implements OnInit, OnDestroy{
+export class CollabComponent implements OnInit, OnDestroy {
 
   @ViewChild('sc') sc!: Scroller;
 
@@ -49,25 +57,28 @@ export class CollabComponent implements OnInit, OnDestroy{
   loadStatus$!: Subscription
   searchResult$!: Observable<ChatDetails[]>
 
-  items!: string[];
+  items!: MenuItem[];
 
   uid!: string
   name!: string
+
+  first: number = 0;
+  rows: number = 5;
 
   ngOnInit(): void {
 
     this.messageSvc.initSocketConnection()
 
-    this.route$ = this.activatedRoute.params.subscribe(params=>{
+    this.route$ = this.activatedRoute.params.subscribe(params => {
       this.currentChatRoomId = params['roomId']
 
-      if (this.currentChatRoomId){
+      if (this.currentChatRoomId) {
         this.messageSvc.joinRoom(this.currentChatRoomId)
-        this.ngrxStore.dispatch(loadAllMessages({roomId: this.currentChatRoomId }))
+        this.ngrxStore.dispatch(loadAllMessages({ roomId: this.currentChatRoomId }))
         this.loadStatus$ = this.ngrxStore.select(selectChat).subscribe(
           (value) => {
-            if (value.loadStatus === 'complete'&&value.roomId === this.currentChatRoomId){
-              this.messageSub$=this.ngrxStore.select(selectMessages).subscribe(
+            if (value.loadStatus === 'complete' && value.roomId === this.currentChatRoomId) {
+              this.messageSub$ = this.ngrxStore.select(selectMessages).subscribe(
                 (value) => {
                   console.info(value)
                   this.messageList = value
@@ -81,9 +92,9 @@ export class CollabComponent implements OnInit, OnDestroy{
 
     firstValueFrom(this.ngrxStore.select(selectUserDetails)).then((value) => {
       console.info(value)
-      this.messageSvc.name=value.name
-      this.name=value.name
-      this.uid=value.id
+      this.messageSvc.name = value.name
+      this.name = value.name
+      this.uid = value.id
     })
 
     this.chatList$ = this.ngrxStore.select(selectChats)
@@ -105,8 +116,26 @@ export class CollabComponent implements OnInit, OnDestroy{
     this.joinForm = this.fb.group({
       id: this.fb.control<string>('', [Validators.required])
     })
-    
+
     this.listenForMessage()
+
+    this.items = [
+            {
+                label: 'Options',
+                items: [
+                    {
+                        label: 'Update',
+                        icon: 'pi pi-refresh',
+                        
+                    },
+                    {
+                        label: 'Delete',
+                        icon: 'pi pi-times',
+                        
+                    }
+                ]
+            }
+          ]
   }
 
   ngOnDestroy(): void {
@@ -115,24 +144,24 @@ export class CollabComponent implements OnInit, OnDestroy{
     if (this.messageSub$) {
       this.messageSub$.unsubscribe();
     }
-    if(this.loadStatus$){
+    if (this.loadStatus$) {
       this.loadStatus$.unsubscribe()
     }
   }
 
-  selectedChat(chatroom: string){
+  selectedChat(chatroom: string) {
     console.info('selected chatroom')
     this.currentChatRoom = chatroom
-    this.ngrxStore.dispatch(enterChatRoom({chatRoom: this.currentChatRoom}))
+    this.ngrxStore.dispatch(enterChatRoom({ chatRoom: this.currentChatRoom }))
     console.info(this.currentChatRoom)
   }
 
   // create new room
-  create(){
+  create() {
     this.createRoomVisible = true
   }
 
-  createChannel(){
+  createChannel() {
     var users: string[] = []
     users.push(this.uid)
     const room: ChatRoom = {
@@ -144,58 +173,64 @@ export class CollabComponent implements OnInit, OnDestroy{
       createDate: new Date().getTime(),
       type: this.form.value['type']
     }
-    this.ngrxStore.dispatch(createChatRoom({chat: room}))
+    this.ngrxStore.dispatch(createChatRoom({ chat: room }))
     this.form.reset()
     this.createRoomVisible = false
   }
 
   // join existing room
-  join(){
+  join() {
     this.joinRoomVisible = true
   }
 
-  joinRoom(){
+  joinRoom() {
     this.joinRoomVisible = false
     const roomId = this.joinForm.value['id']
     this.messageSvc.joinRoom(roomId);
-    this.ngrxStore.dispatch(joinChatRoom({id: this.uid, roomId}))
+    this.ngrxStore.dispatch(joinChatRoom({ id: this.uid, roomId }))
     this.joinForm.reset()
   }
 
-  findPublicChatRoom(){
+  findPublicChatRoom() {
     this.joinRoomVisible = false
     this.publicChatVisible = true
   }
 
-  searchRoom(){
-    const search:string = this.searchForm.value['search']
+  searchRoom() {
+    const search: string = this.searchForm.value['search']
     this.searchResult$ = this.chatSvc.getPublicChats(search)
     this.searchForm.reset()
   }
 
-  joinPublicRoom(roomId: string){
+  joinPublicRoom(roomId: string) {
     this.messageSvc.joinRoom(roomId);
-    this.ngrxStore.dispatch(joinChatRoom({id: this.uid, roomId}))
+    this.ngrxStore.dispatch(joinChatRoom({ id: this.uid, roomId }))
   }
 
-  sendMessage(){
+  sendMessage() {
     const data = this.messageForm.value['message'].trim() as string
     // only send message if it is not empty
-    if(data.length!=0){
+    if (data.length != 0) {
       const message: ChatMessage = {
         content: data,
         sender: this.name,
         type: 'CHAT',
         timestamp: new Date().getTime()
       }
-      this.ngrxStore.dispatch(sendMessage({roomId: this.currentChatRoomId, message}))
+      this.ngrxStore.dispatch(sendMessage({ roomId: this.currentChatRoomId, message }))
     }
     this.messageForm.reset()
   }
 
   listenForMessage() {
     this.messageSvc.getMessageSubject().subscribe((messages: ChatMessage[]) => {
-      this.ngrxStore.dispatch(loadAllMessages({roomId: this.currentChatRoomId}))
+      this.ngrxStore.dispatch(loadAllMessages({ roomId: this.currentChatRoomId }))
     });
+  }
+
+  onPageChange(event: any) {
+    console.info(event)
+    this.first = event.first;
+    this.rows = event.rows;
   }
 }
