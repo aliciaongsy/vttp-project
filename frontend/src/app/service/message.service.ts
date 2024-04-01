@@ -38,7 +38,6 @@ export class MessageService {
       // Perform cleanup tasks, such as resetting UI state or re-establishing the connection
     };
 
-
   }
 
   joinRoom(roomId: string) {
@@ -52,22 +51,25 @@ export class MessageService {
 
         this.messageSubject.next(currentMessage);
       })
+  
+      this.stompClient.activate()
+    })
+  }
+
+  firstJoined(roomId: string){
+    if (this.stompClient && this.stompClient.connected) {
       // tell your name to the server - send to @MessageMapping path
       // only send this when the user FIRST join
       this.stompClient.send(`/app/chat/adduser/${roomId}`,
         {},
         JSON.stringify({ content: `${this.name} has joined the chat`, sender: this.name, type: 'JOIN' })
       )
-
-      this.stompClient.activate()
-    })
+    }
   }
 
   sendMessage(roomId: string, chatMessage: ChatMessage) {
+    // perform operations only if connection is up
     if (this.stompClient && this.stompClient.connected) {
-      // perform operations only if connection is up
-      console.info('send message')
-
       // send to @MessageMapping path
       this.stompClient.send(`/app/chat/sendmessage/${roomId}`, {}, JSON.stringify(chatMessage));
     }
@@ -75,7 +77,6 @@ export class MessageService {
   }
 
   getMessageSubject() {
-    console.info('message subject')
     return this.messageSubject.asObservable();
   }
 
