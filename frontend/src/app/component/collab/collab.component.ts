@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { selectChats, selectUserDetails } from '../../state/user/user.selectors';
 import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
 import { MessageService } from '../../service/message.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChatDetails, ChatMessage, ChatRoom } from '../../model';
 import { ActivatedRoute } from '@angular/router';
-import { ChatService } from '../../service/chat.service';
-import { createChatRoom, getChatList, joinChatRoom } from '../../state/user/user.actions';
+import { createChatRoom, joinChatRoom } from '../../state/user/user.actions';
+import { loadAllMessages, sendMessage } from '../../state/chat/chat.actions';
+import { selectChat, selectMessages } from '../../state/chat/chat.selector';
 
 @Component({
   selector: 'app-collab',
@@ -18,7 +19,6 @@ export class CollabComponent implements OnInit, OnDestroy{
 
   private ngrxStore = inject(Store)
   private messageSvc = inject(MessageService)
-  private chatSvc = inject(ChatService)
   private fb = inject(FormBuilder)
   private activatedRoute = inject(ActivatedRoute)
 
@@ -36,6 +36,7 @@ export class CollabComponent implements OnInit, OnDestroy{
   route$!: Subscription
   messageSub$!: Subscription
   messageList: any[] = [];
+  loadStatus$!: Subscription
 
   uid!: string
   name!: string
@@ -49,11 +50,16 @@ export class CollabComponent implements OnInit, OnDestroy{
 
       if (this.currentChatRoom){
         this.messageSvc.joinRoom(this.currentChatRoom)
-        this.messageSub$ = this.chatSvc.getAllMessages(this.currentChatRoom).subscribe(
+        this.ngrxStore.dispatch(loadAllMessages({roomId: this.currentChatRoom}))
+        this.loadStatus$ = this.ngrxStore.select(selectChat).subscribe(
           (value) => {
-          console.info(value)
-          this.messageList = value
-        })
+            if (value.loadStatus === 'complete'&&value.roomId === this.currentChatRoom){
+              this.messageSub$=this.ngrxStore.select(selectMessages).subscribe(
+                (value) => this.messageList = value
+              )
+            }
+          }
+        )
       }
     })
 
@@ -62,12 +68,6 @@ export class CollabComponent implements OnInit, OnDestroy{
       this.messageSvc.name=value.name
       this.name=value.name
       this.uid=value.id
-      // this.chatList$ = this.chatSvc.getChatList(this.uid).pipe(
-      //   map((value) => {
-      //     console.info(value)
-      //     return [...value]
-      //   })
-      // )
     })
 
     this.chatList$ = this.ngrxStore.select(selectChats)
@@ -81,7 +81,7 @@ export class CollabComponent implements OnInit, OnDestroy{
       message: this.fb.control<string>('', [Validators.required])
     })
     
-    // this.listenForMessage()
+    this.listenForMessage()
   }
 
   ngOnDestroy(): void {
@@ -110,13 +110,6 @@ export class CollabComponent implements OnInit, OnDestroy{
       type: this.form.value['type']
     }
     this.ngrxStore.dispatch(createChatRoom({chat: room}))
-    // this.chatSvc.createChatRoom(room)
-    //   // .then(() => 
-    //   //   this.chatList$ = this.chatSvc.getChatList(this.uid)
-    //   // )
-    //   .catch((error) => 
-    //       alert(`error: ${error.error}`)
-    //   )
     this.form.reset()
     this.createRoomVisible = false
   }
@@ -130,16 +123,6 @@ export class CollabComponent implements OnInit, OnDestroy{
     this.joinRoomVisible = false
     this.messageSvc.joinRoom(this.roomId);
     this.ngrxStore.dispatch(joinChatRoom({id: this.uid, roomId: this.roomId}))
-    // this.chatSvc.joinChatRoom(this.uid, this.roomId)
-    //   .then(() => {
-    //     // if join successfully, add room to list of chats
-    //     // this.chatList$ = this.chatSvc.getChatList(this.uid)
-    //     this.ngrxStore.dispatch(getChatList())
-    //     this.messageSvc.firstJoined(this.roomId)
-    //   })
-    //   .catch((error) => 
-    //     alert(`error: ${error.error}`)
-    //   )
     this.roomId=''
   }
 
@@ -153,21 +136,14 @@ export class CollabComponent implements OnInit, OnDestroy{
         type: 'CHAT',
         timestamp: new Date().getTime()
       }
-      this.messageSvc.sendMessage(this.currentChatRoom, message)
+      this.ngrxStore.dispatch(sendMessage({roomId: this.currentChatRoom, message}))
     }
     this.messageForm.reset()
   }
 
-  // listenForMessage() {
-  //   this.messageSvc.getMessageSubject().subscribe((messages: ChatMessage[]) => {
-  //     for (var m of messages){
-  //       this.messageList.push(m)
-  //     }
-  //     this.messageList = messages.map((item: any)=> ({
-  //       ...item,
-  //       // message_side: item.user === this.name ? 'sender': 'receiver'
-  //     }))
-  //   });
-  // }
-
+  listenForMessage() {
+    this.messageSvc.getMessageSubject().subscribe((messages: ChatMessage[]) => {
+      this.ngrxStore.dispatch(loadAllMessages({roomId: this.currentChatRoom}))
+    });
+  }
 }
