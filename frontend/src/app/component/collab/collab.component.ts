@@ -32,7 +32,6 @@ export class CollabComponent implements OnInit, OnDestroy{
   messageForm!: FormGroup
 
   chatList$!: Observable<ChatDetails[]>
-  chatList!: ChatRoom[]
   route$!: Subscription
   messageSub$!: Subscription
   messageList: any[] = [];
@@ -89,6 +88,9 @@ export class CollabComponent implements OnInit, OnDestroy{
     this.messageSvc.disconnect()
     if (this.messageSub$) {
       this.messageSub$.unsubscribe();
+    }
+    if(this.loadStatus$){
+      this.loadStatus$.unsubscribe()
     }
   }
 
