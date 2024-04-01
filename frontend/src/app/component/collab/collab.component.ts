@@ -10,6 +10,7 @@ import { createChatRoom, joinChatRoom } from '../../state/user/user.actions';
 import { enterChatRoom, loadAllMessages, sendMessage } from '../../state/chat/chat.actions';
 import { selectChat, selectMessages, selectName } from '../../state/chat/chat.selector';
 import { Scroller } from 'primeng/scroller';
+import { ChatService } from '../../service/chat.service';
 
 @Component({
   selector: 'app-collab',
@@ -22,18 +23,23 @@ export class CollabComponent implements OnInit, OnDestroy{
 
   private ngrxStore = inject(Store)
   private messageSvc = inject(MessageService)
+  private chatSvc = inject(ChatService)
   private fb = inject(FormBuilder)
   private activatedRoute = inject(ActivatedRoute)
 
   joinRoomVisible: boolean = false
   createRoomVisible: boolean = false
-  roomId!: string
+  publicChatVisible: boolean = false
+
+  // roomId!: string
   currentChatRoomId!: string
   currentChatRoom!: string
 
   form!: FormGroup
   types: string[] = ['Public', 'Private']
   messageForm!: FormGroup
+  searchForm!: FormGroup
+  joinForm!: FormGroup
 
   chatList$!: Observable<ChatDetails[]>
   chatName$!: Observable<String>
@@ -41,6 +47,7 @@ export class CollabComponent implements OnInit, OnDestroy{
   messageSub$!: Subscription
   messageList: any[] = [];
   loadStatus$!: Subscription
+  searchResult$!: Observable<ChatDetails[]>
 
   items!: string[];
 
@@ -83,12 +90,20 @@ export class CollabComponent implements OnInit, OnDestroy{
     this.chatName$ = this.ngrxStore.select(selectName)
 
     this.form = this.fb.group({
-      name: this.fb.control<string>('', [Validators.required, Validators.minLength(3)]),
+      name: this.fb.control<string>('', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]),
       type: this.fb.control<string>('', [Validators.required])
     })
 
     this.messageForm = this.fb.group({
       message: this.fb.control<string>('', [Validators.required])
+    })
+
+    this.searchForm = this.fb.group({
+      search: this.fb.control<string>('', [Validators.required])
+    })
+
+    this.joinForm = this.fb.group({
+      id: this.fb.control<string>('', [Validators.required])
     })
     
     this.listenForMessage()
@@ -141,9 +156,26 @@ export class CollabComponent implements OnInit, OnDestroy{
 
   joinRoom(){
     this.joinRoomVisible = false
-    this.messageSvc.joinRoom(this.roomId);
-    this.ngrxStore.dispatch(joinChatRoom({id: this.uid, roomId: this.roomId}))
-    this.roomId=''
+    const roomId = this.joinForm.value['id']
+    this.messageSvc.joinRoom(roomId);
+    this.ngrxStore.dispatch(joinChatRoom({id: this.uid, roomId}))
+    this.joinForm.reset()
+  }
+
+  findPublicChatRoom(){
+    this.joinRoomVisible = false
+    this.publicChatVisible = true
+  }
+
+  searchRoom(){
+    const search:string = this.searchForm.value['search']
+    this.searchResult$ = this.chatSvc.getPublicChats(search)
+    this.searchForm.reset()
+  }
+
+  joinPublicRoom(roomId: string){
+    this.messageSvc.joinRoom(roomId);
+    this.ngrxStore.dispatch(joinChatRoom({id: this.uid, roomId}))
   }
 
   sendMessage(){

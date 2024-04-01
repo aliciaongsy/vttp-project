@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { ChatDetails, ChatMessage, ChatRoom } from '../model';
 import { Observable, firstValueFrom } from 'rxjs';
@@ -31,6 +31,12 @@ export class ChatService {
 
   getAllMessages(roomId: string): Observable<ChatMessage[]> {
     return this.http.get<ChatMessage[]>(`${URL}/api/chat/messages/${roomId}`)
+  }
+
+  getPublicChats(name: string): Observable<ChatDetails[]>{
+    const params = new HttpParams()
+      .set("name", name)
+    return this.http.get<ChatDetails[]>(`${URL}/api/chats/public`, {params})
   }
 
 }
