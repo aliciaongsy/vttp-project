@@ -1,3 +1,4 @@
+import { ChatState } from "./chat/chat.reducer";
 import { FocusState } from "./focus/focus.reducer";
 import { PlannerState } from "./planner/planner.reducer";
 import { TaskState } from "./tasks/task.reducer";
@@ -8,4 +9,5 @@ export interface AppState{
     task: TaskState
     planner: PlannerState
     focus: FocusState
+    chat: ChatState
 }
