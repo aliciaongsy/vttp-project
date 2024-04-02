@@ -1,26 +1,37 @@
 import { createReducer, on } from "@ngrx/store";
-import { ChatMessage } from "../../model";
-import { enterChatRoom, loadAllMessages, loadAllMessagesFromService, sendMessage } from "./chat.actions";
+import { ChatMessage, ChatRoom } from "../../model";
+import { enterChatRoom, loadAllMessages, loadAllMessagesFromService, loadChatRoom, loadChatRoomFromService, sendMessage } from "./chat.actions";
 
 export interface ChatState {
     roomId: string,
     name: string,
     messages: ChatMessage[]
     loadStatus: 'NA' | 'pending' | 'complete',
+    chatRoom: ChatRoom
 }
 
 export const initialState: ChatState = {
     roomId: '',
     name: '',
     messages: [],
-    loadStatus: 'NA'
+    loadStatus: 'NA',
+    chatRoom: {
+        roomId: '',
+        ownerId: '',
+        ownerName: '',
+        name: '',
+        users: [],
+        userCount: 0,
+        createDate: 0, 
+        type: 'Private'
+    }
 }
 
 export const chatReducer = createReducer(
     initialState,
-    on(enterChatRoom, (state, {chatRoom}) => ({
+    on(enterChatRoom, (state, {name}) => ({
         ...state,
-        name: chatRoom
+        name: name
     })),
     on(sendMessage, (state, { message }) => ({
         ...state,
@@ -35,5 +46,13 @@ export const chatReducer = createReducer(
         ...state,
         messages: messages,
         loadStatus: 'complete' as const
+    })),
+    on(loadChatRoom, (state, {roomId}) => ({
+        ...state,
+        roomId: roomId
+    })),
+    on(loadChatRoomFromService, (state, {chatRoom}) => ({
+        ...state,
+        chatRoom: chatRoom
     }))
 ) 

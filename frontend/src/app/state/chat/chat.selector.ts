@@ -19,3 +19,7 @@ export const selectLoadStatus = createSelector(
     selectChat,
     (state: ChatState) => state.loadStatus
 )
+export const selectChatRoom = createSelector(
+    selectChat,
+    (state: ChatState) => state.chatRoom
+)
