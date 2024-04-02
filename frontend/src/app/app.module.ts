@@ -25,7 +25,7 @@ import { FocusService } from './service/focus.service';
 import { CalendarComponent } from './component/calendar/calendar.component';
 import { CollabComponent } from './component/collab/collab.component';
 import { ChatService } from './service/chat.service';
-import { MessageService } from './service/message.service';
+import { WebSocketService } from './service/websocket.service';
 
 // primeng imports
 import { DialogModule } from 'primeng/dialog';
@@ -46,6 +46,8 @@ import { ToastModule } from 'primeng/toast';
 import { KnobModule } from 'primeng/knob';
 import { DividerModule } from 'primeng/divider';
 import { ScrollerModule } from 'primeng/scroller';
+import { PaginatorModule } from 'primeng/paginator';
+import { MenuModule } from 'primeng/menu';
 
 // ngrx imports
 import { EffectsModule } from '@ngrx/effects';
@@ -102,13 +104,15 @@ import { ChatEffects } from './state/chat/chat.effects';
     KnobModule,
     DividerModule,
     ScrollerModule,
+    PaginatorModule,
+    MenuModule,
     StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer, focus: focusReducer, chat: chatReducer}),
     StoreDevtoolsModule.instrument({maxAge: 25}),
     EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects, FocusEffects, ChatEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
     FullCalendarModule
   ],
-  providers: [UserService, TaskService, PlannerService, FocusService, ChatService, MessageService],
+  providers: [UserService, TaskService, PlannerService, FocusService, ChatService, WebSocketService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
