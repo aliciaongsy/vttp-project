@@ -17,6 +17,10 @@ export class ChatService {
     return this.http.get<ChatDetails[]>(`${URL}/api/${id}/chats`)
   }
 
+  getChatRoomDetails(roomId:string): Observable<ChatRoom> {
+    return this.http.get<ChatRoom>(`${URL}/api/chat/details/${roomId}`)
+  }
+
   joinChatRoom(userId: string, name: string, roomId: string): Promise<any> {
     const payload = {
       id: userId,
