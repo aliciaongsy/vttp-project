@@ -43,6 +43,12 @@ public class WebSocketController {
         return chatSvc.getAllChats(id);
     }
 
+    @GetMapping("/api/chat/details/{roomId}")
+    @ResponseBody
+    public ResponseEntity<String> getChatRoomDetails(@PathVariable String roomId){
+        return chatSvc.getChatRoomDetails(roomId);
+    }
+
     @PostMapping("/api/chat/join/{roomId}")
     @ResponseBody
     public ResponseEntity<String> joinChatRoom(@PathVariable String roomId, @RequestBody String payload) {

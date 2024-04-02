@@ -30,6 +30,11 @@ public class ChatService {
         return b.build();
     }
 
+    public ResponseEntity<String> getChatRoomDetails(String roomId){
+        ChatRoom room = chatRepo.getDetailsByRoomId(roomId);
+        return ResponseEntity.ok(room.toJson(room).toString());
+    }
+
     public ResponseEntity<String> getAllChats(String id){
         List<ChatRoom> chats = chatRepo.getAllChats(id);
         if (chats.isEmpty()){
