@@ -10,7 +10,7 @@ const URL = environment.url
 @Injectable({
   providedIn: 'root'
 })
-export class MessageService {
+export class WebSocketService {
 
   private stompClient: any;
   private messageSubject: BehaviorSubject<ChatMessage[]> = new BehaviorSubject<ChatMessage[]>([]);
