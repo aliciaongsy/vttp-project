@@ -68,30 +68,53 @@ form{
 }
 
 /* search public chats results */
-.results{
+.result{
     margin: 1ch 0;
     padding: 1ch;
+    display: flex;
+    justify-content: space-between;  
+    align-items: center;
     border: 1px solid #010662;
-    /* display: flex;
-    justify-content: space-between;   */
 }
 
 /* message */
+/* header */
 .chat{
     padding-left: 2ch;
 }
 
 .chatName{
-    display: flex;
+    /* display: flex;
     justify-content: center;
+    align-items: center; */
     border-bottom: 2px solid #010662;
     margin-bottom: 1ch;
 }
 
 .chatName h2{
+    text-align: center;
     margin: 1ch 0;
 }
 
+.chatName span{
+    float: right;
+}
+
+:host ::ng-deep .p-menu.p-menu-overlay{
+    background: #FFF9F4;
+    width: max-content;
+}
+
+:host ::ng-deep .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text{
+    color: #010662;
+    font-size: 15px;
+}
+
+:host ::ng-deep .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-icon{
+    color: #010662;
+}
+
+/* messages */
 .message{
     padding-bottom: 1ch;
 }

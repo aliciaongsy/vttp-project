@@ -1,17 +1,17 @@
 import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { selectChats, selectUserDetails } from '../../state/user/user.selectors';
 import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
-import { MessageService } from '../../service/message.service';
+import { WebSocketService } from '../../service/websocket.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChatDetails, ChatMessage, ChatRoom } from '../../model';
 import { ActivatedRoute } from '@angular/router';
 import { createChatRoom, joinChatRoom } from '../../state/user/user.actions';
-import { enterChatRoom, loadAllMessages, sendMessage } from '../../state/chat/chat.actions';
-import { selectChat, selectMessages, selectName } from '../../state/chat/chat.selector';
+import { enterChatRoom, loadAllMessages, loadChatRoom, sendMessage } from '../../state/chat/chat.actions';
+import { selectChat, selectChatRoom, selectMessages, selectName } from '../../state/chat/chat.selector';
 import { Scroller } from 'primeng/scroller';
 import { ChatService } from '../../service/chat.service';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 
 interface PageEvent {
   first: number;
@@ -23,21 +23,26 @@ interface PageEvent {
 @Component({
   selector: 'app-collab',
   templateUrl: './collab.component.html',
-  styleUrl: './collab.component.css'
+  styleUrl: './collab.component.css',
+  providers: [MessageService]
 })
 export class CollabComponent implements OnInit, OnDestroy {
 
   @ViewChild('sc') sc!: Scroller;
 
   private ngrxStore = inject(Store)
-  private messageSvc = inject(MessageService)
+  private messageSvc = inject(WebSocketService)
   private chatSvc = inject(ChatService)
   private fb = inject(FormBuilder)
   private activatedRoute = inject(ActivatedRoute)
+  private messageService = inject(MessageService)
 
+  // dialogs
   joinRoomVisible: boolean = false
   createRoomVisible: boolean = false
   publicChatVisible: boolean = false
+  chatRoomDetailsVisible: boolean = false
+  leaveChatVisible: boolean = false
 
   // roomId!: string
   currentChatRoomId!: string
@@ -56,6 +61,7 @@ export class CollabComponent implements OnInit, OnDestroy {
   messageList: any[] = [];
   loadStatus$!: Subscription
   searchResult$!: Observable<ChatDetails[]>
+  chatRoomDetails$!: Observable<ChatRoom>
 
   items!: MenuItem[];
 
@@ -87,6 +93,7 @@ export class CollabComponent implements OnInit, OnDestroy {
             }
           }
         )
+        this.ngrxStore.dispatch(loadChatRoom({ roomId: this.currentChatRoomId }))
       }
     })
 
@@ -120,22 +127,22 @@ export class CollabComponent implements OnInit, OnDestroy {
     this.listenForMessage()
 
     this.items = [
-            {
-                label: 'Options',
-                items: [
-                    {
-                        label: 'Update',
-                        icon: 'pi pi-refresh',
-                        
-                    },
-                    {
-                        label: 'Delete',
-                        icon: 'pi pi-times',
-                        
-                    }
-                ]
+          {
+            label: 'Info',
+            icon: 'pi pi-info-circle',
+            command: () => {
+              this.loadDetails()
             }
-          ]
+
+          },
+          {
+            label: 'Leave',
+            icon: 'pi pi-sign-out',
+            command: () => {
+              this.leaveChatVisible = true
+            }
+          }
+        ]
   }
 
   ngOnDestroy(): void {
@@ -152,7 +159,7 @@ export class CollabComponent implements OnInit, OnDestroy {
   selectedChat(chatroom: string) {
     console.info('selected chatroom')
     this.currentChatRoom = chatroom
-    this.ngrxStore.dispatch(enterChatRoom({ chatRoom: this.currentChatRoom }))
+    this.ngrxStore.dispatch(enterChatRoom({ name: this.currentChatRoom }))
     console.info(this.currentChatRoom)
   }
 
@@ -232,5 +239,10 @@ export class CollabComponent implements OnInit, OnDestroy {
     console.info(event)
     this.first = event.first;
     this.rows = event.rows;
+  }
+
+  loadDetails(){
+    this.chatRoomDetailsVisible = true
+    this.chatRoomDetails$ = this.ngrxStore.select(selectChatRoom)
   }
 }

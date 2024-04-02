@@ -54,7 +54,7 @@
                     </div>
                     <div *ngIf="results.length>5">
                         <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows"
-                        [totalRecords]="results.length"></p-paginator>
+                            [totalRecords]="results.length"></p-paginator>
                     </div>
                 </div>
             </p-dialog>
@@ -81,7 +81,25 @@
                     </div>
                     <div *ngIf="this.currentChatRoomId!=undefined" class="chat">
                         <div *ngIf="chatName$ | async as name" class="chatName">
-                            <h2>{{name}} <span><p-button icon="pi pi-ellipsis-v" size="small" [style]="{'background': '#FFF9F4', 'color': '#010662', 'float': 'right'}"></p-button></span></h2>
+                            <h2>{{name}}
+                                <span>
+                                    <p-toast></p-toast>
+                                    <p-menu #menu [model]="items" [popup]="true"></p-menu>
+                                    <p-button icon="pi pi-ellipsis-v" size="small"
+                                        [style]="{'background': '#FFF9F4', 'color': '#010662', 'float': 'right'}"
+                                        (click)="menu.toggle($event)"></p-button>
+                                </span>
+                            </h2>
+                            <p-dialog header="Chat Room Details" [(visible)]="chatRoomDetailsVisible" [modal]="true"
+                                [style]="{ width: '50vw'}" [draggable]="false" [resizable]="false"
+                                [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+                                <div *ngIf="chatRoomDetails$ | async as details">
+                                    Room ID: <p>{{details.roomId}}</p>
+                                    Created on: <p>{{details.createDate}}</p>
+                                    Owner: <p>{{details.ownerName}}</p>
+                                    Number of users: <p>{{details.userCount}}</p>
+                                </div>
+                            </p-dialog>
                         </div>
                         <p-scroller #sc [items]="messageList" [itemSize]="10" scrollHeight="450px"
                             [style]="{'height': '450px'}">
