@@ -32,6 +32,10 @@ export class ChatService {
   createChatRoom(chatRoom: ChatRoom): Promise<any> {
     return firstValueFrom(this.http.post<any>(`${URL}/api/chat/create`, chatRoom))
   }
+  
+  leaveChatRoom(id: string, roomId: string){
+    return this.http.delete<any>(`${URL}/api/${id}/chat/join/${roomId}`)
+  }
 
   getAllMessages(roomId: string): Observable<ChatMessage[]> {
     return this.http.get<ChatMessage[]>(`${URL}/api/chat/messages/${roomId}`)
