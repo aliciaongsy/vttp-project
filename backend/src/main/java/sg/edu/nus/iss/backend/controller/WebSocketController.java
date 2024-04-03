@@ -12,6 +12,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +46,7 @@ public class WebSocketController {
 
     @GetMapping("/api/chat/details/{roomId}")
     @ResponseBody
-    public ResponseEntity<String> getChatRoomDetails(@PathVariable String roomId){
+    public ResponseEntity<String> getChatRoomDetails(@PathVariable String roomId) {
         return chatSvc.getChatRoomDetails(roomId);
     }
 
@@ -66,7 +67,7 @@ public class WebSocketController {
             return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
 
         } catch (ChatRoomException e) {
-           
+
             e.printStackTrace();
             JsonObjectBuilder b = Json.createObjectBuilder();
             b.add("error", e.getMessage());
@@ -76,6 +77,32 @@ public class WebSocketController {
 
         JsonObjectBuilder b = Json.createObjectBuilder();
         b.add("message", "successfully joined new chat room");
+        return ResponseEntity.ok().body(b.build().toString());
+    }
+
+    @DeleteMapping("/api/{id}/chat/leave/{roomId}")
+    @ResponseBody
+    public ResponseEntity<String> leaveChatRoom(@PathVariable String id, @PathVariable String roomId) {
+        try {
+            chatSvc.leaveRoom(id, roomId);
+        } catch (ChatRoomException e) {
+
+            e.printStackTrace();
+            JsonObjectBuilder b = Json.createObjectBuilder();
+            b.add("error", e.getMessage());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
+
+        } catch (ChatListException e) {
+
+            e.printStackTrace();
+            JsonObjectBuilder b = Json.createObjectBuilder();
+            b.add("error", e.getMessage());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
+
+        }
+
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        b.add("message", "successfully left chat room");
         return ResponseEntity.ok().body(b.build().toString());
     }
 
@@ -114,14 +141,15 @@ public class WebSocketController {
 
     @GetMapping("/api/chats/public")
     @ResponseBody
-    public ResponseEntity<String> getPublicChats(@RequestParam String name){
+    public ResponseEntity<String> getPublicChats(@RequestParam String name) {
         return chatSvc.getPublicChats(name);
     }
 
     // --- websocket ---
     // sending message
     @MessageMapping("/chat/sendmessage/{roomId}")
-    @SendTo("/topic/{roomId}") // messages sent to @MessageMapping endpoint will be dispatched to this @SendTo endpoint
+    @SendTo("/topic/{roomId}") // messages sent to @MessageMapping endpoint will be dispatched to this @SendTo
+                               // endpoint
     public ChatMessage sendMessage(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
         System.out.println(chatMessage.getContent());
 
@@ -142,7 +170,7 @@ public class WebSocketController {
 
     @GetMapping("/api/chat/messages/{roomId}")
     @ResponseBody
-    public ResponseEntity<String> getChatRoomMessages(@PathVariable String roomId){
+    public ResponseEntity<String> getChatRoomMessages(@PathVariable String roomId) {
         return chatSvc.getAllChatMessages(roomId);
     }
 
