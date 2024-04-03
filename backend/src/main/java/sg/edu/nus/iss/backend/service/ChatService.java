@@ -30,14 +30,14 @@ public class ChatService {
         return b.build();
     }
 
-    public ResponseEntity<String> getChatRoomDetails(String roomId){
+    public ResponseEntity<String> getChatRoomDetails(String roomId) {
         ChatRoom room = chatRepo.getDetailsByRoomId(roomId);
         return ResponseEntity.ok(room.toJson(room).toString());
     }
 
-    public ResponseEntity<String> getAllChats(String id){
+    public ResponseEntity<String> getAllChats(String id) {
         List<ChatRoom> chats = chatRepo.getAllChats(id);
-        if (chats.isEmpty()){
+        if (chats.isEmpty()) {
             JsonArrayBuilder b = Json.createArrayBuilder();
             return ResponseEntity.ok(b.build().toString());
         }
@@ -46,21 +46,21 @@ public class ChatService {
         return ResponseEntity.ok(b.build().toString());
     }
 
-    @Transactional(rollbackFor = {ChatRoomException.class, ChatListException.class})
-    public void joinRoom(String id, String name, String roomId) throws ChatListException, ChatRoomException{
+    @Transactional(rollbackFor = { ChatRoomException.class, ChatListException.class })
+    public void joinRoom(String id, String name, String roomId) throws ChatListException, ChatRoomException {
         chatRepo.addNewUser(roomId, id);
         chatRepo.joinChatRoom(id, roomId);
     }
 
-    @Transactional(rollbackFor = {ChatRoomException.class, ChatListException.class})
-    public void createRoom(String id, ChatRoom room) throws ChatRoomException, ChatListException{
+    @Transactional(rollbackFor = { ChatRoomException.class, ChatListException.class })
+    public void createRoom(String id, ChatRoom room) throws ChatRoomException, ChatListException {
         chatRepo.addChatRoom(id, room);
         chatRepo.createChatRoom(id, room);
     }
 
-    public ResponseEntity<String> getPublicChats(String name){
+    public ResponseEntity<String> getPublicChats(String name) {
         List<ChatRoom> chats = chatRepo.getAllPublicChatRoom(name);
-        if (chats.isEmpty()){
+        if (chats.isEmpty()) {
             JsonArrayBuilder b = Json.createArrayBuilder();
             return ResponseEntity.ok(b.build().toString());
         }
@@ -68,12 +68,18 @@ public class ChatService {
         chats.forEach(c -> b.add(c.toJson2(c)));
         return ResponseEntity.ok(b.build().toString());
     }
-    
+
+    @Transactional(rollbackFor = { ChatRoomException.class, ChatListException.class })
+    public void leaveRoom(String id, String roomId) throws ChatRoomException, ChatListException {
+        chatRepo.removeUserFromChatRoom(roomId, id);
+        chatRepo.leaveChatRoom(id, roomId);
+    }
+
     // --- chat messages ---
-    public ResponseEntity<String> getAllChatMessages(String roomId){
+    public ResponseEntity<String> getAllChatMessages(String roomId) {
         List<ChatMessage> messages = chatRepo.getAllMessagesByRoomId(roomId);
 
-        if (messages.isEmpty()){
+        if (messages.isEmpty()) {
             JsonArrayBuilder b = Json.createArrayBuilder();
             return ResponseEntity.ok(b.build().toString());
         }
@@ -82,11 +88,11 @@ public class ChatService {
         return ResponseEntity.ok(b.build().toString());
     }
 
-    public ResponseEntity<String> saveMessages(String roomId, ChatMessage message){
+    public ResponseEntity<String> saveMessages(String roomId, ChatMessage message) {
         boolean added = chatRepo.saveMessages(roomId, message);
 
-        if (added){
-        JsonObject o = buildJsonObject("message", "successfully added messages");
+        if (added) {
+            JsonObject o = buildJsonObject("message", "successfully added messages");
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error adding messages");

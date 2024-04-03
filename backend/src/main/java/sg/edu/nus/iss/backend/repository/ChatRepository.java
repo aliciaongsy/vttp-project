@@ -211,6 +211,60 @@ public class ChatRepository {
         }
     }
 
+    /*db.chatroom.updateOne(
+        {
+            roomId: "d73726"
+        },
+        {
+            $pull:{
+                { users: "12345678" }
+            },
+            $inc: { userCount: -1 }
+        }
+    ); */
+    public void removeUserFromChatRoom(String roomId, String id) throws ChatRoomException{
+        Criteria criteria = Criteria.where("roomId").is(roomId);
+
+        Query query = new Query(criteria);
+
+        Update updateOps = new Update()
+            .pull("users", id)
+            .inc("userCount", -1);
+        
+        UpdateResult update = template.updateFirst(query, updateOps, "chatroom");
+
+        if (update.getModifiedCount() == 0){
+            throw new ChatRoomException("error removing user from chatroom");
+        }
+    }
+
+    /* db.chatlist.updateOne(
+        {
+            id: "d73726d8",
+        },
+        {
+            $pull:{
+                chats:{
+                    roomId: "1ca6ea"
+                }
+            }
+        }
+    ); */
+    public void leaveChatRoom(String id, String roomId) throws ChatListException{
+        Criteria criteria = Criteria.where("id").is(id);
+
+        Query query = new Query(criteria);
+
+        Update updateOps = new Update()
+            .pull("chats", new Query(Criteria.where("roomId").is(roomId)));
+        
+        UpdateResult update = template.updateFirst(query, updateOps, "chatlist");
+
+        if (update.getModifiedCount() == 0){
+            throw new ChatListException("error removing chatroom details from chatlist");
+        }
+    }
+
     /* db.chatroom.aggregate([
     {
         $match: {
