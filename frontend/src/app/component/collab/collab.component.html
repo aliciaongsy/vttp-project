@@ -46,7 +46,7 @@
                 </form>
                 <div *ngIf="searchResult$ | async as results" class="results">
                     <div *ngIf="results.length==0">
-                        no search results
+                        <p>no search results</p>
                     </div>
                     <div *ngFor="let result of results" class="result">
                         {{result.name}}
@@ -76,8 +76,9 @@
             </ng-template>
             <ng-template pTemplate>
                 <div class="col flex align-items-center justify-content-center" id="rightpanel">
-                    <div *ngIf="this.currentChatRoomId==undefined">
-                        select chat!
+                    <div *ngIf="this.currentChatRoomId==undefined" style="text-align: center;">
+                        <h3>Click on chatroom to view chat</h3>
+                        <img id="image" src="/assets/chat.png" width="40%" height="50%">
                     </div>
                     <div *ngIf="this.currentChatRoomId!=undefined" class="chat">
                         <div *ngIf="chatName$ | async as name" class="chatName">
@@ -91,14 +92,21 @@
                                 </span>
                             </h2>
                             <p-dialog header="Chat Room Details" [(visible)]="chatRoomDetailsVisible" [modal]="true"
-                                [style]="{ width: '50vw'}" [draggable]="false" [resizable]="false"
-                                [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+                                [draggable]="false" [resizable]="false"
+                                [style]="{ width: '40vw' ,color: '#010662', background: '#FFF9F4', border:'none' }">
                                 <div *ngIf="chatRoomDetails$ | async as details">
-                                    Room ID: <p>{{details.roomId}}</p>
-                                    Created on: <p>{{details.createDate}}</p>
-                                    Owner: <p>{{details.ownerName}}</p>
-                                    Number of users: <p>{{details.userCount}}</p>
+                                    <p><strong>Room ID: </strong>{{details.roomId}}</p>
+                                    <p><strong>Created on: </strong>{{details.createDate | date: 'dd/MM/yyyy'}}</p>
+                                    <p><strong>Owner: </strong>{{details.ownerName}}</p>
+                                    <p><strong>Number of users: </strong>{{details.userCount}}</p>
                                 </div>
+                            </p-dialog>
+                            <p-dialog header="Leave Chat" [(visible)]="leaveChatVisible" [modal]="true"
+                                [draggable]="false" [resizable]="false"
+                                [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+                                    <p>Are you sure you want to leave?</p>
+                                    <p-button size="small">No</p-button>
+                                    <p-button size="small">Yes</p-button>
                             </p-dialog>
                         </div>
                         <p-scroller #sc [items]="messageList" [itemSize]="10" scrollHeight="450px"
