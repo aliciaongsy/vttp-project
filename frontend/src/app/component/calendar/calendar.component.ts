@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
+import { Observable, Subscription, firstValueFrom, interval, map, takeWhile } from 'rxjs';
 import { Event, Task } from '../../model';
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -10,6 +10,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import { selectUser, selectUserDetails } from '../../state/user/user.selectors';
 import { addEvent, loadAllEvents, loadAllOutstandingTasks } from '../../state/planner/planner.actions';
 import { selectAllEvents, selectLoadStatus, selectAllOutstandingTasks } from '../../state/planner/planner.selector';
+import { GoogleService } from '../../service/google.service';
 
 @Component({
   selector: 'app-calendar',
@@ -19,6 +20,7 @@ import { selectAllEvents, selectLoadStatus, selectAllOutstandingTasks } from '..
 export class CalendarComponent implements OnInit, OnDestroy {
   private ngrxStore = inject(Store);
   private activatedRoute = inject(ActivatedRoute)
+  private googleSvc = inject(GoogleService)
 
   currentWorkspace!: string
   tasks$!: Observable<Task[]>
@@ -30,6 +32,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
   events$!: Subscription
   loadStatus$!: Subscription
   eventUpdated: boolean = false
+
+  authSub$!: Subscription
+  googleLoginUrl!: string
+  authStatusSub$!: Subscription
+  authStatus: boolean = false
+  userEmail!: string
 
   ngOnInit(): void {
 
@@ -94,6 +102,26 @@ export class CalendarComponent implements OnInit, OnDestroy {
           }
         })
       })
+
+    this.authSub$ = this.googleSvc.getAuthorisationPage(this.uid).subscribe({
+      next: (value) => {
+        console.info(value)
+        this.googleLoginUrl = value.url
+      },
+      error: (error) => console.info(error.error.error)
+    })
+
+    this.authStatusSub$ = interval(5000).pipe(takeWhile(() => this.authStatus == false)).subscribe(() =>
+      this.googleSvc.getStatus().subscribe(
+        (value) => {
+          console.info(value)
+          this.authStatus = value.status
+          this.userEmail = value.email
+          this.googleSvc.getEvents()
+        }
+      )
+    )
+
   }
 
   ngOnDestroy(): void {
@@ -121,6 +149,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.events$.unsubscribe()
     this.loadStatus$.unsubscribe()
     this.tasksSub$.unsubscribe()
+    this.authSub$.unsubscribe()
+    this.authStatusSub$.unsubscribe()
   }
 
   loadCalendar() {
@@ -164,4 +194,5 @@ export class CalendarComponent implements OnInit, OnDestroy {
       this.eventUpdated = true
     })
   }
+
 }
