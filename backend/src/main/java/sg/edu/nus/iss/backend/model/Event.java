@@ -8,10 +8,14 @@ import jakarta.json.JsonObjectBuilder;
 
 public class Event {
 
+    private String id;
     private String title;
     private String start;
     private String end;
     private boolean allDay;
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -51,5 +55,15 @@ public class Event {
             .add("allDay", e.isAllDay())
             .build();
     }
-    
+
+    public JsonObject toJson2(Event e){
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        return builder.add("title", e.getTitle())
+            .add("start", e.getStart())
+            .add("end", e.getEnd())
+            .add("allDay", e.isAllDay())
+            .add("id", e.getId())
+            .build();
+    }
+
 }
