@@ -26,6 +26,7 @@ import { CalendarComponent } from './component/calendar/calendar.component';
 import { CollabComponent } from './component/collab/collab.component';
 import { ChatService } from './service/chat.service';
 import { WebSocketService } from './service/websocket.service';
+import { GoogleService } from './service/google.service';
 
 // primeng imports
 import { DialogModule } from 'primeng/dialog';
@@ -112,7 +113,7 @@ import { ChatEffects } from './state/chat/chat.effects';
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
     FullCalendarModule
   ],
-  providers: [UserService, TaskService, PlannerService, FocusService, ChatService, WebSocketService],
+  providers: [UserService, TaskService, PlannerService, FocusService, ChatService, WebSocketService, GoogleService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
