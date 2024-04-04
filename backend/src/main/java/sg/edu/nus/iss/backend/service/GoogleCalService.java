@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -75,6 +76,12 @@ public class GoogleCalService {
     // public void setEvents(Set<Event> events) {
     // this.events = events;
     // }
+
+    public JsonObject buildJsonObject(String key, String value) {
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        b.add(key, value);
+        return b.build();
+    }
 
     public String authorize() throws Exception {
         AuthorizationCodeRequestUrl authorizationUrl;
@@ -212,22 +219,22 @@ public class GoogleCalService {
 
     }
 
-    public void createEvent(Event event) {
+    public ResponseEntity<String> createEvent(Event event) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
-        JsonObject start = Json.createObjectBuilder().add("dateTime",convertStringToDate(event.getStart())).build();
-        JsonObject end = Json.createObjectBuilder().add("dateTime",convertStringToDate(event.getEnd())).build();
+        JsonObject start = Json.createObjectBuilder().add("dateTime", convertStringToDate(event.getStart())).build();
+        JsonObject end = Json.createObjectBuilder().add("dateTime", convertStringToDate(event.getEnd())).build();
 
         JsonObject e = builder.add("summary", event.getTitle())
-            .add("start", start)
-            .add("end", end)
-            .build();
+                .add("start", start)
+                .add("end", end)
+                .build();
 
         String eventUrl = baseUrl + "/primary/events";
 
         String url = UriComponentsBuilder.fromUriString(eventUrl)
-        .queryParam("key", apiKey)
-        .toUriString();
+                .queryParam("key", apiKey)
+                .toUriString();
 
         System.out.printf("querying from %s\n", url);
 
@@ -236,10 +243,10 @@ public class GoogleCalService {
         System.out.printf("authorisation header: %s\n", authorisation);
 
         RequestEntity<String> req = RequestEntity.post(url)
-        .header("Authorization", authorisation)
-        .accept(MediaType.APPLICATION_JSON)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(e.toString(), String.class);
+                .header("Authorization", authorisation)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(e.toString(), String.class);
 
         RestTemplate template = new RestTemplate();
 
@@ -249,6 +256,61 @@ public class GoogleCalService {
         JsonObject jsonObject = jsonReader.readObject();
 
         System.out.println("-----RESPONSE-----\n" + jsonObject);
+
+        if (jsonObject.isEmpty()) {
+            JsonObject o = buildJsonObject("error", "error adding new event");
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+        }
+        JsonObject o = buildJsonObject("message", "added new event");
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(o.toString());
+
+    }
+
+    public ResponseEntity<String> updateEvent(Event event) {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+
+        JsonObject start = Json.createObjectBuilder().add("dateTime", convertStringToDate(event.getStart())).build();
+        JsonObject end = Json.createObjectBuilder().add("dateTime", convertStringToDate(event.getEnd())).build();
+
+        JsonObject e = builder.add("summary", event.getTitle())
+                .add("start", start)
+                .add("end", end)
+                .build();
+
+        String eventUrl = baseUrl + "/primary/events/" + event.getId();
+
+        String url = UriComponentsBuilder.fromUriString(eventUrl)
+                .queryParam("key", apiKey)
+                .toUriString();
+
+        System.out.printf("querying from %s\n", url);
+
+        String authorisation = "Bearer " + credential.getAccessToken();
+
+        System.out.printf("authorisation header: %s\n", authorisation);
+
+        RequestEntity<String> req = RequestEntity.put(url)
+                .header("Authorization", authorisation)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(e.toString(), String.class);
+
+        RestTemplate template = new RestTemplate();
+
+        ResponseEntity<String> resp = template.exchange(req, String.class);
+
+        JsonReader jsonReader = Json.createReader(new StringReader(resp.getBody()));
+        JsonObject jsonObject = jsonReader.readObject();
+
+        System.out.println("-----RESPONSE-----\n" + jsonObject);
+
+        if (jsonObject.isEmpty()) {
+            JsonObject o = buildJsonObject("error", "error adding new event");
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+        }
+        JsonObject o = buildJsonObject("message", "added new event");
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(o.toString());
+
     }
 
     public String convertStringToDate(String date) {

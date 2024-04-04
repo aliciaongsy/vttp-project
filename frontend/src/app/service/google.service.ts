@@ -23,11 +23,15 @@ export class GoogleService {
   }
 
   getEvents(){
-    return firstValueFrom(this.http.get<Event[]>(`${URL}/google/events`))
+    return this.http.get<Event[]>(`${URL}/google/events`)
   }
 
   createEvent(event: Event){
     return firstValueFrom(this.http.post<any>(`${URL}/google/event/create`, event))
+  }
+
+  updateEvent(event: Event){
+    return firstValueFrom(this.http.put<any>(`${URL}/google/event/update`, event))
   }
 
 }

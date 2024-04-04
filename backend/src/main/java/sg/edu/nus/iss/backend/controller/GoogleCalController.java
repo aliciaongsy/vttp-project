@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -111,9 +112,25 @@ public class GoogleCalController {
 		event.setEnd(o.getString("end"));
 		event.setAllDay(o.getBoolean("allDay"));
 
-		googleSvc.createEvent(event);
+		return googleSvc.createEvent(event);
+	}
 
-		return null;
+	@PutMapping("google/event/update")
+	@ResponseBody
+	public ResponseEntity<String> updateEvent(@RequestBody String payload) {
+
+		JsonReader reader = Json.createReader(new StringReader(payload));
+		System.out.println(payload);
+
+		JsonObject o = reader.readObject();
+		Event event = new Event();
+		event.setId(o.getString("id"));
+		event.setTitle(o.getString("title"));
+		event.setStart(o.getString("start"));
+		event.setEnd(o.getString("end"));
+		event.setAllDay(o.getBoolean("allDay"));
+
+		return googleSvc.updateEvent(event);
 	}
 
 }

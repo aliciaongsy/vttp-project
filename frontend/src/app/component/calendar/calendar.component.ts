@@ -40,6 +40,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   authStatus: boolean = false
   userEmail!: string
   key!: string
+  googleEvent$!: Subscription
 
   ngOnInit(): void {
 
@@ -124,7 +125,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           this.userEmail = value.email
           if (this.authStatus) {
             // get events on successful authorisation
-            this.googleSvc.getEvents().then((value) => {
+            this.googleEvent$ = this.googleSvc.getEvents().subscribe((value) => {
 
               // stop getting data from store
               this.events$.unsubscribe()
@@ -210,8 +211,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     // add new event
     this.calendar.on('eventReceive', (info) => {
       console.info(this.calendarMode)
-      this.eventUpdated = true
-      
+
       // create new google event
       if (this.calendarMode === 'google') {
         const event: Event = {
@@ -223,24 +223,47 @@ export class CalendarComponent implements OnInit, OnDestroy {
         console.info(event)
         this.googleSvc.createEvent(event)
       }
+      else {
+        this.eventUpdated = true
+      }
 
     })
     // move event
     this.calendar.on('eventDrop', (info) => {
-      // this.eventUpdated = true
+      
       console.info(info)
+      if (this.calendarMode === 'google') {
+        const event: Event = {
+          id: info.event.id,
+          title: info.event.title,
+          start: info.event.start?.toISOString()!,
+          end: info.event.end == null ? '' : info.event.end.toISOString(),
+          allDay: info.event.allDay
+        }
+        console.info(event)
+        this.googleSvc.updateEvent(event)
+      }
+      else {
+        this.eventUpdated = true
+      }
     })
     this.calendar.on('eventResize', (info) => {
-      // this.eventUpdated = true
       console.info(info)
-      const event: Event = {
-        title: info.event.title,
-        start: info.event.start?.toISOString()!,
-        end: info.event.end == null ? '' : info.event.end.toISOString(),
-        allDay: info.event.allDay
+      if (this.calendarMode === 'google') {
+        const event: Event = {
+          id: info.event.id,
+          title: info.event.title,
+          start: info.event.start?.toISOString()!,
+          end: info.event.end == null ? '' : info.event.end.toISOString(),
+          allDay: info.event.allDay
+        }
+        console.info(event)
+        this.googleSvc.updateEvent(event)
+      }
+      else {
+        this.eventUpdated = true
       }
 
-      console.info(event)
     })
   }
 
