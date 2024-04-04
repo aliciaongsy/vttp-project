@@ -7,7 +7,7 @@ import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { selectUser, selectUserDetails } from '../../state/user/user.selectors';
+import { selectUser } from '../../state/user/user.selectors';
 import { addEvent, loadAllEvents, loadAllOutstandingTasks } from '../../state/planner/planner.actions';
 import { selectAllEvents, selectLoadStatus, selectAllOutstandingTasks } from '../../state/planner/planner.selector';
 import { GoogleService } from '../../service/google.service';
@@ -32,12 +32,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
   events$!: Subscription
   loadStatus$!: Subscription
   eventUpdated: boolean = false
+  calendarMode!: 'google' | 'mongo'
 
   authSub$!: Subscription
   googleLoginUrl!: string
   authStatusSub$!: Subscription
   authStatus: boolean = false
   userEmail!: string
+  key!: string
 
   ngOnInit(): void {
 
@@ -55,6 +57,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
         return [...value]
       })
     )
+
+    // calendar mode is mongo by default
+    this.calendarMode = 'mongo'
 
     this.tasksSub$ = this.tasks$.subscribe(
       (task) => {
@@ -117,7 +122,17 @@ export class CalendarComponent implements OnInit, OnDestroy {
           console.info(value)
           this.authStatus = value.status
           this.userEmail = value.email
-          this.googleSvc.getEvents()
+          if (this.authStatus) {
+            // get events on successful authorisation
+            this.googleSvc.getEvents().then((value) => {
+
+              // stop getting data from store
+              this.events$.unsubscribe()
+              this.events = value
+              this.calendarMode = 'google'
+              this.loadCalendar()
+            })
+          }
         }
       )
     )
@@ -125,7 +140,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.eventUpdated) {
+    console.info(this.calendar.getEvents())
+    if (this.eventUpdated && this.calendarMode == 'mongo') {
       const events: any[] = this.calendar.getEvents()
       if (events.length != 0) {
         var eventsToAdd: Event[] = []
@@ -149,13 +165,18 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.events$.unsubscribe()
     this.loadStatus$.unsubscribe()
     this.tasksSub$.unsubscribe()
-    this.authSub$.unsubscribe()
-    this.authStatusSub$.unsubscribe()
+    if (this.authSub$) {
+      this.authSub$.unsubscribe()
+    }
+    if (this.authStatusSub$) {
+      this.authStatusSub$.unsubscribe()
+    }
   }
 
   loadCalendar() {
+
+    console.info(this.key)
     var calendarEl = document.getElementById('calendar')
-    var update = false
 
     // load calendar
     this.calendar = new Calendar(calendarEl!, {
@@ -171,7 +192,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
       events: this.events,
       eventColor: '#010662'
     })
-    this.eventUpdated = update
     this.calendar.render()
 
     // delete event
@@ -187,11 +207,40 @@ export class CalendarComponent implements OnInit, OnDestroy {
     })
 
     // drop event & move event
-    this.calendar.on('drop', (info) => {
+    // add new event
+    this.calendar.on('eventReceive', (info) => {
+      console.info(this.calendarMode)
       this.eventUpdated = true
+      
+      // create new google event
+      if (this.calendarMode === 'google') {
+        const event: Event = {
+          title: info.event.title,
+          start: info.event.start?.toISOString()!,
+          end: info.event.end == null ? info.event.allDay == false ? new Date(info.event.start?.getTime()! + (60 * 60 * 1000)).toISOString() : '' : info.event.end.toISOString(),
+          allDay: info.event.allDay
+        }
+        console.info(event)
+        this.googleSvc.createEvent(event)
+      }
+
     })
+    // move event
     this.calendar.on('eventDrop', (info) => {
-      this.eventUpdated = true
+      // this.eventUpdated = true
+      console.info(info)
+    })
+    this.calendar.on('eventResize', (info) => {
+      // this.eventUpdated = true
+      console.info(info)
+      const event: Event = {
+        title: info.event.title,
+        start: info.event.start?.toISOString()!,
+        end: info.event.end == null ? '' : info.event.end.toISOString(),
+        allDay: info.event.allDay
+      }
+
+      console.info(event)
     })
   }
 

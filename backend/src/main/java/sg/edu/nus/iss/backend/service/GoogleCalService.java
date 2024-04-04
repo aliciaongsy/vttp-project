@@ -1,9 +1,14 @@
 package sg.edu.nus.iss.backend.service;
 
 import java.io.StringReader;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -27,10 +32,14 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.Calendar.Events;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.EventDateTime;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
+import sg.edu.nus.iss.backend.model.Event;
 
 @Service
 public class GoogleCalService {
@@ -64,7 +73,7 @@ public class GoogleCalService {
     // private Set<Event> events = new HashSet<>();
 
     // public void setEvents(Set<Event> events) {
-    //     this.events = events;
+    // this.events = events;
     // }
 
     public String authorize() throws Exception {
@@ -84,7 +93,7 @@ public class GoogleCalService {
 
         authorizationUrl = flow.newAuthorizationUrl().setRedirectUri(redirectURI);
 
-        System.out.println("cal authorizationUrl->" + authorizationUrl);
+        System.out.printf("google calendar authorization url: %s\n", authorizationUrl);
         return authorizationUrl.build();
     }
 
@@ -98,27 +107,26 @@ public class GoogleCalService {
             credential = flow.createAndStoreCredential(response, userId);
             client = new Calendar.Builder(httpTransport, JSON_FACTORY, credential)
                     .setApplicationName(APPLICATION_NAME).build();
-            // Events events = client.events();
-            // eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
-            // message = eventList.getItems().toString();
-            // System.out.println("My:" + eventList.getItems());
-            // System.out.println("cal message:" + message);
+            Events events = client.events();
+            eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
+            System.out.println("Calendar event list:" + eventList.getItems());
             return true;
 
         } catch (Exception e) {
 
             message = "Exception while handling OAuth2 callback (" + e.getMessage() + ")."
                     + " Redirecting to google connection status page.";
+            System.out.printf("error message: %s", message);
             return false;
         }
     }
 
-    public String getEmail(){
+    public String getEmail() {
 
         String emailUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
 
         String url = UriComponentsBuilder.fromUriString(emailUrl)
-                .queryParam("access_token",credential.getAccessToken())
+                .queryParam("access_token", credential.getAccessToken())
                 .toUriString();
 
         RequestEntity<Void> req = RequestEntity.get(url).build();
@@ -137,9 +145,9 @@ public class GoogleCalService {
         return email;
     }
 
-    public void getEvents(){
+    public List<Event> getEvents() {
 
-        String eventUrl = baseUrl+"/primary/events";
+        String eventUrl = baseUrl + "/primary/events";
 
         String url = UriComponentsBuilder.fromUriString(eventUrl)
                 .queryParam("key", apiKey)
@@ -147,14 +155,14 @@ public class GoogleCalService {
 
         System.out.printf("querying from %s\n", url);
 
-        String authorisation = "Bearer "+credential.getAccessToken();
+        String authorisation = "Bearer " + credential.getAccessToken();
 
         System.out.printf("authorisation header: %s\n", authorisation);
 
         RequestEntity<Void> req = RequestEntity.get(url)
-            .accept(MediaType.APPLICATION_JSON)
-            .header("Authorization", authorisation)
-            .build();
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", authorisation)
+                .build();
 
         RestTemplate template = new RestTemplate();
 
@@ -164,9 +172,98 @@ public class GoogleCalService {
         JsonObject jsonObject = jsonReader.readObject();
 
         System.out.println("-----JSONOBJECT-----\n" + jsonObject);
+
+        JsonArray jsonArray = jsonObject.getJsonArray("items");
+        List<Event> events = new LinkedList<>();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonObject o = jsonArray.getJsonObject(i);
+            Event event = new Event();
+            event.setTitle(o.getString("summary"));
+            event.setId(o.getString("id"));
+            JsonObject start = o.getJsonObject("start");
+            JsonObject end = o.getJsonObject("end");
+
+            // if event is all-day event
+            try {
+                String startDate = start.getString("date");
+                event.setStart(startDate);
+                String endDate = end.getString("date");
+                event.setEnd(endDate);
+            } catch (NullPointerException e) {
+                // non all-day event
+                System.out.println("non all-day event");
+                event.setAllDay(false);
+            }
+
+            // non all-day event
+            try {
+                String startDate = start.getString("dateTime");
+                event.setStart(startDate);
+                String endDate = end.getString("dateTime");
+                event.setEnd(endDate);
+            } catch (NullPointerException e) {
+                System.out.println("all-day event");
+                event.setAllDay(true);
+            }
+            events.add(event);
+        }
+
+        return events;
+
+    }
+
+    public void createEvent(Event event) {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+
+        JsonObject start = Json.createObjectBuilder().add("dateTime",convertStringToDate(event.getStart())).build();
+        JsonObject end = Json.createObjectBuilder().add("dateTime",convertStringToDate(event.getEnd())).build();
+
+        JsonObject e = builder.add("summary", event.getTitle())
+            .add("start", start)
+            .add("end", end)
+            .build();
+
+        String eventUrl = baseUrl + "/primary/events";
+
+        String url = UriComponentsBuilder.fromUriString(eventUrl)
+        .queryParam("key", apiKey)
+        .toUriString();
+
+        System.out.printf("querying from %s\n", url);
+
+        String authorisation = "Bearer " + credential.getAccessToken();
+
+        System.out.printf("authorisation header: %s\n", authorisation);
+
+        RequestEntity<String> req = RequestEntity.post(url)
+        .header("Authorization", authorisation)
+        .accept(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(e.toString(), String.class);
+
+        RestTemplate template = new RestTemplate();
+
+        ResponseEntity<String> resp = template.exchange(req, String.class);
+
+        JsonReader jsonReader = Json.createReader(new StringReader(resp.getBody()));
+        JsonObject jsonObject = jsonReader.readObject();
+
+        System.out.println("-----RESPONSE-----\n" + jsonObject);
+    }
+
+    public String convertStringToDate(String date) {
+
+        TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(date);
+        Instant i = Instant.from(ta);
+
+        DateTime dt = new DateTime(i.toEpochMilli());
+
+        EventDateTime dateTime = new EventDateTime().setDateTime(dt);
+
+        return dateTime.getDateTime().toString();
     }
 
     // public Set<Event> getEvents() throws IOException {
-    //     return this.events;
+    // return this.events;
     // }
 }
