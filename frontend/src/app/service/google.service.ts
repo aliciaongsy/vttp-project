@@ -34,4 +34,8 @@ export class GoogleService {
     return firstValueFrom(this.http.put<any>(`${URL}/google/event/update`, event))
   }
 
+  deleteEvent(id: string){
+    return firstValueFrom(this.http.delete<any>(`${URL}/google/event/delete/${id}`))
+  }
+
 }

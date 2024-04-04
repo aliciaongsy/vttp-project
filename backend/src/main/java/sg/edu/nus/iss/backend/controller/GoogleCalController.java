@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,9 +34,9 @@ public class GoogleCalController {
 	@Autowired
 	private GoogleCalService googleSvc;
 
-	private boolean authStatus;
+	private boolean authStatus = false;
 	private String userId;
-	private String email;
+	private String email = "";
 
 	@GetMapping("/google/auth/login")
 	public ResponseEntity<String> googleConnectionStatus(HttpServletRequest request,
@@ -81,7 +83,7 @@ public class GoogleCalController {
 
 		JsonObjectBuilder builder = Json.createObjectBuilder();
 		builder.add("status", authStatus)
-				.add("email", email == null ? "" : email);
+				.add("email", email);
 		return ResponseEntity.status(authStatus ? HttpStatusCode.valueOf(200) : HttpStatusCode.valueOf(400))
 				.body(builder.build().toString());
 	}
@@ -131,6 +133,12 @@ public class GoogleCalController {
 		event.setAllDay(o.getBoolean("allDay"));
 
 		return googleSvc.updateEvent(event);
+	}
+
+	@DeleteMapping("google/event/delete/{id}")
+	@ResponseBody
+	public ResponseEntity<String> deleteEvent(@PathVariable String id) {
+		return googleSvc.deleteEvent(id);
 	}
 
 }

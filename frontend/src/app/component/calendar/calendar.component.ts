@@ -202,7 +202,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
         console.info(info.event)
         if (confirm(`Delete event: ${info.event.title}?`)) {
           info.event.remove();
-          this.eventUpdated = true
+          if (this.calendarMode === 'google') {
+            this.googleSvc.deleteEvent(info.event.id)
+          }
+          else {
+            this.eventUpdated = true
+          }
         }
       }
     })
@@ -221,7 +226,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
           allDay: info.event.allDay
         }
         console.info(event)
-        this.googleSvc.createEvent(event)
+        this.googleSvc.createEvent(event).then(() => {
+          this.googleEvent$ = this.googleSvc.getEvents().subscribe((value) => {
+            this.events = value
+            this.loadCalendar()
+          })
+        })
       }
       else {
         this.eventUpdated = true

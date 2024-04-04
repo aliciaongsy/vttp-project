@@ -305,10 +305,44 @@ public class GoogleCalService {
         System.out.println("-----RESPONSE-----\n" + jsonObject);
 
         if (jsonObject.isEmpty()) {
-            JsonObject o = buildJsonObject("error", "error adding new event");
+            JsonObject o = buildJsonObject("error", "error updating event");
             return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
         }
-        JsonObject o = buildJsonObject("message", "added new event");
+        JsonObject o = buildJsonObject("message", "updated event");
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(o.toString());
+
+    }
+
+    public ResponseEntity<String> deleteEvent(String id) {
+
+        String eventUrl = baseUrl + "/primary/events/" + id;
+
+        String url = UriComponentsBuilder.fromUriString(eventUrl)
+                .queryParam("key", apiKey)
+                .toUriString();
+
+        System.out.printf("querying from %s\n", url);
+
+        String authorisation = "Bearer " + credential.getAccessToken();
+
+        System.out.printf("authorisation header: %s\n", authorisation);
+
+        RequestEntity<Void> req = RequestEntity.delete(url)
+                .header("Authorization", authorisation)
+                .accept(MediaType.APPLICATION_JSON)
+                .build();
+
+        RestTemplate template = new RestTemplate();
+
+        ResponseEntity<String> resp = template.exchange(req, String.class);
+
+        System.out.println(resp.getBody());
+        if (!(resp.getBody()==null)){
+            JsonObject o = buildJsonObject("error", "error deleting event");
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+        }
+
+        JsonObject o = buildJsonObject("message", "deleted event");
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(o.toString());
 
     }
