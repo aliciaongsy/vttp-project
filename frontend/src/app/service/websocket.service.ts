@@ -15,13 +15,10 @@ export class WebSocketService {
   constructor() {
     this.initSocketConnection();
   }
-  msg = [];
 
   name!: string
-  newmessage!: string;
 
   initSocketConnection() {
-    // const ws = 'http://localhost:8080/socket'
     const socket = new SockJS('//localhost:8080/socket');
     this.stompClient = Stomp.over(socket);
 
