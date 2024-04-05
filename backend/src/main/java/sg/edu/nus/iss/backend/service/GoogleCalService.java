@@ -71,12 +71,6 @@ public class GoogleCalService {
     final DateTime date1 = new DateTime("2017-05-05T16:30:00.000+05:30");
     final DateTime date2 = new DateTime(new Date());
 
-    // private Set<Event> events = new HashSet<>();
-
-    // public void setEvents(Set<Event> events) {
-    // this.events = events;
-    // }
-
     public JsonObject buildJsonObject(String key, String value) {
         JsonObjectBuilder b = Json.createObjectBuilder();
         b.add(key, value);
@@ -106,7 +100,6 @@ public class GoogleCalService {
 
     public boolean getTokenStatus(String code, String userId) {
         com.google.api.services.calendar.model.Events eventList;
-        String message;
         try {
 
             TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectURI).execute();
@@ -116,14 +109,11 @@ public class GoogleCalService {
                     .setApplicationName(APPLICATION_NAME).build();
             Events events = client.events();
             eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
-            System.out.println("Calendar event list:" + eventList.getItems());
+            System.out.println("calendar event list:" + eventList.getItems());
             return true;
 
         } catch (Exception e) {
-
-            message = "Exception while handling OAuth2 callback (" + e.getMessage() + ")."
-                    + " Redirecting to google connection status page.";
-            System.out.printf("error message: %s", message);
+            System.out.printf("exception while handling oauth2 callback (%s)\n", e.getMessage());
             return false;
         }
     }
@@ -381,8 +371,4 @@ public class GoogleCalService {
 
         return dateTime.getDateTime().toString();
     }
-
-    // public Set<Event> getEvents() throws IOException {
-    // return this.events;
-    // }
 }
