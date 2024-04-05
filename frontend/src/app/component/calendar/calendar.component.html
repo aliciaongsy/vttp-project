@@ -10,9 +10,9 @@
         </div>
     </div>
     <div id="calendar-container">
-        <div *ngIf="authStatus==false">
+        <div *ngIf="authStatus==false" style="padding: 1ch 0">
             <!-- <p-button icon="pi pi-sync" size="small" [style]="{'background':'#FFF9F4', 'color': '#010662', 'border': 'none'}">Sync with Google Calendar</p-button> -->
-            <a href="{{googleLoginUrl}}" target="_blank">Sync with Google Calendar</a>
+            <a href="{{googleLoginUrl}}" target="_blank" (click)="syncCal()"><i class="pi pi-refresh" style="font-size: 1rem"></i> Sync with Google Calendar</a>
         </div>
         <div *ngIf="authStatus">
             <p>Synced with Google Calendar: <i>{{userEmail}}</i></p>
