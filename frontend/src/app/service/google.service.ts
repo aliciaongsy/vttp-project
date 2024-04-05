@@ -15,27 +15,31 @@ export class GoogleService {
 
   getAuthorisationPage(id: string): Observable<any>{
     const params = new HttpParams().set("id", id)
-    return this.http.get<any>(`${URL}/google/auth/login`, { params })
+    return this.http.get<any>(`${URL}/api/google/auth/login`, { params })
   }
 
   getStatus(){
-    return this.http.get<any>(`${URL}/google/auth/status`)
+    return this.http.get<any>(`${URL}/api/google/auth/status`)
   }
 
   getEvents(){
-    return this.http.get<Event[]>(`${URL}/google/events`)
+    return this.http.get<Event[]>(`${URL}/api/google/events`)
   }
 
   createEvent(event: Event){
-    return firstValueFrom(this.http.post<any>(`${URL}/google/event/create`, event))
+    return firstValueFrom(this.http.post<any>(`${URL}/api/google/event/create`, event))
   }
 
   updateEvent(event: Event){
-    return firstValueFrom(this.http.put<any>(`${URL}/google/event/update`, event))
+    return firstValueFrom(this.http.put<any>(`${URL}/api/google/event/update`, event))
   }
 
   deleteEvent(id: string){
-    return firstValueFrom(this.http.delete<any>(`${URL}/google/event/delete/${id}`))
+    return firstValueFrom(this.http.delete<any>(`${URL}/api/google/event/delete/${id}`))
+  }
+
+  revokeToken(){
+    return firstValueFrom(this.http.delete<any>(`${URL}/api/google/auth/token/revoke`))
   }
 
 }
