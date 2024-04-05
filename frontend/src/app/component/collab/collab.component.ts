@@ -28,8 +28,6 @@ interface PageEvent {
 })
 export class CollabComponent implements OnInit, OnDestroy {
 
-  @ViewChild('sc') sc!: Scroller;
-
   private ngrxStore = inject(Store)
   private messageSvc = inject(WebSocketService)
   private chatSvc = inject(ChatService)
