@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.RedirectView;
@@ -29,6 +30,7 @@ import sg.edu.nus.iss.backend.service.GoogleCalService;
 
 @Controller
 @CrossOrigin(origins = "*")
+@RequestMapping("/api")
 public class GoogleCalController {
 
 	@Autowired
@@ -77,7 +79,7 @@ public class GoogleCalController {
 		return "Unsuccessful authorisation, you may close this tab and retry";
 	}
 
-	@GetMapping("google/auth/status")
+	@GetMapping("/google/auth/status")
 	@ResponseBody
 	public ResponseEntity<String> getStatus() {
 
@@ -88,7 +90,7 @@ public class GoogleCalController {
 				.body(builder.build().toString());
 	}
 
-	@GetMapping("google/events")
+	@GetMapping("/google/events")
 	@ResponseBody
 	public ResponseEntity<String> getEvents() {
 		List<Event> events = googleSvc.getEvents();
@@ -100,7 +102,7 @@ public class GoogleCalController {
 		return ResponseEntity.ok(builder.build().toString());
 	}
 
-	@PostMapping("google/event/create")
+	@PostMapping("/google/event/create")
 	@ResponseBody
 	public ResponseEntity<String> createEvent(@RequestBody String payload) {
 
@@ -117,7 +119,7 @@ public class GoogleCalController {
 		return googleSvc.createEvent(event);
 	}
 
-	@PutMapping("google/event/update")
+	@PutMapping("/google/event/update")
 	@ResponseBody
 	public ResponseEntity<String> updateEvent(@RequestBody String payload) {
 
@@ -135,10 +137,16 @@ public class GoogleCalController {
 		return googleSvc.updateEvent(event);
 	}
 
-	@DeleteMapping("google/event/delete/{id}")
+	@DeleteMapping("/google/event/delete/{id}")
 	@ResponseBody
 	public ResponseEntity<String> deleteEvent(@PathVariable String id) {
 		return googleSvc.deleteEvent(id);
+	}
+
+	@GetMapping("google/auth/token/revoke")
+	@ResponseBody
+	public ResponseEntity<String> revokeToken(){
+		return googleSvc.revokeToken();
 	}
 
 }

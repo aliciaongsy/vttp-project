@@ -128,6 +128,29 @@ public class GoogleCalService {
         }
     }
 
+    public ResponseEntity<String> revokeToken(){
+        
+        String url = UriComponentsBuilder.fromUriString("https://oauth2.googleapis.com/revoke")
+            .queryParam("token", credential.getAccessToken())
+            .toUriString();
+
+        RequestEntity<Void> req = RequestEntity.post(url)
+            .header("Content-type", "application/x-www-form-urlencoded")
+            .build();
+
+        RestTemplate template = new RestTemplate();
+
+        ResponseEntity<String> resp = template.exchange(req, String.class);
+
+        if (resp.getStatusCode()==HttpStatusCode.valueOf(200)){
+            credential = null;
+        }
+        
+        JsonObject error = buildJsonObject("error", "error revoking token");
+        JsonObject success = buildJsonObject("message", "token revoked");
+        return ResponseEntity.status(resp.getStatusCode()).body(credential==null ? success.toString() : error.toString());
+    }
+
     public String getEmail() {
 
         String emailUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
