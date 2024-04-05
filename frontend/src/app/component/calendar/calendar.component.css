@@ -1,13 +1,13 @@
 .row{
     display: flex;
     padding: 1ch 2ch;
-    height: min-content;
+    height: 90vh;
 }
 
 /* draggable */
 div #draggable{
     padding-right: 1ch;
-    height: min-content;
+    height: 100%;
 }
 
 #draggable .fc-event {
@@ -26,9 +26,13 @@ div #draggable{
 div #calendar-container{
     padding-left: 1ch;
     width: 100%;
-    height: min-content;
+    height: 100%;
 }
 
 .fc-view-harness.fc-view-harness-active {
     height: 80vh;
+}
+
+#calendar{
+    height: 100%
 }
