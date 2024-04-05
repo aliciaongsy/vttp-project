@@ -93,7 +93,7 @@
                             </h2>
                             <p-dialog header="Chat Room Details" [(visible)]="chatRoomDetailsVisible" [modal]="true"
                                 [draggable]="false" [resizable]="false"
-                                [style]="{ width: '40vw' ,color: '#010662', background: '#FFF9F4', border:'none' }">
+                                [style]="{ width: '20vw', color: '#010662', background: '#FFF9F4', border:'none' }">
                                 <div *ngIf="chatRoomDetails$ | async as details">
                                     <p><strong>Room ID: </strong>{{details.roomId}}</p>
                                     <p><strong>Created on: </strong>{{details.createDate | date: 'dd/MM/yyyy'}}</p>
@@ -109,26 +109,28 @@
                                     <p-button size="small">Yes</p-button>
                             </p-dialog>
                         </div>
-                        <p-scroller #sc [items]="messageList" [itemSize]="10" scrollHeight="450px"
+                        <div>
+                            <p-scroller [items]="messageList" [itemSize]="messageList.length" [showLoader]="true" scrollHeight="450px"
                             [style]="{'height': '450px'}">
-                            <ng-template pTemplate="item" let-item>
-                                <div class="message"
-                                    [ngClass]="{'left': item.sender !== name, 'right': item.sender === name}">
-                                    <div class="bubble">
-                                        <p *ngIf="item.sender !== name" style="border-bottom: 1px solid #010662;">
-                                            {{item.sender}}:</p>
-                                        <p>{{item.content}}</p>
-                                        <p class="date">{{ item.timestamp | date: 'short' }}</p>
+                                <ng-template pTemplate="item" let-item>
+                                    <div class="message"
+                                        [ngClass]="{'left': item.sender !== name, 'right': item.sender === name}">
+                                        <div class="bubble">
+                                            <p *ngIf="item.sender !== name" style="border-bottom: 1px solid #010662;">
+                                                {{item.sender}}:</p>
+                                            <p>{{item.content}}</p>
+                                            <p class="date">{{ item.timestamp | date: 'short' }}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </ng-template>
-                        </p-scroller>
-                        <form [formGroup]="messageForm">
-                            <input pInputText type="text" formControlName="message"
-                                style="width: 95%; padding-top: 1ch;" placeholder="enter a message...">
-                            <p-button (onClick)="sendMessage()" size="small" height="40px" icon="pi pi-send"
-                                [style]="{'width': '5%'}" [disabled]="messageForm.invalid"></p-button>
-                        </form>
+                                </ng-template>
+                            </p-scroller>
+                            <form [formGroup]="messageForm">
+                                <input pInputText type="text" formControlName="message"
+                                    style="width: 95%; padding-top: 1ch;" placeholder="enter a message...">
+                                <p-button (onClick)="sendMessage()" size="small" height="40px" icon="pi pi-send"
+                                    [style]="{'width': '5%'}" [disabled]="messageForm.invalid"></p-button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </ng-template>

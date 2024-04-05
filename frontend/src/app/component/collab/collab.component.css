@@ -145,6 +145,12 @@ form{
     font-style: italic;
 }
 
+:host ::ng-deep .p-scroller-content {
+    position: relative;
+    overflow: auto;
+    max-height: 100%;
+}
+
 /* :host ::ng-deep .p-scroller{
     transform: none;
 } */
