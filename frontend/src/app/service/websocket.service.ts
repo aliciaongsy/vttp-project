@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { ChatMessage } from '../model';
 import { BehaviorSubject } from 'rxjs';
-
-const URL = environment.url
 
 @Injectable({
   providedIn: 'root'
@@ -29,13 +26,11 @@ export class WebSocketService {
     this.stompClient = Stomp.over(socket);
 
     socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      // Handle error, such as displaying an error message to the user
+      console.error('websocket error:', error);
     };
 
     socket.onclose = (event) => {
-      console.log('WebSocket connection closed:', event);
-      // Perform cleanup tasks, such as resetting UI state or re-establishing the connection
+      console.log('websocket connection closed:', event);
     };
 
   }
@@ -83,7 +78,7 @@ export class WebSocketService {
   disconnect() {
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.disconnect(() => {
-        console.log('Disconnected from WebSocket');
+        console.log('disconnected from websocket');
       });
     }
   }
