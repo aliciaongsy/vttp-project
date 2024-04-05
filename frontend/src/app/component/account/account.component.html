@@ -1,1 +1,32 @@
-<p>account works!</p>
+<div class="base">
+    <div class="profile">
+        <h3>Profile <i class="pi pi-user"></i></h3>
+        <div>
+            <img src="/assets/placeholder_image.jpeg" alt="profile picture" width="100%">
+        </div>
+        <p>Name: {{userDetail.name}}</p>
+        <p>ID: {{userDetail.id}}</p>
+        <p>Email: {{userDetail.email}}</p>
+        <p>Joined: </p>
+        <p-button size="small">Edit Account</p-button>
+    </div>
+    <div class="display">
+        <h3>Dashboard</h3>
+        <div class="row">
+            <div class="row-item">
+                <h4>Outstanding tasks:</h4>
+                <p></p>
+            </div>
+            <p-divider layout="vertical"></p-divider>
+            <div class="row-item">
+                <h4>Active workspaces:</h4>
+                <p class="route" *ngFor="let w of workspaces" [routerLink]="['/workspace', w]">{{w}}</p>
+            </div>
+            <p-divider layout="vertical"></p-divider>
+            <div class="row-item">
+                <h4>Active chat rooms:</h4>
+                <p class="route" *ngFor="let c of chatDetails" [routerLink]="['/chat', c.roomId]">{{c.name}}</p>
+            </div>
+        </div>
+    </div>
+</div>
