@@ -26,6 +26,15 @@ export const loadAllEventsFromService = createAction(
     props<{ events: Event[] }>()
 )
 
+export const changeCalendarMode = createAction(
+    '[Planner Page] Change Calendar Mode'
+)
+
+export const changeAuthStatus = createAction(
+    '[Planner Page] Change Auth Status',
+    props<{ email: string }>()
+)
+
 export const resetPlannerState = createAction(
     '[Planner Page] Reset State'
 )

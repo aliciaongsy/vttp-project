@@ -15,3 +15,15 @@ export const selectAllOutstandingTasks = createSelector(
     selectPlanner,
     (state: PlannerState) => state.outstandingTasks
 )
+export const selectCalendarMode  = createSelector(
+    selectPlanner,
+    (state: PlannerState) => state.calendarMode
+)
+export const selectAuthStatus  = createSelector(
+    selectPlanner,
+    (state: PlannerState) => state.authStatus
+)
+export const selectEmail  = createSelector(
+    selectPlanner,
+    (state: PlannerState) => state.email
+)
