@@ -6,6 +6,10 @@ import { resetState } from '../state/user/user.actions';
 import { selectStatus, selectUserDetails } from '../state/user/user.selectors';
 import { resetTaskState } from '../state/tasks/task.actions';
 import { Router } from '@angular/router';
+import { resetPlannerState } from '../state/planner/planner.actions';
+import { resetChatState } from '../state/chat/chat.actions';
+import { resetFocusState } from '../state/focus/focus.actions';
+import { GoogleService } from '../service/google.service';
 
 @Component({
   selector: 'app-navbar',
@@ -16,6 +20,7 @@ export class NavbarComponent implements OnInit{
 
   private ngrx = inject(Store)
   private router = inject(Router)
+  private googleSvc = inject(GoogleService)
 
   loginStatus!: Observable<boolean>
   user!: Observable<UserDetails>
@@ -36,9 +41,12 @@ export class NavbarComponent implements OnInit{
           label: 'Sign out',
           icon: 'pi pi-sign-out',
           command: () => {
-            // this.store.signOut()
             this.ngrx.dispatch(resetState())
             this.ngrx.dispatch(resetTaskState())
+            this.ngrx.dispatch(resetPlannerState())
+            this.ngrx.dispatch(resetChatState())
+            this.ngrx.dispatch(resetFocusState())
+            this.googleSvc.revokeToken()
           },
           routerLink: ['/']
       }

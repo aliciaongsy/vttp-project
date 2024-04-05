@@ -24,3 +24,7 @@ export const resetState = createAction(
     '[Focus Page] Reset State',
     props<{ duration: number }>()
 )
+
+export const resetFocusState = createAction(
+    '[Focus Page] Reset Focus State',
+)

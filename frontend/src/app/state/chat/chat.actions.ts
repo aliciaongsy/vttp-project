@@ -30,3 +30,7 @@ export const loadChatRoomFromService = createAction(
     '[Chat Page] Load Chat Room From Service',
     props<{ chatRoom: ChatRoom }>()
 )
+
+export const resetChatState = createAction(
+    '[Chat Page] Reset Chat State'
+)

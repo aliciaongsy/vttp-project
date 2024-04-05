@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store";
 import { ChatMessage, ChatRoom } from "../../model";
-import { enterChatRoom, loadAllMessages, loadAllMessagesFromService, loadChatRoom, loadChatRoomFromService, sendMessage } from "./chat.actions";
+import { enterChatRoom, loadAllMessages, loadAllMessagesFromService, loadChatRoom, loadChatRoomFromService, resetChatState, sendMessage } from "./chat.actions";
 
 export interface ChatState {
     roomId: string,
@@ -22,14 +22,14 @@ export const initialState: ChatState = {
         name: '',
         users: [],
         userCount: 0,
-        createDate: 0, 
+        createDate: 0,
         type: 'Private'
     }
 }
 
 export const chatReducer = createReducer(
     initialState,
-    on(enterChatRoom, (state, {name}) => ({
+    on(enterChatRoom, (state, { name }) => ({
         ...state,
         name: name
     })),
@@ -47,12 +47,28 @@ export const chatReducer = createReducer(
         messages: messages,
         loadStatus: 'complete' as const
     })),
-    on(loadChatRoom, (state, {roomId}) => ({
+    on(loadChatRoom, (state, { roomId }) => ({
         ...state,
         roomId: roomId
     })),
-    on(loadChatRoomFromService, (state, {chatRoom}) => ({
+    on(loadChatRoomFromService, (state, { chatRoom }) => ({
         ...state,
         chatRoom: chatRoom
+    })),
+    on(resetChatState, (state) => ({
+        roomId: '',
+        name: '',
+        messages: [],
+        loadStatus: 'NA' as const,
+        chatRoom: {
+            roomId: '',
+            ownerId: '',
+            ownerName: '',
+            name: '',
+            users: [],
+            userCount: 0,
+            createDate: 0,
+            type: 'Private' as const
+        }
     }))
 ) 
