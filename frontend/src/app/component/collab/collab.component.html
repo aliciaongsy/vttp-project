@@ -78,7 +78,7 @@
                 <div class="col flex align-items-center justify-content-center" id="rightpanel">
                     <div *ngIf="this.currentChatRoomId==undefined" style="text-align: center;">
                         <h3>Click on chatroom to view chat</h3>
-                        <img id="image" src="/assets/chat.png" width="40%" height="50%">
+                        <img id="image" src="/assets/chat.png" width="300px" height="300px">
                     </div>
                     <div *ngIf="this.currentChatRoomId!=undefined" class="chat">
                         <div *ngIf="chatName$ | async as name" class="chatName">
