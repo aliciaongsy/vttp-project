@@ -2,6 +2,7 @@ package sg.edu.nus.iss.backend.service;
 
 import java.util.List;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -51,9 +52,9 @@ public class TaskService {
     }
 
     // --- tasks ---
-    public ResponseEntity<String> getAllTasks(String id, String workspace){
+    public ResponseEntity<String> getAllTasks(String id, String workspace) {
         List<Task> tasks = taskRepo.getAllTasks(id, workspace);
-        if (tasks.isEmpty()){
+        if (tasks.isEmpty()) {
             JsonArrayBuilder b = Json.createArrayBuilder();
             return ResponseEntity.ok(b.build().toString());
         }
@@ -72,9 +73,9 @@ public class TaskService {
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
-    public ResponseEntity<String> updateCompletedStatus(String id, String workspace, String taskId, boolean completed){
+    public ResponseEntity<String> updateCompletedStatus(String id, String workspace, String taskId, boolean completed) {
         boolean updated = taskRepo.updateCompleteStatus(id, workspace, taskId, completed);
-        if (updated){
+        if (updated) {
             JsonObject o = buildJsonObject("message", "successfully updated completed status");
             return ResponseEntity.ok(o.toString());
         }
@@ -82,9 +83,9 @@ public class TaskService {
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
-    public ResponseEntity<String> deleteTaskById(String id, String workspace, String taskId){
+    public ResponseEntity<String> deleteTaskById(String id, String workspace, String taskId) {
         boolean deleted = taskRepo.deleteTaskById(id, workspace, taskId);
-        if (deleted){
+        if (deleted) {
             JsonObject o = buildJsonObject("message", "successfully deleted task");
             return ResponseEntity.ok(o.toString());
         }
@@ -92,14 +93,32 @@ public class TaskService {
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
-    public ResponseEntity<String> updateTaskById(String id, String workspace, String taskId, Task task){
+    public ResponseEntity<String> updateTaskById(String id, String workspace, String taskId, Task task) {
         boolean updated = taskRepo.updateTaskById(id, workspace, taskId, task);
 
-        if (updated){
+        if (updated) {
             JsonObject o = buildJsonObject("message", "successfully updated task");
             return ResponseEntity.ok(o.toString());
         }
         JsonObject o = buildJsonObject("error", "error updating task");
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
+
+    public ResponseEntity<String> getOutstandingTasks(String id) {
+        List<Document> docs = taskRepo.getOutstandingTasks(id);
+        JsonArrayBuilder builder = Json.createArrayBuilder();
+        if (docs.isEmpty()) {
+            return ResponseEntity.ok(builder.build().toString());
+        }
+        
+        docs.forEach(d -> {
+            System.out.println(d.toJson());
+            Task t = new Task();
+            t = t.convertDocToTask(d);
+            builder.add(t.taskToJson(t));
+        });
+
+        return ResponseEntity.ok(builder.build().toString());
+    }
+
 }
