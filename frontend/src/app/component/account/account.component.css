@@ -1,38 +1,39 @@
 @media (max-width : 700px) {
-    .base{
+    .base {
         padding: 0 2ch;
         font-family: 'Lora', sans-serif;
         color: #010662;
     }
 
-    .profile{
+    .profile {
         padding: 2ch;
         border: 1px solid #010662;
         border-radius: 20px;
         width: 100%;
         word-wrap: break-word;
     }
-     
-    .display{
+
+    .display {
         padding: 2ch;
         border: 1px solid #010662;
         border-radius: 20px;
         width: 100%;
     }
-    
-    img{
+
+    img {
         border-radius: 50%;
     }
-    
-    :host ::ng-deep .p-button{
+
+    :host ::ng-deep .p-button {
         background: #FFF9F4;
         color: #010662;
         border: 1px solid #010662;
         font-family: 'Lora', sans-serif;
     }
 }
+
 @media (min-width : 700px) {
-    .base{
+    .base {
         padding: 0 2ch;
         font-family: 'Lora', sans-serif;
         color: #010662;
@@ -40,21 +41,21 @@
         align-content: center;
         justify-content: center;
     }
-    
+
     /* profile styling */
-    .profile{
+    .profile {
         padding: 2ch;
         border: 1px solid #010662;
         border-radius: 20px;
         width: 20vw;
         word-wrap: break-word;
     }
-    
-    img{
+
+    img {
         border-radius: 50%;
     }
-    
-    :host ::ng-deep .p-button{
+
+    :host ::ng-deep .p-button {
         background: #FFF9F4;
         color: #010662;
         border: 1px solid #010662;
@@ -62,25 +63,62 @@
     }
 
     /* dashboard styling */
-    .display{
+    .display {
         padding: 2ch;
         border: 1px solid #010662;
         border-radius: 20px;
-        width: 80vw;
+        width: 60vw;
     }
 
-    .row{
+    .row {
         display: flex;
         align-content: center;
         /* justify-content: center; */
     }
 
-    .row-item{
+    .row-item {
         width: 30%;
     }
 
-    .route{
+    .route {
         cursor: pointer;
     }
-}
 
+    .center {
+        display: flex;
+        align-content: center;
+        justify-content: center;
+    }
+
+    /* account tab */
+    .row-item-tab {
+        width: 20%
+    }
+
+    .row-item-form {
+        width: 70%
+    }
+
+    table {
+        width: 100%;
+    }
+
+    input {
+        width: 100%;
+        background-color: #FFF9F4;
+        font-family: 'Lora', sans-serif;
+        color: #010662;
+        border-color: #010662;
+    }
+
+    image-cropper {
+        display: flex;
+        position: relative;
+        width: 100%;
+        max-height: 60vh;
+        max-width: 60vw;
+        padding: 5px;
+        text-align: center;
+    }
+
+}

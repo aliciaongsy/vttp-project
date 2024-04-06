@@ -2,30 +2,97 @@
     <div class="profile">
         <h3>Profile <i class="pi pi-user"></i></h3>
         <div>
+            <!-- <img src="/assets/placeholder_image.jpeg" alt="profile picture" width="100%"> -->
             <img src="/assets/placeholder_image.jpeg" alt="profile picture" width="100%">
         </div>
         <p>Name: {{userDetail.name}}</p>
         <p>ID: {{userDetail.id}}</p>
         <p>Email: {{userDetail.email}}</p>
         <p>Joined: </p>
-        <p-button size="small">Edit Account</p-button>
+        <!-- <p-button size="small">Edit Account</p-button> -->
     </div>
     <div class="display">
-        <h3>Dashboard</h3>
-        <div class="row">
-            <div class="row-item">
-                <h4>Outstanding tasks:</h4>
-                <p *ngFor="let t of tasks">{{t.task}} (due: <i>{{t.due | date: 'shortDate'}}</i>)</p>
+        <p-toast></p-toast>
+        <p-menu #menu [model]="items" [popup]="true"></p-menu>
+        <button pButton type="button" (click)="menu.toggle($event)" style="padding: 1em 0; border: none">
+            <h3 style="margin: 0;">{{currentTab}} <i class="pi pi-angle-down"></i></h3>
+        </button>
+        <div *ngIf="currentTab=='Dashboard'">
+            <div class="row">
+                <div class="row-item">
+                    <h4>Tasks summary:</h4>
+                    <div class="center">
+                        <p-chart *ngIf="taskSummary!=''" type="doughnut" [data]="data" [options]="options"
+                            width="200px"></p-chart>
+                    </div>
+                </div>
+                <p-divider layout="vertical"></p-divider>
+                <div class="row-item">
+                    <h4>Outstanding tasks:</h4>
+                    <p *ngFor="let t of tasks">{{t.task}} (due: <i>{{t.due | date: 'shortDate'}}</i>)</p>
+                </div>
+                <p-divider layout="vertical"></p-divider>
             </div>
-            <p-divider layout="vertical"></p-divider>
-            <div class="row-item">
-                <h4>Active workspaces:</h4>
-                <p class="route" *ngFor="let w of workspaces" [routerLink]="['/workspace', w]">{{w}}</p>
+            <p-divider></p-divider>
+            <div class="row">
+                <div class="row-item">
+                    <h4>Active workspaces:</h4>
+                    <p class="route" *ngFor="let w of workspaces" [routerLink]="['/workspace', w]">{{w}}</p>
+                </div>
+                <p-divider layout="vertical"></p-divider>
+                <div class="row-item">
+                    <h4>Active chat rooms:</h4>
+                    <p class="route" *ngFor="let c of chatDetails" [routerLink]="['/chat', c.roomId]">{{c.name}}</p>
+                </div>
+                <p-divider layout="vertical"></p-divider>
             </div>
-            <p-divider layout="vertical"></p-divider>
-            <div class="row-item">
-                <h4>Active chat rooms:</h4>
-                <p class="route" *ngFor="let c of chatDetails" [routerLink]="['/chat', c.roomId]">{{c.name}}</p>
+        </div>
+        <div *ngIf="currentTab=='Account'" style="height: 100%">
+            <div class="row">
+                <div class="row-item-tab">
+                    <p>Edit Profile</p>
+                    <p>Change Password</p>
+                    <p>Delete Account</p>
+                </div>
+                <p-divider layout="vertical" [style]="{'height': '100%'}"></p-divider>
+                <div class="row-item-form">
+                    <form [formGroup]="editForm" (submit)="submit()">
+                        <table>
+                            <tr>
+                                <td>Profile Picture: </td>
+                                <td><input type="file" accept="image/*" #file hidden (change)="openDialog($event)"
+                                        (click)="file.value = ''">
+                                    <p-button icon="pi pi-upload" label="Choose Image"
+                                        (click)="file.click()"></p-button>
+                                    <p-dialog header="Choose Image" [(visible)]="imageDialogVisible" [modal]="true"
+                                        [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false">
+                                        <div *ngIf="image!=undefined" style="height: min-content">
+                                            <image-cropper 
+                                            [imageChangedEvent]="imageChangedEvent"
+                                            [maintainAspectRatio]="true"
+                                            [aspectRatio]="1 / 1" [resizeToHeight]="200"
+                                            [resizeToWidth]="200" [onlyScaleDown]="true"
+                                            (imageCropped)="imageCropped($event)"
+                                            output="base64"></image-cropper>
+                                        </div>
+                                    </p-dialog>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Name: </td>
+                                <td><input pInputText type="text" formControlName="name"></td>
+                            </tr>
+                            <tr>
+                                <td>Email: </td>
+                                <td><input pInputText type="text" formControlName="email"></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><p-button type="submit" [disabled]="checkEdits()">Save</p-button></td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
