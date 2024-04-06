@@ -10,6 +10,8 @@ create table user_details (
    email varchar(128) not null unique,
    password varchar(128) not null,
    salt varchar(128) not null,
+   createdate timestamp default current_timestamp,
+   image varchar(128) default '',
    
    primary key(id)
 );
