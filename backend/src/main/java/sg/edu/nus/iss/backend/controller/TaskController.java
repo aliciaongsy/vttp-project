@@ -115,4 +115,10 @@ public class TaskController {
 
         return taskSvc.updateTaskById(id, workspace, taskId, task);
     }
+
+    @GetMapping(path="/{id}/tasks/outstanding")
+    @ResponseBody
+    public ResponseEntity<String> getAllOutstandingTasks(@PathVariable String id){
+        return taskSvc.getOutstandingTasks(id);
+    }
 }
