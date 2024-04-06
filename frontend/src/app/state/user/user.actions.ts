@@ -1,5 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { ChatDetails, ChatRoom, UserDetails } from "../../model";
+import { ChatDetails, ChatRoom, Task, UserDetails } from "../../model";
 
 export const changeStatus = createAction(
     '[User Page] Change Login Status',
@@ -34,6 +34,11 @@ export const loadWorkspaces = createAction(
 export const loadChats = createAction(
     '[User Page] Load Chats',
     props<{ chats: ChatDetails[] }>()
+)
+
+export const loadOutstandingTasks = createAction(
+    '[User Page] Load Outstanding Tasks',
+    props<{ tasks: Task[] }>()
 )
 
 export const resetState = createAction(

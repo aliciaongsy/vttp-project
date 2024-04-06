@@ -56,4 +56,8 @@ export class TaskService {
   updateTask(id: string, workspace: string, taskId: string, task: Task){
     return this.http.put<any>(`${URL}/api/${id}/${workspace}/task/update/${taskId}`, task)
   }
+
+  getAllOutstandingTasks(id: string){
+    return this.http.get<Task[]>(`${URL}/api/${id}/tasks/outstanding`)
+  }
 }

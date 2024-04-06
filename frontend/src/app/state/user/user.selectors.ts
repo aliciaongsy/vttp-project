@@ -19,3 +19,7 @@ export const selectChats = createSelector(
     selectUser,
     (state: UserState) => state.chats
 )
+export const selectOutstandingTasks = createSelector(
+    selectUser,
+    (state: UserState) => state.outstandingTasks
+)
