@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectChats, selectUserDetails, selectWorkspaces } from '../../state/user/user.selectors';
+import { selectChats, selectOutstandingTasks, selectUserDetails, selectWorkspaces } from '../../state/user/user.selectors';
 import { firstValueFrom } from 'rxjs';
-import { ChatDetails, UserDetails } from '../../model';
+import { ChatDetails, Task, UserDetails } from '../../model';
 
 @Component({
   selector: 'app-account',
@@ -20,6 +20,7 @@ export class AccountComponent implements OnInit {
   }
   workspaces: string[] = []
   chatDetails: ChatDetails[] = []
+  tasks: Task[] = []
 
   ngOnInit(): void {
     firstValueFrom(this.ngrxStore.select(selectUserDetails))
@@ -35,5 +36,9 @@ export class AccountComponent implements OnInit {
     this.ngrxStore.select(selectChats).subscribe((value) => {
         this.chatDetails = value
       })
+
+    this.ngrxStore.select(selectOutstandingTasks).subscribe((value) => {
+      this.tasks = value
+    })
   }
 }

@@ -15,7 +15,7 @@
         <div class="row">
             <div class="row-item">
                 <h4>Outstanding tasks:</h4>
-                <p></p>
+                <p *ngFor="let t of tasks">{{t.task}} (due: <i>{{t.due | date: 'shortDate'}}</i>)</p>
             </div>
             <p-divider layout="vertical"></p-divider>
             <div class="row-item">
