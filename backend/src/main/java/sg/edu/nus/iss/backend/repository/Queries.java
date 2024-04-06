@@ -31,4 +31,9 @@ public class Queries {
         select id from telegram_bot
         where chatid=?
         """;
+
+    public final static String SQL_GET_TASK_DATA_BY_ID = """
+        select * from task_data
+        where id=?
+        """;
 }

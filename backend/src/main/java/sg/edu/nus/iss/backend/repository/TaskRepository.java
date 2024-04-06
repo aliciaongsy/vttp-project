@@ -21,10 +21,15 @@ import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import com.mongodb.client.result.UpdateResult;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import sg.edu.nus.iss.backend.model.Task;
 
 @Repository
@@ -32,6 +37,9 @@ public class TaskRepository {
 
     @Autowired
     private MongoTemplate template;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     // find workspace by user id
     public List<String> getWorkspacesById(String id) {
@@ -511,5 +519,19 @@ public class TaskRepository {
         return docs;
     }
 
+    // --- SQL ---
+    // get total number of task completed and incompleted
+    public JsonObject getTaskDataSummary(String id){
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(Queries.SQL_GET_TASK_DATA_BY_ID, id);
+
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if(rs.first()){
+            builder.add("complete", rs.getInt("complete"))
+                .add("incomplete", rs.getInt("incomplete"))
+                .add("total", rs.getInt("total"));
+            return builder.build();
+        }
+        return builder.build();
+    }
 
 }

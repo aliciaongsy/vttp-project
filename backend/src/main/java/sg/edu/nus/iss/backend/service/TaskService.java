@@ -121,4 +121,9 @@ public class TaskService {
         return ResponseEntity.ok(builder.build().toString());
     }
 
+    public ResponseEntity<String> getTaskDataSummary(String id){
+        JsonObject o = taskRepo.getTaskDataSummary(id);
+
+        return ResponseEntity.ok(o.toString());
+    }
 }

@@ -121,4 +121,10 @@ public class TaskController {
     public ResponseEntity<String> getAllOutstandingTasks(@PathVariable String id){
         return taskSvc.getOutstandingTasks(id);
     }
+
+    @GetMapping(path = "/{id}/tasks/summary")
+    @ResponseBody
+    public ResponseEntity<String> getTaskDataSummary(@PathVariable String id){
+        return taskSvc.getTaskDataSummary(id);
+    }
 }
