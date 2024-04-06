@@ -2,6 +2,7 @@ import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FullCalendarModule } from '@fullcalendar/angular';
+import { ImageCropperModule } from 'ngx-image-cropper';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -49,6 +50,7 @@ import { DividerModule } from 'primeng/divider';
 import { ScrollerModule } from 'primeng/scroller';
 import { PaginatorModule } from 'primeng/paginator';
 import { MenuModule } from 'primeng/menu';
+import { FileUploadModule } from 'primeng/fileupload';
 
 // ngrx imports
 import { EffectsModule } from '@ngrx/effects';
@@ -107,11 +109,13 @@ import { ChatEffects } from './state/chat/chat.effects';
     ScrollerModule,
     PaginatorModule,
     MenuModule,
+    FileUploadModule,
     StoreModule.forRoot({user: userReducer, task: taskReducer, planner: plannerReducer, focus: focusReducer, chat: chatReducer}),
     StoreDevtoolsModule.instrument({maxAge: 25}),
     EffectsModule.forRoot([UserEffects, TaskEffects, PlannerEffects, FocusEffects, ChatEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
-    FullCalendarModule
+    FullCalendarModule,
+    ImageCropperModule
   ],
   providers: [UserService, TaskService, PlannerService, FocusService, ChatService, WebSocketService, GoogleService],
   bootstrap: [AppComponent]
