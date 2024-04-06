@@ -26,5 +26,15 @@ create table telegram_bot (
    foreign key (id) references user_details(id)
 );
 
+create table task_data (
+   id char(8) not null,
+   complete int default 0,
+   incomplete int default 0,
+   total int default 0,
+
+   primary key(id),
+   foreign key(id) references user_details(id)
+);
+
 grant all privileges on tasksync.* to fred@'%';
 flush privileges;
