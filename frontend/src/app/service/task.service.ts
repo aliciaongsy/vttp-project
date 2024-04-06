@@ -60,4 +60,9 @@ export class TaskService {
   getAllOutstandingTasks(id: string){
     return this.http.get<Task[]>(`${URL}/api/${id}/tasks/outstanding`)
   }
+
+  getTaskSummary(id: string){
+    return this.http.get<any>(`${URL}/api/${id}/tasks/summary`)
+  }
+
 }

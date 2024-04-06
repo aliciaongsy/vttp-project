@@ -23,3 +23,7 @@ export const selectOutstandingTasks = createSelector(
     selectUser,
     (state: UserState) => state.outstandingTasks
 )
+export const selectTaskSummary = createSelector(
+    selectUser,
+    (state: UserState) => state.taskSummary
+)

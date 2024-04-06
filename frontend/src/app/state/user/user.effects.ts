@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { AppState } from "../app.state";
 import { Store } from "@ngrx/store";
 import { TaskService } from "../../service/task.service";
-import { addWorkspace, changeStatus, createChatRoom, joinChatRoom, loadChats, loadOutstandingTasks, loadWorkspaces } from "./user.actions";
+import { addWorkspace, changeStatus, createChatRoom, joinChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadWorkspaces } from "./user.actions";
 import { from, map, switchMap, withLatestFrom } from "rxjs";
 import { selectUser, selectUserDetails } from "./user.selectors";
 import { ChatService } from "../../service/chat.service";
@@ -53,6 +53,18 @@ export class UserEffects {
             )
         )
     )
+
+    loadTaskSummary$ = createEffect(() =>
+    this.actions$.pipe(
+        ofType(changeStatus),
+        withLatestFrom(this.store.select(selectUserDetails)),
+        switchMap(([action, details]) =>
+            this.taskSvc.getTaskSummary(details.id).pipe(
+                map((value) => loadTaskSummary({ summary: value }))
+            )
+        )
+    )
+)
 
     addWorkspace$ = createEffect(() =>
         this.actions$.pipe(

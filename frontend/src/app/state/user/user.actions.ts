@@ -41,6 +41,11 @@ export const loadOutstandingTasks = createAction(
     props<{ tasks: Task[] }>()
 )
 
+export const loadTaskSummary = createAction(
+    '[User Page] Load Task Summary',
+    props<{ summary: any }>()
+)
+
 export const resetState = createAction(
     '[User Page] Reset State',
 )

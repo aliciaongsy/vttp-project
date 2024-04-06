@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store"
 import { ChatDetails, Task, UserDetails } from "../../model"
-import { addWorkspace, changeStatus, createChatRoom, getChatList, joinChatRoom, loadChats, loadOutstandingTasks, loadWorkspaces, resetState } from "./user.actions"
+import { addWorkspace, changeStatus, createChatRoom, getChatList, joinChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadWorkspaces, resetState } from "./user.actions"
 
 export interface UserState {
     login: boolean
@@ -8,6 +8,7 @@ export interface UserState {
     workspaces: string[]
     chats: ChatDetails[]
     outstandingTasks: Task[]
+    taskSummary: any
 }
 
 export const initialState: UserState = {
@@ -19,7 +20,8 @@ export const initialState: UserState = {
     },
     workspaces: [],
     chats: [],
-    outstandingTasks: []
+    outstandingTasks: [],
+    taskSummary: ''
 }
 
 export const userReducer = createReducer(
@@ -48,6 +50,10 @@ export const userReducer = createReducer(
         ...state,
         outstandingTasks: tasks
     })),
+    on(loadTaskSummary, (state, { summary }) => ({
+        ...state,
+        taskSummary: summary
+    })),
     on(resetState, state => ({
         login: false,
         user: {
@@ -57,7 +63,7 @@ export const userReducer = createReducer(
         },
         workspaces: [],
         chats: [],
-        outstandingTasks: []
-
+        outstandingTasks: [],
+        taskSummary: ''
     }))
 )
