@@ -10,6 +10,8 @@ export interface UserDetails {
     id: string
     name: string
     email: string
+    image: string
+    createDate: number
 }
 
 // user slice for component store
