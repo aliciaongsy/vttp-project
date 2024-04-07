@@ -36,4 +36,9 @@ public class Queries {
         select * from task_data
         where id=?
         """;
+
+    public final static String SQL_UPDATE_USER = """
+        update user_details set name=?, email=?, image=?
+        where id=?
+        """;
 }
