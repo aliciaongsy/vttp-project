@@ -121,4 +121,20 @@
         text-align: center;
     }
 
+    /* dropdown menu */
+    :host ::ng-deep .p-menu.p-menu-overlay{
+        background: #FFF9F4;
+        width: max-content;
+    }
+    
+    :host ::ng-deep .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text{
+        color: #010662;
+        font-size: 15px;
+        font-family: 'Lora', sans-serif;
+    }
+    
+    :host ::ng-deep .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-icon{
+        color: #010662;
+    }
+
 }
