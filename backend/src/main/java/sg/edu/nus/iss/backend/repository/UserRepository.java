@@ -84,4 +84,12 @@ public class UserRepository {
     public boolean addTelegramDetails(String chatid, String username, String email, String id){
         return template.update(Queries.SQL_ADD_TELEGRAM_ACCOUNT, chatid, username, email, id) > 0;
     }
+
+    public void updateUserDetails(String id, String name, String email, String image) throws Exception{
+        int update = template.update(Queries.SQL_UPDATE_USER, name, email, image, id);
+        if (update == 0){
+            throw new Exception();
+        };
+    }
+
 }
