@@ -1,11 +1,12 @@
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectChats, selectOutstandingTasks, selectTaskSummary, selectUserDetails, selectWorkspaces } from '../../state/user/user.selectors';
-import { firstValueFrom } from 'rxjs';
 import { ChatDetails, Task, UserDetails } from '../../model';
 import { MenuItem, MessageService } from 'primeng/api';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { updateProfile } from '../../state/user/user.actions';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-account',
@@ -13,7 +14,7 @@ import { ImageCroppedEvent } from 'ngx-image-cropper';
   styleUrl: './account.component.css',
   providers: [MessageService]
 })
-export class AccountComponent implements OnInit {
+export class AccountComponent implements OnInit, OnDestroy {
 
   @ViewChild('file') imageFile!: ElementRef;
 
@@ -21,14 +22,22 @@ export class AccountComponent implements OnInit {
   private fb = inject(FormBuilder)
 
   userDetail: UserDetails = {
-    name: '',
     id: '',
-    email: ''
+    name: '',
+    email: '',
+    createDate: 0,
+    image: ''
   }
   workspaces: string[] = []
   chatDetails: ChatDetails[] = []
   tasks: Task[] = []
   taskSummary: any
+
+  userSub$!: Subscription
+  workspaceSub$!: Subscription
+  chatSub$!: Subscription
+  outstandingTaskSub$!: Subscription
+  taskSub$!: Subscription
 
   data!: any
   options!: any
@@ -54,28 +63,30 @@ export class AccountComponent implements OnInit {
   imageDialogVisible: boolean = false
   image!: any
   imageChangedEvent: any
+  cropImage: string = ''
 
   ngOnInit(): void {
     this.currentTab = 'Dashboard'
-    firstValueFrom(this.ngrxStore.select(selectUserDetails))
-      .then((details) => {
+    this.userSub$ = this.ngrxStore.select(selectUserDetails).subscribe
+      ((details) => {
         console.info(details)
         this.userDetail = details
         this.editForm = this.editProfileForm()
       })
 
-    this.ngrxStore.select(selectWorkspaces).subscribe((value) => {
-        this.workspaces = value
-      })
+    this.workspaceSub$ = this.ngrxStore.select(selectWorkspaces).subscribe((value) => {
+      this.workspaces = value
+    })
 
-    this.ngrxStore.select(selectChats).subscribe((value) => {
-        this.chatDetails = value
-      })
+    this.chatSub$ = this.ngrxStore.select(selectChats).subscribe((value) => {
+      this.chatDetails = value
+    })
 
-    this.ngrxStore.select(selectOutstandingTasks).subscribe((value) => {
+    this.outstandingTaskSub$ = this.ngrxStore.select(selectOutstandingTasks).subscribe((value) => {
       this.tasks = value
     })
-    this.ngrxStore.select(selectTaskSummary).subscribe((value) => {
+
+    this.taskSub$ = this.ngrxStore.select(selectTaskSummary).subscribe((value) => {
       console.info(value)
       this.taskSummary = value
       this.data = {
@@ -105,22 +116,39 @@ export class AccountComponent implements OnInit {
     })
   }
 
-  editProfileForm(): FormGroup{
+  ngOnDestroy(): void {
+    this.userSub$.unsubscribe()
+    this.chatSub$.unsubscribe()
+    this.workspaceSub$.unsubscribe()
+    this.taskSub$.unsubscribe()
+    this.outstandingTaskSub$.unsubscribe()
+  }
+
+  editProfileForm(): FormGroup {
     return this.fb.group({
       name: this.fb.control<string>(this.userDetail.name, [Validators.required]),
       email: this.fb.control<string>(this.userDetail.email, [Validators.required, Validators.email])
     })
   }
 
-  checkEdits(){
-    return this.editForm.controls['email'].value==this.userDetail.email && this.editForm.controls['name'].value==this.userDetail.name
+  checkEdits() {
+    return this.editForm.controls['email'].value == this.userDetail.email && this.editForm.controls['name'].value == this.userDetail.name && this.cropImage==''
   }
 
-  openDialog(event: any){
+  openDialog(event: any) {
     this.imageDialogVisible = true
     this.imageChangedEvent = event;
     // this.image = this.imageFile.nativeElement.files[0]
     // console.info(this.image)
+  }
+
+  closeDialog(){
+    this.imageDialogVisible = false
+  }
+
+  crop(){
+    this.imageDialogVisible = false
+    this.cropImage = this.image.name
   }
 
   imageCropped(event: ImageCroppedEvent) {
@@ -138,20 +166,20 @@ export class AccountComponent implements OnInit {
     let n = bstr.length;
     let u8arr = new Uint8Array(n);
 
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
     }
 
     return new File([u8arr], filename, { type: mime });
   }
 
-  
-  submit(){
+  submit() {
     console.info(this.image)
     const formData = new FormData();
-    formData.set('id', this.userDetail.id);
-		formData.set('name', this.editForm.value.name);
-		formData.set('email', this.editForm.value.email);
-		formData.set('imageFile', this.image);
+    formData.set('name', this.editForm.value.name);
+    formData.set('email', this.editForm.value.email);
+    formData.set('image', this.image);
+    this.ngrxStore.dispatch(updateProfile({data: formData}))
+    this.cropImage=''
   }
 }
