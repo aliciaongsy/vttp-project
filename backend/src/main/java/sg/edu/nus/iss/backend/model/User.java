@@ -14,6 +14,8 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private long createDate; // convert date to long
+    private String image; // image url
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -27,14 +29,22 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
+    public long getCreateDate() { return createDate; }
+    public void setCreateDate(long createDate) { this.createDate = createDate; }
+
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
+    
     public User(){
         this.id = UUID.randomUUID().toString().substring(0,8);
     }
 
-    public User(String name, String email, String password){
+    public User(String name, String email, String password, long createDate, String image) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.createDate = createDate;
+        this.image = image;
         this.id = UUID.randomUUID().toString().substring(0,8);
     }
 
@@ -43,6 +53,8 @@ public class User {
         return b.add("id", rs.getString("id"))
             .add("name", rs.getString("name"))
             .add("email", rs.getString("email"))
+            .add("createDate", rs.getDate("createdate").getTime())
+            .add("image", rs.getString("image"))
             .build();
     }
 }
