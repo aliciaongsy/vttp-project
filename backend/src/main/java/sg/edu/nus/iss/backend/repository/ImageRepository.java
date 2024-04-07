@@ -24,7 +24,7 @@ public class ImageRepository {
 
     public String saveImageTo3T(String id, ObjectMetadata metadata, InputStream is) throws SdkClientException, AmazonServiceException{
 
-        String key = "newsimages/%s".formatted(id);
+        String key = "userprofile/%s".formatted(id);
 
         PutObjectRequest putReq = new PutObjectRequest(bucketName, key, is, metadata);
         putReq = putReq.withCannedAcl(CannedAccessControlList.PublicRead);
