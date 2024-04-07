@@ -32,4 +32,8 @@ export class UserService {
     // endpoint: localhost:8080/api/register
     return firstValueFrom(this.http.post<any>(`${URL}/api/register`, user))
   }
+
+  updateUser(id: string, data: FormData){
+    return this.http.post<UserDetails>(`${URL}/api/profile/update/${id}`, data)
+  }
 }

@@ -25,6 +25,11 @@ export const getChatList = createAction(
     '[User Page] Reload Chats'
 )
 
+export const updateProfile = createAction(
+    '[User Page] Update Profile',
+    props<{ data: FormData }>()
+)
+
 // this action is triggered by change status
 export const loadWorkspaces = createAction(
     '[User Page] Load Workspaces',
@@ -44,6 +49,11 @@ export const loadOutstandingTasks = createAction(
 export const loadTaskSummary = createAction(
     '[User Page] Load Task Summary',
     props<{ summary: any }>()
+)
+
+export const loadUserProfile = createAction(
+    '[User Page] Load User Profile',
+    props<{ currUser: UserDetails }>()
 )
 
 export const resetState = createAction(
