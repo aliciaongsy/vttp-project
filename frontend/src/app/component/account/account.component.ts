@@ -197,8 +197,8 @@ export class AccountComponent implements OnInit, OnDestroy {
   passwordForm(): FormGroup {
     return this.fb.group({
       current: this.fb.control<string>('', [Validators.required]),
-      new: this.fb.control<string>('', [Validators.required]),
-      confirm: this.fb.control<string>('', [Validators.required])
+      new: this.fb.control<string>('', [Validators.required, Validators.pattern("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\\!\\?~/\\-'\\[\\];\\(\\)\\{\\}:\\<\\>\\.,@#\\$%\\^&+\\=\\*\\_\\\\])(?=\\S+$).*$")]),
+      confirm: this.fb.control<string>('', [Validators.required, Validators.pattern("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\\!\\?~/\\-'\\[\\];\\(\\)\\{\\}:\\<\\>\\.,@#\\$%\\^&+\\=\\*\\_\\\\])(?=\\S+$).*$")])
     })
   }
 
