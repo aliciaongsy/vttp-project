@@ -43,6 +43,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   options!: any
 
   currentTab!: 'Dashboard' | 'Account'
+  accountTab!: string
 
   items: MenuItem[] = [
     {
@@ -65,13 +66,17 @@ export class AccountComponent implements OnInit, OnDestroy {
   imageChangedEvent: any
   cropImage: string = ''
 
+  changePasswordForm!: FormGroup
+
   ngOnInit(): void {
     this.currentTab = 'Dashboard'
+    this.accountTab = 'edit'
     this.userSub$ = this.ngrxStore.select(selectUserDetails).subscribe
       ((details) => {
         console.info(details)
         this.userDetail = details
         this.editForm = this.editProfileForm()
+        this.changePasswordForm = this.passwordForm()
       })
 
     this.workspaceSub$ = this.ngrxStore.select(selectWorkspaces).subscribe((value) => {
@@ -124,6 +129,11 @@ export class AccountComponent implements OnInit, OnDestroy {
     this.outstandingTaskSub$.unsubscribe()
   }
 
+  changeTab(tab: string){
+    this.accountTab = tab
+  }
+
+  // edit profile 
   editProfileForm(): FormGroup {
     return this.fb.group({
       name: this.fb.control<string>(this.userDetail.name, [Validators.required]),
@@ -181,5 +191,22 @@ export class AccountComponent implements OnInit, OnDestroy {
     formData.set('image', this.image);
     this.ngrxStore.dispatch(updateProfile({data: formData}))
     this.cropImage=''
+  }
+
+  // change password
+  passwordForm(): FormGroup {
+    return this.fb.group({
+      current: this.fb.control<string>('', [Validators.required]),
+      new: this.fb.control<string>('', [Validators.required]),
+      confirm: this.fb.control<string>('', [Validators.required])
+    })
+  }
+
+  unmatchedPassword(){
+    return this.changePasswordForm.controls['new'].value != this.changePasswordForm.controls['confirm'].value
+  }
+
+  changePassword(){
+
   }
 }

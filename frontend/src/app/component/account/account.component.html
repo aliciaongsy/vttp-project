@@ -48,58 +48,110 @@
                 <p-divider layout="vertical"></p-divider>
             </div>
         </div>
-        <div *ngIf="currentTab=='Account'" style="height: 100%">
-            <div class="row">
+        <div *ngIf="currentTab=='Account'" style="height: 80%">
+            <div class="row" style="height: 100%;">
                 <div class="row-item-tab">
-                    <p>Edit Profile</p>
-                    <p>Change Password</p>
-                    <p>Delete Account</p>
+                    <p [ngClass]="{'selected': accountTab=='edit'}" (click)="changeTab('edit')">Edit Profile</p>
+                    <p [ngClass]="{'selected': accountTab=='change'}" (click)="changeTab('change')">Change Password</p>
+                    <p [ngClass]="{'selected': accountTab=='delete'}" (click)="changeTab('delete')">Delete Account</p>
                 </div>
-                <p-divider layout="vertical" [style]="{'height': '100%'}"></p-divider>
+                <p-divider layout="vertical" [style]="{'height': '100%', 'color': '#010662'}"></p-divider>
                 <div class="row-item-form">
-                    <form [formGroup]="editForm" (submit)="submit()">
-                        <table>
-                            <tr>
-                                <td>Profile Picture: </td>
-                                <td><input type="file" accept="image/*" #file hidden (change)="openDialog($event)"
-                                        (click)="file.value = ''">
-                                    <div class=row>
-                                        <p-button icon="pi pi-upload" label="Choose Image"
-                                        (click)="file.click()"></p-button>
-                                        <p *ngIf="cropImage!=undefined" style="padding-left: 1em;">{{cropImage}}</p>
-                                    </div>
-                                    <p-dialog header="Choose Image" [(visible)]="imageDialogVisible" [modal]="true"
-                                        [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false">
-                                        <div *ngIf="imageChangedEvent!=undefined" style="height: min-content">
-                                            <image-cropper 
-                                            [imageChangedEvent]="imageChangedEvent"
-                                            [maintainAspectRatio]="true"
-                                            [aspectRatio]="1 / 1" [resizeToHeight]="200"
-                                            [resizeToWidth]="200" [onlyScaleDown]="true"
-                                            (imageCropped)="imageCropped($event)"
-                                            output="base64"></image-cropper>
+                    <div *ngIf="accountTab=='edit'">
+                        <form [formGroup]="editForm" (submit)="submit()">
+                            <table>
+                                <tr>
+                                    <td>Profile Picture: </td>
+                                    <td><input type="file" accept="image/*" #file hidden (change)="openDialog($event)"
+                                            (click)="file.value = ''">
+                                        <div class=row>
+                                            <p-button icon="pi pi-upload" label="Choose Image"
+                                                (click)="file.click()"></p-button>
+                                            <p *ngIf="cropImage!=undefined" style="padding-left: 1em;">{{cropImage}}</p>
                                         </div>
-                                        <div>
-                                            <p-button (click)="crop()">Crop</p-button>
-                                            <p-button (click)="closeDialog()">Cancel</p-button>
-                                        </div>
-                                    </p-dialog>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Name: </td>
-                                <td><input pInputText type="text" formControlName="name"></td>
-                            </tr>
-                            <tr>
-                                <td>Email: </td>
-                                <td><input pInputText type="text" formControlName="email"></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><p-button type="submit" [disabled]="checkEdits()">Save</p-button></td>
-                            </tr>
-                        </table>
-                    </form>
+                                        <p-dialog header="Choose Image" [(visible)]="imageDialogVisible" [modal]="true"
+                                            [style]="{ width: 'fit-content', height: '40px'}" [draggable]="false"
+                                            [resizable]="false">
+                                            <div *ngIf="imageChangedEvent!=undefined" style="height: min-content">
+                                                <image-cropper [imageChangedEvent]="imageChangedEvent"
+                                                    [maintainAspectRatio]="true" [aspectRatio]="1 / 1"
+                                                    [resizeToHeight]="200" [resizeToWidth]="200" [onlyScaleDown]="true"
+                                                    (imageCropped)="imageCropped($event)"
+                                                    output="base64"></image-cropper>
+                                            </div>
+                                            <div>
+                                                <p-button (click)="crop()">Crop</p-button>
+                                                <p-button (click)="closeDialog()">Cancel</p-button>
+                                            </div>
+                                        </p-dialog>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Name: </td>
+                                    <td><input pInputText type="text" formControlName="name"></td>
+                                </tr>
+                                <tr>
+                                    <td>Email: </td>
+                                    <td><input pInputText type="text" formControlName="email"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><p-button type="submit" [disabled]="checkEdits()"
+                                            [style]="{'height': '40px'}">Save</p-button></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                    <div *ngIf="accountTab=='change'">
+                        <form [formGroup]="changePasswordForm" (submit)="changePassword()">
+                            <table>
+                                <tr>
+                                    <td>Current Password: </td>
+                                    <td><input pInputText type="password" formControlName="current"></td>
+                                </tr>
+                                <tr>
+                                    <td>New Password: </td>
+                                    <td><input pInputText type="password" formControlName="new"></td>
+                                </tr>
+                                <tr>
+                                    <td>Confirm New Password: </td>
+                                    <td><input pInputText type="password" formControlName="confirm"></td>
+                                </tr>
+                                <tr *ngIf="changePasswordForm.controls['confirm'].dirty && unmatchedPassword()" class="error">
+                                    <td></td>
+                                    <td>password does not match</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><p-button type="submit" [disabled]="unmatchedPassword()"
+                                            [style]="{'height': '40px'}">Change</p-button></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                    <div *ngIf="accountTab=='delete'">
+                        <form [formGroup]="changePasswordForm" (submit)="changePassword()">
+                            <table>
+                                <tr>
+                                    <td><h3 style="color:crimson">Delete Account</h3></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Current Password: </td>
+                                    <td><input pInputText type="password" formControlName="current"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><p style="padding: 1ch 0; margin: 0"><i style="color: crimson;">Enter current password to proceed</i></p></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><p-button type="submit" [disabled]="unmatchedPassword()"
+                                            [style]="{'height': '40px'}">Delete</p-button></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

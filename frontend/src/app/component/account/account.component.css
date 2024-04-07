@@ -40,6 +40,7 @@
         display: flex;
         align-content: center;
         justify-content: center;
+        height: fit-content;
     }
 
     /* profile styling */
@@ -95,6 +96,16 @@
     }
 
     /* account tab */
+    .selected{
+        background-color: #d4dbe3 ;
+        border-radius: 20px;
+    }
+
+    .row-item-tab p{
+        margin: 0;
+        padding: 1em
+    }
+
     .row-item-tab {
         width: 20%
     }
@@ -107,12 +118,18 @@
         width: 100%;
     }
 
+    tr td:first-child {
+        width: 1%;
+        white-space: nowrap;
+    }
+
     input {
         width: 100%;
         background-color: #FFF9F4;
         font-family: 'Lora', sans-serif;
         color: #010662;
         border-color: #010662;
+        /* height: 40px; */
     }
 
     image-cropper {
