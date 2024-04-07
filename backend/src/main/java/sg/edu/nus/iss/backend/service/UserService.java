@@ -85,8 +85,9 @@ public class UserService {
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
-    @Transactional(rollbackFor = {SdkClientException.class, AmazonServiceException.class, Exception.class})
-    public void updateUserProfile(String id, String name, String email, MultipartFile image) throws SdkClientException, AmazonServiceException, Exception{
+    @Transactional(rollbackFor = { SdkClientException.class, AmazonServiceException.class, Exception.class })
+    public void updateUserProfile(String id, String name, String email, MultipartFile image)
+            throws SdkClientException, AmazonServiceException, Exception {
         InputStream is;
         try {
             // persist image to s3
@@ -99,16 +100,17 @@ public class UserService {
             userRepo.updateUserDetails(id, name, email, imageUrl);
 
         } catch (IOException e) {
-            
+
             e.printStackTrace();
-        } 
+        }
     }
 
-    public JsonObject getUserByEmail(String email){
+    public JsonObject getUserByEmail(String email) {
         return userRepo.findUserByEmail(email).get();
     }
 
-    public String saveToS3(InputStream is, String contentType, long length) throws SdkClientException, AmazonServiceException {
+    public String saveToS3(InputStream is, String contentType, long length)
+            throws SdkClientException, AmazonServiceException {
         ObjectMetadata metadata = new ObjectMetadata();
         Map<String, String> mydata = new HashMap<>();
 
@@ -119,6 +121,26 @@ public class UserService {
         String id = UUID.randomUUID().toString().substring(0, 8);
 
         return imgRepo.saveImageTo3T(id, metadata, is);
+    }
+
+    public ResponseEntity<String> changeUserPassword(User user, String newPassword) {
+        // 1. check if current password is correct
+        boolean valid = userRepo.checkPassword(user.getEmail(), user.getPassword());
+
+        if (!valid) {
+            JsonObject o = buildJsonObject("error", "incorrect password");
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+        }
+
+        // 2. change password - only proceed if current password is correct
+        boolean updated = userRepo.changePassword(user.getEmail(), newPassword);
+        if (!updated) {
+            JsonObject o = buildJsonObject("error", "error changing password");
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+        }
+
+        JsonObject o = buildJsonObject("message", "password changed successfully");
+        return ResponseEntity.ok().body(o.toString());
     }
 
 }

@@ -92,4 +92,14 @@ public class UserRepository {
         };
     }
 
+    public boolean changePassword(String email, String newPassword){
+        /* generates the Salt value. It can be stored in a database. */
+        String saltvalue = PassBasedEnc.getSaltvalue(30);
+
+        /* generates an encrypted password. It can be stored in a database. */
+        String encryptedpassword = PassBasedEnc.generateSecurePassword(newPassword, saltvalue);
+
+        return template.update(Queries.SQL_CHANGE_PASSWORD, encryptedpassword, saltvalue, email) > 0;
+    }
+
 }

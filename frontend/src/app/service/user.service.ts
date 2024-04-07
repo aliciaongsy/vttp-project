@@ -36,4 +36,13 @@ export class UserService {
   updateUser(id: string, data: FormData){
     return this.http.post<UserDetails>(`${URL}/api/profile/update/${id}`, data)
   }
+
+  changePassword(email: string, password: string, newPassword: string){
+    const payload = {
+      email: email,
+      password: password,
+      newPassword: newPassword
+    }
+    return firstValueFrom(this.http.post<any>(`${URL}/api/profile/changepassword`, payload))
+  }
 }

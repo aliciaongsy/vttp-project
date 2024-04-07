@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { updateProfile } from '../../state/user/user.actions';
 import { Subscription } from 'rxjs';
+import { UserService } from '../../service/user.service';
 
 @Component({
   selector: 'app-account',
@@ -20,6 +21,7 @@ export class AccountComponent implements OnInit, OnDestroy {
 
   private ngrxStore = inject(Store)
   private fb = inject(FormBuilder)
+  private userSvc = inject(UserService)
 
   userDetail: UserDetails = {
     id: '',
@@ -207,6 +209,19 @@ export class AccountComponent implements OnInit, OnDestroy {
   }
 
   changePassword(){
-
+    const password = this.changePasswordForm.value['current']
+    const newPassword = this.changePasswordForm.value['new']
+    this.userSvc.changePassword(this.userDetail.email, password, newPassword)
+      .then(() => {
+        // on successful update
+        alert("successfully changed password")
+      })
+      .catch((error) => {
+        // error updating - 1. wrong password, 2. sql update error
+        alert(`error changing password: ${error}`)
+      })
   }
+
+  // delete account
+  
 }

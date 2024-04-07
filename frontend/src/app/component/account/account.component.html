@@ -113,6 +113,10 @@
                                     <td>New Password: </td>
                                     <td><input pInputText type="password" formControlName="new"></td>
                                 </tr>
+                                <tr *ngIf="changePasswordForm.controls['new'].dirty && changePasswordForm.get('new')?.errors?.['pattern']" class="error">
+                                    <td></td>
+                                    <td>hint: min 8 characters - 1 special character, 1 digit, 1 uppercase, 1 lowercase</td>
+                                </tr>
                                 <tr>
                                     <td>Confirm New Password: </td>
                                     <td><input pInputText type="password" formControlName="confirm"></td>

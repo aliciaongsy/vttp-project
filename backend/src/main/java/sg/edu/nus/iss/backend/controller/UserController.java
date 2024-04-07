@@ -75,4 +75,23 @@ public class UserController {
         JsonObject o = userSvc.getUserByEmail(email);
         return ResponseEntity.ok().body(o.toString());
     }
+
+    @PostMapping(path = "/profile/changepassword")
+    @ResponseBody
+    public ResponseEntity<String> changePassword(@RequestBody String payload){
+
+        JsonReader reader = Json.createReader(new StringReader(payload));
+        JsonObject u = reader.readObject();
+
+        User user = new User();
+        user.setEmail(u.getString("email"));
+        user.setPassword(u.getString("password"));
+
+        String newPassword = u.getString("newPassword");
+
+        return userSvc.changeUserPassword(user, newPassword);
+    }
+
+
+    
 }

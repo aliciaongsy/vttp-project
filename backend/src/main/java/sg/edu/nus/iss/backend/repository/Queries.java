@@ -41,4 +41,10 @@ public class Queries {
         update user_details set name=?, email=?, image=?
         where id=?
         """;
+
+    public final static String SQL_CHANGE_PASSWORD = """
+        update user_details set password=?, salt=?
+        where email=?
+        """;
+
 }
