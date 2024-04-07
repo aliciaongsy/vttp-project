@@ -70,6 +70,10 @@
         width: 60vw;
     }
 
+    h4{
+        margin-top: 0;
+    }
+
     .row {
         display: flex;
         align-content: center;
