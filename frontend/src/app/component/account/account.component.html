@@ -1,15 +1,16 @@
 <div class="base">
     <div class="profile">
         <h3>Profile <i class="pi pi-user"></i></h3>
-        <div>
-            <!-- <img src="/assets/placeholder_image.jpeg" alt="profile picture" width="100%"> -->
+        <div *ngIf="userDetail.image==''">
             <img src="/assets/placeholder_image.jpeg" alt="profile picture" width="100%">
+        </div>
+        <div *ngIf="userDetail.image!=''">
+            <img src="{{userDetail.image}}" alt="profile picture" width="100%">
         </div>
         <p>Name: {{userDetail.name}}</p>
         <p>ID: {{userDetail.id}}</p>
         <p>Email: {{userDetail.email}}</p>
-        <p>Joined: </p>
-        <!-- <p-button size="small">Edit Account</p-button> -->
+        <p>Joined: {{userDetail.createDate | date: 'dd/MM/yyyy'}}</p>
     </div>
     <div class="display">
         <p-toast></p-toast>
@@ -29,7 +30,7 @@
                 <p-divider layout="vertical"></p-divider>
                 <div class="row-item">
                     <h4>Outstanding tasks:</h4>
-                    <p *ngFor="let t of tasks">{{t.task}} (due: <i>{{t.due | date: 'shortDate'}}</i>)</p>
+                    <p *ngFor="let t of tasks">{{t.task}} (due: <i>{{t.due | date: 'dd/MM/yyyy'}}</i>)</p>
                 </div>
                 <p-divider layout="vertical"></p-divider>
             </div>
@@ -62,11 +63,14 @@
                                 <td>Profile Picture: </td>
                                 <td><input type="file" accept="image/*" #file hidden (change)="openDialog($event)"
                                         (click)="file.value = ''">
-                                    <p-button icon="pi pi-upload" label="Choose Image"
+                                    <div class=row>
+                                        <p-button icon="pi pi-upload" label="Choose Image"
                                         (click)="file.click()"></p-button>
+                                        <p *ngIf="cropImage!=undefined" style="padding-left: 1em;">{{cropImage}}</p>
+                                    </div>
                                     <p-dialog header="Choose Image" [(visible)]="imageDialogVisible" [modal]="true"
                                         [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false">
-                                        <div *ngIf="image!=undefined" style="height: min-content">
+                                        <div *ngIf="imageChangedEvent!=undefined" style="height: min-content">
                                             <image-cropper 
                                             [imageChangedEvent]="imageChangedEvent"
                                             [maintainAspectRatio]="true"
@@ -74,6 +78,10 @@
                                             [resizeToWidth]="200" [onlyScaleDown]="true"
                                             (imageCropped)="imageCropped($event)"
                                             output="base64"></image-cropper>
+                                        </div>
+                                        <div>
+                                            <p-button (click)="crop()">Crop</p-button>
+                                            <p-button (click)="closeDialog()">Cancel</p-button>
                                         </div>
                                     </p-dialog>
                                 </td>
