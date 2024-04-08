@@ -3,6 +3,7 @@ package sg.edu.nus.iss.backend.controller;
 import java.io.StringReader;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
+import sg.edu.nus.iss.backend.exception.DeleteWorkspaceException;
 import sg.edu.nus.iss.backend.model.Task;
 import sg.edu.nus.iss.backend.service.TaskService;
 
@@ -46,6 +49,22 @@ public class TaskController {
         String id = o.getString("uid");
 
         return taskSvc.createNewWorkspace(id, workspace);
+    }
+
+    @DeleteMapping(path = "{id}/workspace/delete/{ws}")
+    @ResponseBody
+    public ResponseEntity<String> deleteWorkspace(@PathVariable String id, @PathVariable String ws){
+        try {
+            taskSvc.deleteWorkspace(id, ws);
+        } catch (DeleteWorkspaceException e) {
+            e.printStackTrace();
+            JsonObjectBuilder b = Json.createObjectBuilder();
+            b.add("error", e.getMessage());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
+        }
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        b.add("message", "sucessfully deleted workspace");
+        return ResponseEntity.ok().body(b.build().toString());
     }
 
     // --- tasks ---

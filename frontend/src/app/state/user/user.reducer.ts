@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store"
 import { ChatDetails, Task, UserDetails } from "../../model"
-import { addWorkspace, changeStatus, createChatRoom, getChatList, joinChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadUserProfile, loadWorkspaces, resetState, updateProfile } from "./user.actions"
+import { addWorkspace, changeStatus, createChatRoom, deleteWorkspace, getChatList, joinChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadUserProfile, loadWorkspaces, resetState, updateProfile } from "./user.actions"
 
 export interface UserState {
     login: boolean
@@ -31,6 +31,10 @@ export const userReducer = createReducer(
     on(addWorkspace, (state, { workspace }) => ({
         ...state,
         workspaces: [...state.workspaces, workspace]
+    })),
+    on(deleteWorkspace, (state, { workspace }) => ({
+        ...state,
+        workspaces: state.workspaces.filter(w => w != workspace)
     })),
     on(createChatRoom, state => state),
     on(joinChatRoom, state => state),

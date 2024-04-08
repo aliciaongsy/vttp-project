@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import sg.edu.nus.iss.backend.exception.DeleteWorkspaceException;
 import sg.edu.nus.iss.backend.model.Task;
 import sg.edu.nus.iss.backend.repository.TaskRepository;
 
@@ -125,5 +127,11 @@ public class TaskService {
         JsonObject o = taskRepo.getTaskDataSummary(id);
 
         return ResponseEntity.ok(o.toString());
+    }
+
+    @Transactional(rollbackFor={DeleteWorkspaceException.class})
+    public void deleteWorkspace(String id, String workspace) throws DeleteWorkspaceException{
+        taskRepo.deleteWorkspace(id, workspace);
+        taskRepo.deleteWorkspaceTasks(id, workspace);
     }
 }

@@ -19,7 +19,16 @@
                     </div>
                 </div>
                 <div *ngIf="workspaces | async as workspaces">
-                    <p *ngFor="let w of workspaces" width="max" id="ws" [routerLink]="['/workspace',w]">{{w}}</p>
+                    <div *ngFor="let w of workspaces" id="w" style="display: flex;justify-content: space-between; margin-right: 1ch;" [ngClass]="{'selected': this.currentWorkspace==w}" [routerLink]="['/workspace', w, 'tasks']">
+                        <p width="max" id="ws">{{w}}</p>
+                        <span>
+                            <p-toast></p-toast>
+                            <p-menu #menu [model]="items" [popup]="true"></p-menu>
+                            <button pButton icon="pi pi-ellipsis-v" size="small"
+                                [style]="{'background': 'transparent', 'color': '#010662', 'float': 'right', 'padding-right': 0, 'width': '100%'}"
+                                (click)="menu.toggle($event)"></button>
+                        </span>
+                    </div>
                 </div>
             </div>
         </ng-template>
@@ -53,7 +62,16 @@
                     </div>
                 </div>
                 <div *ngIf="workspaces | async as workspaces">
-                    <p *ngFor="let w of workspaces" width="max" id="ws" [routerLink]="['/workspace', w, 'tasks']" [ngClass]="{'selected': this.currentWorkspace==w}">{{w}}</p>
+                    <div *ngFor="let w of workspaces" id="w" style="display: flex;justify-content: space-between; margin-right: 1ch;" [ngClass]="{'selected': this.currentWorkspace==w}" [routerLink]="['/workspace', w, 'tasks']">
+                        <p width="max" id="ws">{{w}}</p>
+                        <span>
+                            <p-toast></p-toast>
+                            <p-menu #menu [model]="items" [popup]="true"></p-menu>
+                            <button pButton icon="pi pi-ellipsis-v" size="small"
+                                [style]="{'background': 'transparent', 'color': '#010662', 'float': 'right', 'padding-right': 0, 'width': '100%'}"
+                                (click)="menu.toggle($event)"></button>
+                        </span>
+                    </div>
                 </div>
             </div>
         </ng-template>

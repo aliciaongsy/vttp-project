@@ -11,6 +11,11 @@ export const addWorkspace = createAction(
     props<{ workspace: string }>()
 )
 
+export const deleteWorkspace = createAction(
+    '[User Page] Delete Workspace',
+    props<{ workspace: string }>()
+)
+
 export const createChatRoom = createAction(
     '[User Page] Create Chat Room',
     props<{ chat: ChatRoom }>()

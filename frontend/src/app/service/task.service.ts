@@ -31,6 +31,10 @@ export class TaskService {
     return firstValueFrom(this.http.post<any>(`${URL}/api/workspace/create`, w))
   }
 
+  deleteWorkspace(id: string, workspace: string){
+    return firstValueFrom(this.http.delete<any>(`${URL}/api/${id}/workspace/delete/${workspace}`))
+  }
+
   getTasksOfWorkspace(id: string, workspace: string){
     // endpoint: localhost:8080/api/{id}/{workspace}/tasks
     return this.http.get<Task[]>(`${URL}/api/${id}/${workspace}/tasks`)
@@ -64,5 +68,6 @@ export class TaskService {
   getTaskSummary(id: string){
     return this.http.get<any>(`${URL}/api/${id}/tasks/summary`)
   }
+
 
 }

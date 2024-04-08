@@ -84,12 +84,13 @@ input:focus{
     line-height: 40px;
 }
 
-#ws:hover{
+#w:hover{
     border: none;
     border-radius: 5px;
     line-height: 40px;
     background-color: #d4dbe3;
     color: #010662;
+    cursor: pointer;
 }
 
 .selected{
@@ -108,7 +109,22 @@ a {
     color: #010662;
 }
 
+/* ellipsis button */
+:host ::ng-deep .p-menu.p-menu-overlay{
+    background: #FFF9F4;
+    width: max-content;
+}
 
+:host ::ng-deep .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text{
+    color: #010662;
+    font-size: 15px;
+}
+
+:host ::ng-deep .p-menu .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-icon{
+    color: #010662;
+}
+
+/* tab menu */
 :host ::ng-deep .p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link{
     background: #FFF9F4;
     color:#010662;

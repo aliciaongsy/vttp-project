@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { AppState } from "../app.state";
 import { Store } from "@ngrx/store";
 import { TaskService } from "../../service/task.service";
-import { addWorkspace, changeStatus, createChatRoom, joinChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadUserProfile, loadWorkspaces, updateProfile } from "./user.actions";
+import { addWorkspace, changeStatus, createChatRoom, deleteWorkspace, joinChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadUserProfile, loadWorkspaces, updateProfile } from "./user.actions";
 import { from, map, switchMap, withLatestFrom } from "rxjs";
 import { selectUser, selectUserDetails } from "./user.selectors";
 import { ChatService } from "../../service/chat.service";
@@ -73,7 +73,18 @@ export class UserEffects {
             ofType(addWorkspace),
             withLatestFrom(this.store.select(selectUser)),
             switchMap(([action, user]) =>
-                this.taskSvc.addWorkspace(user.user.id, user.workspaces[user.workspaces.length - 1])
+                this.taskSvc.addWorkspace(user.user.id, action.workspace)
+            ),
+        ),
+        { dispatch: false }
+    )
+
+    deleteWorkspace$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(deleteWorkspace),
+            withLatestFrom(this.store.select(selectUser)),
+            switchMap(([action, user]) =>
+                this.taskSvc.deleteWorkspace(user.user.id, action.workspace)
             ),
         ),
         { dispatch: false }

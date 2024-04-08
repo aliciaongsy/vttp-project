@@ -25,11 +25,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import sg.edu.nus.iss.backend.exception.DeleteWorkspaceException;
 import sg.edu.nus.iss.backend.model.Task;
 
 @Repository
@@ -83,6 +85,32 @@ public class TaskRepository {
 
         return update.getModifiedCount() > 0;
 
+    }
+
+    public void deleteWorkspace(String id, String workspace) throws DeleteWorkspaceException{
+        System.out.println(id);
+        System.out.println(workspace);
+        Criteria criteria = Criteria.where("id").is(id);
+        Query query = new Query(criteria);
+
+        Update updateOps = new Update().pull("workspaces", workspace);
+
+        UpdateResult update = template.updateFirst(query, updateOps, Document.class, "workspaces");
+
+        if(update.getModifiedCount() == 0){
+            throw new DeleteWorkspaceException("error deleting workspace");
+        }
+    }
+
+    public void deleteWorkspaceTasks(String id, String workspace) throws DeleteWorkspaceException{
+        Criteria criteria = Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace));
+        Query query = new Query(criteria);
+
+        DeleteResult delete = template.remove(query, Document.class, "tasks");
+
+        if(delete.getDeletedCount() == 0){
+            throw new DeleteWorkspaceException("error deleting tasks belonging to workspace");
+        }
     }
 
     /* db.tasks.aggregate([
