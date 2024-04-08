@@ -20,6 +20,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import sg.edu.nus.iss.backend.exception.DeleteUserException;
 import sg.edu.nus.iss.backend.model.User;
 import sg.edu.nus.iss.backend.repository.ImageRepository;
 import sg.edu.nus.iss.backend.repository.UserRepository;
@@ -141,6 +142,13 @@ public class UserService {
 
         JsonObject o = buildJsonObject("message", "password changed successfully");
         return ResponseEntity.ok().body(o.toString());
+    }
+
+    @Transactional(rollbackFor = DeleteUserException.class)
+    public void deleteAccount(String id) throws DeleteUserException{
+        userRepo.deleteUserById(id);
+        userRepo.deleteTelegramUser(id);
+        userRepo.deleteTaskSummaryById(id);
     }
 
 }

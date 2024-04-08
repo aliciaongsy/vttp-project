@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.json.JsonObject;
 import sg.edu.nus.iss.backend.PassBasedEnc;
+import sg.edu.nus.iss.backend.exception.DeleteUserException;
 import sg.edu.nus.iss.backend.model.User;
 
 @Repository
@@ -100,6 +101,26 @@ public class UserRepository {
         String encryptedpassword = PassBasedEnc.generateSecurePassword(newPassword, saltvalue);
 
         return template.update(Queries.SQL_CHANGE_PASSWORD, encryptedpassword, saltvalue, email) > 0;
+    }
+
+    // for deleting account
+    public void deleteUserById(String id) throws DeleteUserException{
+        if(template.update(Queries.SQL_DELETE_USER, id)!=1){
+            throw new DeleteUserException("error deleting from user_details table");
+        };
+       
+    }
+
+    public void deleteTelegramUser(String id) throws DeleteUserException{
+        if(template.update(Queries.SQL_DELETE_TELEGRAM_USER, id)!=1){
+            throw new DeleteUserException("error deleting from telegram_bot table");
+        };
+    }
+
+    public void deleteTaskSummaryById(String id) throws DeleteUserException{
+        if(template.update(Queries.SQL_DELETE_TASK_BY_USER, id)!=0){
+            throw new DeleteUserException("error deleting from task_data table");
+        };
     }
 
 }

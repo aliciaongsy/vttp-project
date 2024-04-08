@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
+import sg.edu.nus.iss.backend.exception.DeleteUserException;
 import sg.edu.nus.iss.backend.model.User;
 import sg.edu.nus.iss.backend.service.UserService;
 
@@ -92,6 +94,20 @@ public class UserController {
         return userSvc.changeUserPassword(user, newPassword);
     }
 
-
+    @DeleteMapping("/profile/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<String> deleteAccount(@PathVariable String id){
+        try {
+            userSvc.deleteAccount(id);
+        } catch (DeleteUserException e) {
+            e.printStackTrace();
+            JsonObjectBuilder b = Json.createObjectBuilder();
+            b.add("error", e.getMessage());
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(b.build().toString());
+        }
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        b.add("message", "sucessfully deleted account");
+        return ResponseEntity.ok().body(b.build().toString());
+    }
     
 }

@@ -93,7 +93,7 @@
                             <span *ngSwitchCase="'start'">
                                 {{ rowData[col.field] | date }}
                             </span>
-                            <span *ngSwitchCase="'due'">
+                            <span *ngSwitchCase="'due'" [ngClass]="{'due': rowData[col.field]<this.minDate.getTime()}">
                                 {{ rowData[col.field] | date }}
                             </span>
                             <span *ngSwitchCase="'completed'">

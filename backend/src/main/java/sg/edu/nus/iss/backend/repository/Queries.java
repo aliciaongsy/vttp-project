@@ -47,4 +47,18 @@ public class Queries {
         where email=?
         """;
 
+    public final static String SQL_DELETE_USER = """
+        delete from user_details
+        where id=?
+        """;
+
+    public final static String SQL_DELETE_TELEGRAM_USER = """
+        delete from telegram_bot
+        where id=?
+        """;
+
+    public final static String SQL_DELETE_TASK_BY_USER = """
+        delete from task_data
+        where id=?
+        """;
 }

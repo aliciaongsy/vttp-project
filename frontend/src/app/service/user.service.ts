@@ -45,4 +45,8 @@ export class UserService {
     }
     return firstValueFrom(this.http.post<any>(`${URL}/api/profile/changepassword`, payload))
   }
+
+  deleteAccount(id: string){
+    return firstValueFrom(this.http.delete<any>(`${URL}/api/profile/delete/${id}`))
+  }
 }
