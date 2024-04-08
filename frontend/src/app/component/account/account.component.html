@@ -69,17 +69,17 @@
                                                 (click)="file.click()"></p-button>
                                             <p *ngIf="cropImage!=undefined" style="padding-left: 1em;">{{cropImage}}</p>
                                         </div>
-                                        <p-dialog header="Choose Image" [(visible)]="imageDialogVisible" [modal]="true"
-                                            [style]="{ width: 'fit-content', height: '40px'}" [draggable]="false"
+                                        <p-dialog header="Crop Image" [(visible)]="imageDialogVisible" [modal]="true"
+                                            [style]="{ width: 'fit-content', height: 'auto'}" [draggable]="false"
                                             [resizable]="false">
-                                            <div *ngIf="imageChangedEvent!=undefined" style="height: min-content">
+                                            <div *ngIf="imageChangedEvent!=undefined" style="height: min-content;">
                                                 <image-cropper [imageChangedEvent]="imageChangedEvent"
                                                     [maintainAspectRatio]="true" [aspectRatio]="1 / 1"
                                                     [resizeToHeight]="200" [resizeToWidth]="200" [onlyScaleDown]="true"
                                                     (imageCropped)="imageCropped($event)"
                                                     output="base64"></image-cropper>
                                             </div>
-                                            <div>
+                                            <div class="row-button">
                                                 <p-button (click)="crop()">Crop</p-button>
                                                 <p-button (click)="closeDialog()">Cancel</p-button>
                                             </div>

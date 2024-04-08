@@ -25,7 +25,7 @@
     }
 
     :host ::ng-deep .p-button {
-        background: #FFF9F4;
+        /* background: #FFF9F4; */
         color: #010662;
         border: 1px solid #010662;
         font-family: 'Lora', sans-serif;
@@ -57,7 +57,7 @@
     }
 
     :host ::ng-deep .p-button {
-        background: #FFF9F4;
+        background: transparent;
         color: #010662;
         border: 1px solid #010662;
         font-family: 'Lora', sans-serif;
@@ -146,6 +146,21 @@
         text-align: center;
     }
 
+    :host ::ng-deep .p-dialog .p-dialog-content {
+        background: white;
+    }
+    
+    :host ::ng-deep .p-dialog .p-dialog-header {
+        background: white;
+        font-family: 'Lora', sans-serif;
+        color: #010662;
+    }
+
+    .row-button{
+        display: flex;
+        justify-content: space-between;
+    }
+    
     /* dropdown menu */
     :host ::ng-deep .p-menu.p-menu-overlay{
         background: #FFF9F4;
