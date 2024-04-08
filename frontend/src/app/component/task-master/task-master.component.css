@@ -81,21 +81,21 @@ input:focus{
     margin-right: 1ch;
     justify-content: center;
     border: none;
-    line-height: 30px;
+    line-height: 40px;
 }
 
 #ws:hover{
     border: none;
     border-radius: 5px;
-    line-height: 30px;
+    line-height: 40px;
     background-color: #d4dbe3;
     color: #010662;
 }
 
-#ws:focus{
+.selected{
     border: none;
     border-radius: 5px;
-    line-height: 30px;
+    line-height: 40px;
     background-color: #d4dbe3;
     color: #010662;
 }
