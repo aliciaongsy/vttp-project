@@ -132,6 +132,10 @@
         /* height: 40px; */
     }
 
+    .error{
+        color: crimson;
+    }
+
     image-cropper {
         display: flex;
         position: relative;

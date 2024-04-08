@@ -8,6 +8,7 @@ import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { updateProfile } from '../../state/user/user.actions';
 import { Subscription } from 'rxjs';
 import { UserService } from '../../service/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-account',
@@ -22,6 +23,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   private ngrxStore = inject(Store)
   private fb = inject(FormBuilder)
   private userSvc = inject(UserService)
+  private router = inject(Router)
 
   userDetail: UserDetails = {
     id: '',
@@ -223,5 +225,16 @@ export class AccountComponent implements OnInit, OnDestroy {
   }
 
   // delete account
-  
+  deleteAccount(){
+    if(confirm('Are you sure you want to delete this account?')){
+      // successful deletion -> redirect back to home page
+      this.userSvc.deleteAccount(this.userDetail.id)
+        .then(() => {
+          this.router.navigate(['/'])
+        })
+        .catch((error) => {
+          alert(`error: ${error}`)
+        })
+    }
+  }
 }
