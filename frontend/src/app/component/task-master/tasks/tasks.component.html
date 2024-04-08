@@ -1,13 +1,16 @@
 <div class="row">
-    <div *ngIf="tasks | async as tasks; else noTasks">
+    <div *ngIf="tasks | async as tasks; else loading">
         <div *ngIf="tasks.length!=0; else noTasks">
-            <h2 style="padding: 0;">Active task</h2>
+            <h2 style="padding: 0;">Task list</h2>
         </div>
     </div>
     <ng-template #noTasks>
         <div>
             <h2 style="padding: 0;">No active task</h2>
         </div>
+    </ng-template>
+    <ng-template #loading>
+        <h2>Loading...</h2>
     </ng-template>
     <div>
         <p-toast key="error" position="top-right"></p-toast>
@@ -58,14 +61,19 @@
     <div *ngIf="tasks.length!=0">
         <p-toast key="error" position="top-right"></p-toast>
         <p-toast key="success" position="top-right"></p-toast>
-        <p-table [columns]="cols" [value]="tasks" [tableStyle]="{ 'min-width': '50rem' }">
+        <p-table #table [columns]="cols" [value]="tasks" [tableStyle]="{ 'min-width': '50rem' }" [paginator]="true"
+            [rows]="5" [rowsPerPageOptions]="[5, 10]">
             <ng-template pTemplate="header" let-columns>
                 <tr>
-                    <th *ngFor="let col of columns" [pSortableColumn]="col.field" [pSortableColumnDisabled]="col.field=='task' || col.field=='start' || col.field=='completed' || col.field=='actions'">
+                    <th *ngFor="let col of columns" [pSortableColumn]="col.field"
+                        [pSortableColumnDisabled]="col.field=='start' || col.field=='completed' || col.field=='actions'">
                         {{ col.header }}
                         <p-sortIcon [field]="col.field"
-                            *ngIf="col.field=='priority'||col.field=='status'||col.field=='due'"></p-sortIcon>
+                            *ngIf="col.field=='task' || col.field=='priority'||col.field=='status'||col.field=='due'"></p-sortIcon>
                     </th>
+                    <!-- <th>
+                        <button pButton class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(table)" size="small"></button>
+                    </th> -->
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns">
@@ -93,7 +101,7 @@
                             <span *ngSwitchCase="'start'">
                                 {{ rowData[col.field] | date }}
                             </span>
-                            <span *ngSwitchCase="'due'" [ngClass]="{'due': rowData[col.field]<this.minDate.getTime()}">
+                            <span *ngSwitchCase="'due'" [ngClass]="{'due': rowData[col.field]<this.dueDate.getTime()}">
                                 {{ rowData[col.field] | date }}
                             </span>
                             <span *ngSwitchCase="'completed'">
@@ -147,9 +155,11 @@
                                 <p-button icon="pi pi-trash" (click)="deleteDialog()"></p-button>
                                 <p-dialog header="Delete Task" [(visible)]="deleteVisible" [modal]="true"
                                     [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false">
-                                    <p style="color: #8B0000; font-weight: 500; padding-bottom: 1ch;">Are you sure you want to delete task?</p>
+                                    <p style="color: #8B0000; font-weight: 500; padding-bottom: 1ch;">Are you sure you
+                                        want to delete task?</p>
                                     <div class="button">
-                                        <p-button [style]="{background: '#8B0000'}" (click)="deleteTask(rowData)">Yes</p-button>
+                                        <p-button [style]="{background: '#8B0000'}"
+                                            (click)="deleteTask(rowData)">Yes</p-button>
                                         <p-button (click)="closeDialog()">Cancel</p-button>
                                     </div>
                                 </p-dialog>
@@ -159,6 +169,7 @@
                             </ng-template>
                         </container-element>
                     </td>
+                    <!-- <td></td> -->
                 </tr>
             </ng-template>
         </p-table>
