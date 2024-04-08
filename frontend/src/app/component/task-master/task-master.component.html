@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div *ngIf="workspaces | async as workspaces">
-                    <p *ngFor="let w of workspaces" width="max" id="ws" [routerLink]="['/workspace', w, 'overview']">{{w}}</p>
+                    <p *ngFor="let w of workspaces" width="max" id="ws" [routerLink]="['/workspace', w, 'tasks']" [ngClass]="{'selected': this.currentWorkspace==w}">{{w}}</p>
                 </div>
             </div>
         </ng-template>
