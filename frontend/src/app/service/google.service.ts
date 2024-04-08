@@ -39,7 +39,7 @@ export class GoogleService {
   }
 
   revokeToken(){
-    return firstValueFrom(this.http.delete<any>(`${URL}/api/google/auth/token/revoke`))
+    return firstValueFrom(this.http.get<any>(`${URL}/api/google/auth/token/revoke`))
   }
 
 }

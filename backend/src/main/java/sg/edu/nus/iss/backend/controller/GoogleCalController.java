@@ -143,9 +143,11 @@ public class GoogleCalController {
 		return googleSvc.deleteEvent(id);
 	}
 
-	@GetMapping("google/auth/token/revoke")
+	@GetMapping("/google/auth/token/revoke")
 	@ResponseBody
 	public ResponseEntity<String> revokeToken(){
+		authStatus = false;
+		email = "";
 		return googleSvc.revokeToken();
 	}
 
