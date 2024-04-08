@@ -112,7 +112,7 @@
                                 <p-button icon="pi pi-file-edit" (click)="editForm(rowData)"></p-button>
                                 <p-dialog header="Edit Task" [(visible)]="editVisible" [modal]="true"
                                     [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false">
-                                    <form [formGroup]="taskForm" (submit)="updateTask(rowData.id)">
+                                    <form [formGroup]="taskForm" (submit)="updateTask()">
                                         <table>
                                             <tr>
                                                 <td>Task:</td>

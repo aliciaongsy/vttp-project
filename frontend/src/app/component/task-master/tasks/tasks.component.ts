@@ -8,6 +8,7 @@ import { selectUserDetails } from '../../../state/user/user.selectors';
 import { addTask, changeCompleteStatus, deleteTask, loadAllTasks, updateTask } from '../../../state/tasks/task.actions';
 import { selectActionStatus, selectTask } from '../../../state/tasks/task.selector';
 import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
 
 interface Column {
   field: string;
@@ -35,6 +36,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   currentWorkspace!: string
   uid!: string
   tasks!: Observable<Task[]>
+  editId!: string
 
   // dialog
   visible: boolean = false
@@ -91,24 +93,20 @@ export class TasksComponent implements OnInit, OnDestroy {
       { field: 'priority', header: 'Priority' },
       { field: 'start', header: 'Start Date' },
       { field: 'due', header: 'Due Date' },
-      { field: 'completed', header: 'Completed' },
-      { field: 'actions', header: 'Actions' }
+      { field: 'actions', header: 'Actions' },
+      { field: 'completed', header: 'Completed' }
     ];
 
     this.actionStatus$ = this.ngrxStore.select(selectActionStatus).subscribe(
       status => {
         this.actionStatus = status
-        switch (this.currentAction) {
-          case 'add': {
-            if (this.actionStatus == 'success') {
-              console.info('success toast')
-              this.showSuccessToast()
-            }
-            if (this.actionStatus == 'error') {
-              console.info('error toast')
-              this.showErrorToast()
-            }
-          }
+        if (this.actionStatus == 'success') {
+          console.info('success toast')
+          this.showSuccessToast()
+        }
+        if (this.actionStatus == 'error') {
+          console.info('error toast')
+          this.showErrorToast()
         }
       }
     )
@@ -117,9 +115,13 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.actionStatus$.unsubscribe()
-    if (this.paramSub$){
+    if (this.paramSub$) {
       this.paramSub$.unsubscribe()
     }
+  }
+
+  clear(table: Table) {
+    table.clear();
   }
 
   createForm(): FormGroup {
@@ -156,12 +158,42 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   showErrorToast() {
     this.messageSvc.clear()
-    this.messageSvc.add({ key: 'error', severity: 'error', summary: 'error', detail: 'error adding new task' })
+    var details = ''
+    switch (this.currentAction) {
+      case 'add': {
+        details = 'error adding new task'
+        break;
+      }
+      case 'update': {
+        details = 'error updating task'
+        break;
+      }
+      case 'delete': {
+        details = 'error deleting task'
+        break;
+      }
+    }
+    this.messageSvc.add({ key: 'error', severity: 'error', summary: 'error', detail: details })
   }
 
   showSuccessToast() {
     this.messageSvc.clear()
-    this.messageSvc.add({ key: 'success', severity: 'success', summary: 'success', detail: 'successfully added new task!' })
+    var details = ''
+    switch (this.currentAction) {
+      case 'add': {
+        details = 'successfully added new task!'
+        break;
+      }
+      case 'update': {
+        details = 'successfully updated task!'
+        break;
+      }
+      case 'delete': {
+        details = 'successfully deleted task!'
+        break;
+      }
+    }
+    this.messageSvc.add({ key: 'success', severity: 'success', summary: 'success', detail: details })
   }
 
   completedSwitch(data: Task) {
@@ -182,6 +214,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   // --- editing task ---
   editForm(data: Task) {
+    this.editId = data.id!
     this.editVisible = true
     // get current task data and map it to the form
     this.taskForm = this.fb.group({
@@ -193,20 +226,22 @@ export class TasksComponent implements OnInit, OnDestroy {
     })
   }
 
-  updateTask(taskId: string) {
+  updateTask() {
     const task = this.taskForm.value as Task
-    task.id = taskId
+    task.id = this.editId
     task.start = this.taskForm.value.start.getTime()
     task.due = this.taskForm.value.due.getTime()
     task.completed = this.taskForm.value.status == "Completed" ? true : false
     console.info(task)
 
     // dispatch action to update task
-    this.ngrxStore.dispatch(updateTask({ taskId: taskId, task: task }))
+    this.ngrxStore.dispatch(updateTask({ taskId: this.editId, task: task }))
 
     // close dialog
     this.editVisible = false
     this.taskForm = this.createForm()
+
+    this.currentAction = 'update'
 
   }
 
@@ -218,6 +253,8 @@ export class TasksComponent implements OnInit, OnDestroy {
   deleteTask(data: Task) {
     this.ngrxStore.dispatch(deleteTask({ taskId: data.id!, completed: data.completed }))
     this.deleteVisible = false
+
+    this.currentAction = 'delete'
   }
 
   closeDialog() {
