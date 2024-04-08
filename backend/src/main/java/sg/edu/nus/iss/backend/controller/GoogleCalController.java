@@ -60,9 +60,9 @@ public class GoogleCalController {
 		email = googleSvc.getEmail();
 
 		if (authStatus) {
-			return new RedirectView("http://localhost:8080/google/auth/success");
+			return new RedirectView("http://localhost:8080/api/google/auth/success");
 		} else {
-			return new RedirectView("http://localhost:8080/google/auth/error");
+			return new RedirectView("http://localhost:8080/api/google/auth/error");
 		}
 
 	}
