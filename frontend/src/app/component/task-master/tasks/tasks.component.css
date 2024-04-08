@@ -10,6 +10,10 @@ td{
     font-family: 'Lora', sans-serif;
 }
 
+.due{
+    color: crimson;
+}
+
 input{
     background-color: #FFF9F4;
     color: #010662;
@@ -80,7 +84,7 @@ input{
 
 p-checkbox {
     display: flex;
-    justify-content: center;
+    /* justify-content: center; */
 }
 
 :host ::ng-deep .p-checkbox .p-checkbox-box {
@@ -96,4 +100,17 @@ p-checkbox {
 div .button{
     display: flex;
     justify-content: space-between;  
+}
+
+/* paginator */
+:host ::ng-deep .p-paginator{
+    background-color: #FFF9F4;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last{
+    color: #010662;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page{
+    font-family: "Lora", sans-serif;
 }
