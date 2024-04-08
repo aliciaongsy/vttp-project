@@ -29,6 +29,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   taskForm!: FormGroup
   minDate!: Date
+  dueDate!: Date
 
   // details
   currentWorkspace!: string
@@ -53,26 +54,35 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   currentAction!: 'add' | 'delete' | 'update'
 
+  paramSub$!: Subscription | undefined
+
   ngOnInit(): void {
     this.taskForm = this.createForm()
     this.minDate = new Date()
 
-    // get workspace name - get parent path variable {workspace}/tasks
-    this.currentWorkspace = this.activatedRoute.parent?.snapshot.params['w']
+    var date = new Date()
+    date.setDate(date.getDate() - 1)
+    this.dueDate = date
+    console.info(this.dueDate)
 
-    // getting task data 
-    firstValueFrom(this.ngrxStore.select(selectUserDetails)).then((value) => {
-      this.uid = value.id
-      // loads data from mongodb
-      this.ngrxStore.dispatch(loadAllTasks({ id: this.uid, workspace: this.currentWorkspace }))
-    })
-    // console.info(this.ngrxStore.select(selectTask))
-    this.tasks = this.ngrxStore.select(selectTask).pipe(
-      map((value)=>{
-        return [...value.tasks]
+    // get workspace name - get parent path variable {workspace}/tasks
+    this.paramSub$ = this.activatedRoute.parent?.params.subscribe(params => {
+      this.currentWorkspace = params['w']
+
+      // getting task data 
+      firstValueFrom(this.ngrxStore.select(selectUserDetails)).then((value) => {
+        this.uid = value.id
+        // loads data from mongodb
+        this.ngrxStore.dispatch(loadAllTasks({ id: this.uid, workspace: this.currentWorkspace }))
       })
-    )
-    firstValueFrom(this.tasks).then((value) => console.info(value))
+      // console.info(this.ngrxStore.select(selectTask))
+      this.tasks = this.ngrxStore.select(selectTask).pipe(
+        map((value) => {
+          return [...value.tasks]
+        })
+      )
+      firstValueFrom(this.tasks).then((value) => console.info(value))
+    })
 
     // table columns
     this.cols = [
@@ -88,13 +98,13 @@ export class TasksComponent implements OnInit, OnDestroy {
     this.actionStatus$ = this.ngrxStore.select(selectActionStatus).subscribe(
       status => {
         this.actionStatus = status
-        switch(this.currentAction){
+        switch (this.currentAction) {
           case 'add': {
-            if(this.actionStatus == 'success'){
+            if (this.actionStatus == 'success') {
               console.info('success toast')
               this.showSuccessToast()
             }
-            if(this.actionStatus == 'error'){
+            if (this.actionStatus == 'error') {
               console.info('error toast')
               this.showErrorToast()
             }
@@ -107,6 +117,9 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.actionStatus$.unsubscribe()
+    if (this.paramSub$){
+      this.paramSub$.unsubscribe()
+    }
   }
 
   createForm(): FormGroup {
@@ -134,28 +147,28 @@ export class TasksComponent implements OnInit, OnDestroy {
     task.completed = task.status == 'Completed'
     this.ngrxStore.dispatch(addTask({ task: task }))
     // this.tasks = this.ngrxStore.select(selectAllTasks)
-    
+
     this.visible = false
     this.taskForm = this.createForm()
 
     this.currentAction = 'add'
   }
 
-  showErrorToast(){
+  showErrorToast() {
     this.messageSvc.clear()
-    this.messageSvc.add({key: 'error', severity: 'error', summary: 'error', detail: 'error adding new task'})
+    this.messageSvc.add({ key: 'error', severity: 'error', summary: 'error', detail: 'error adding new task' })
   }
 
-  showSuccessToast(){
+  showSuccessToast() {
     this.messageSvc.clear()
-    this.messageSvc.add({key: 'success', severity: 'success', summary: 'success', detail: 'successfully added new task!'})
+    this.messageSvc.add({ key: 'success', severity: 'success', summary: 'success', detail: 'successfully added new task!' })
   }
 
   completedSwitch(data: Task) {
     var task: Task = {
       id: data.id,
       task: data.task,
-      status: !(data.completed)? "Completed" : data.status==='Completed' ? "In Progress" : data.status,
+      status: !(data.completed) ? "Completed" : data.status === 'Completed' ? "In Progress" : data.status,
       priority: data.priority,
       start: data.start,
       due: data.due,
@@ -164,11 +177,11 @@ export class TasksComponent implements OnInit, OnDestroy {
     console.info(task)
     const taskId = data.id
     // dispatch action to update completed boolean
-    this.ngrxStore.dispatch(changeCompleteStatus({taskId: taskId!, task: task, completed: task.completed}))
+    this.ngrxStore.dispatch(changeCompleteStatus({ taskId: taskId!, task: task, completed: task.completed }))
   }
 
   // --- editing task ---
-  editForm(data: Task){
+  editForm(data: Task) {
     this.editVisible = true
     // get current task data and map it to the form
     this.taskForm = this.fb.group({
@@ -180,7 +193,7 @@ export class TasksComponent implements OnInit, OnDestroy {
     })
   }
 
-  updateTask(taskId: string){
+  updateTask(taskId: string) {
     const task = this.taskForm.value as Task
     task.id = taskId
     task.start = this.taskForm.value.start.getTime()
@@ -189,7 +202,7 @@ export class TasksComponent implements OnInit, OnDestroy {
     console.info(task)
 
     // dispatch action to update task
-    this.ngrxStore.dispatch(updateTask({taskId: taskId, task: task}))
+    this.ngrxStore.dispatch(updateTask({ taskId: taskId, task: task }))
 
     // close dialog
     this.editVisible = false
@@ -198,16 +211,16 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   // --- deleting task --- 
-  deleteDialog(){
+  deleteDialog() {
     this.deleteVisible = true
   }
 
-  deleteTask(data: Task){
-    this.ngrxStore.dispatch(deleteTask({taskId: data.id!, completed: data.completed}))
+  deleteTask(data: Task) {
+    this.ngrxStore.dispatch(deleteTask({ taskId: data.id!, completed: data.completed }))
     this.deleteVisible = false
   }
 
-  closeDialog(){
+  closeDialog() {
     this.deleteVisible = false
   }
 }

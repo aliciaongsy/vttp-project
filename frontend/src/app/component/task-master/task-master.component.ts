@@ -1,6 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, firstValueFrom } from 'rxjs';
+import { Observable, Subscription, firstValueFrom } from 'rxjs';
 import { MenuItem } from 'primeng/api';
 import { Store } from '@ngrx/store';
 import { selectStatus, selectUserDetails, selectWorkspaces } from '../../state/user/user.selectors';
@@ -13,7 +13,7 @@ import { selectTask } from '../../state/tasks/task.selector';
   templateUrl: './task-master.component.html',
   styleUrl: './task-master.component.css'
 })
-export class TaskMasterComponent implements OnInit {
+export class TaskMasterComponent implements OnInit, OnDestroy {
 
   private activatedRoute = inject(ActivatedRoute)
   private ngrxStore = inject(Store)
@@ -27,23 +27,29 @@ export class TaskMasterComponent implements OnInit {
 
   loginStatus!: Observable<boolean>
 
-  tab: string = 'Overview'
+  // tab: string = 'Overview'
+
+  paramSub$!: Subscription
 
   menuItems: MenuItem[] = [
-    { label: 'Overview', routerLink: 'overview' },  
+    // { label: 'Overview', routerLink: 'overview' },  
     { label: 'Tasks', routerLink: 'tasks' },
     { label: 'Focus Session', routerLink: 'focus' }
   ]
   activeTab = this.menuItems[0]
 
   ngOnInit(): void {
-    this.currentWorkspace = this.activatedRoute.snapshot.params['w']
-    console.info(this.activatedRoute.snapshot.params['w'])
+    this.paramSub$ = this.activatedRoute.params.subscribe(params => {
+      this.currentWorkspace = params['w']})
 
     console.info("retrieve from ngrx store")
     this.loginStatus = this.ngrxStore.select(selectStatus)
     this.workspaces = this.ngrxStore.select(selectWorkspaces)
 
+  }
+
+  ngOnDestroy(): void {
+    this.paramSub$.unsubscribe()
   }
 
   showDialog() {
