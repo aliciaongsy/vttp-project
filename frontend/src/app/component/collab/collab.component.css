@@ -47,6 +47,7 @@ td{
 
 :host ::ng-deep .p-dialog .p-dialog-content {
     background: #FFF9F4;
+    color: #010662;
 }
 
 input{

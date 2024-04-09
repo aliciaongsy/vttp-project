@@ -105,8 +105,10 @@
                                 [draggable]="false" [resizable]="false"
                                 [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
                                     <p>Are you sure you want to leave?</p>
-                                    <p-button size="small" (click)="closeDialog()">No</p-button>
-                                    <p-button size="small" (click)="leaveRoom()">Yes</p-button>
+                                    <div class="row">
+                                        <p-button size="small" (click)="closeDialog()" [style]="{'background': '#FFF9F4', 'color': '#010662', 'border': '1px solid #010662'}">Cancel</p-button>
+                                        <p-button size="small" (click)="leaveRoom()" [style]="{'border': '1px solid #010662'}">Leave</p-button>
+                                    </div>                        
                             </p-dialog>
                         </div>
                         <div>
@@ -119,7 +121,7 @@
                                             <p *ngIf="item.sender !== name&&item.type==='CHAT'" style="border-bottom: 1px solid #010662;">
                                                 {{item.sender}}:</p>
                                             <p>{{item.content}}</p>
-                                            <p *ngIf="item.type==='CHAT'" class="date">{{ item.timestamp | date: 'short' }}</p>
+                                            <p *ngIf="item.type==='CHAT'" class="date">{{ item.timestamp | date: 'dd/MM/yy, h:mm a' }}</p>
                                         </div>
                                     </div>
                                 </ng-template>

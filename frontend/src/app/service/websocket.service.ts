@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { ChatMessage } from '../model';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription, interval, takeWhile } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,7 @@ export class WebSocketService {
   }
 
   name!: string
+  newJoin: boolean = false
 
   initSocketConnection() {
     const socket = new SockJS('//localhost:8080/socket');
@@ -33,6 +34,7 @@ export class WebSocketService {
   }
 
   joinRoom(roomId: string) {
+    console.info(this.newJoin)
     this.stompClient.connect({}, () => {
       this.stompClient.subscribe(`/topic/${roomId}`, (messages: any) => {
         const messageContent = JSON.parse(messages.body)
@@ -43,12 +45,37 @@ export class WebSocketService {
 
         this.messageSubject.next(currentMessage);
       })
-  
+
       this.stompClient.activate()
+      if (this.newJoin) {
+        console.info('first join')
+        this.firstJoined(roomId)
+        this.newJoin = false
+      }
     })
+
+    if(this.stompClient.connected){
+      // change sub
+      this.stompClient.subscribe(`/topic/${roomId}`, (messages: any) => {
+        const messageContent = JSON.parse(messages.body)
+        console.info(messageContent)
+
+        const currentMessage = this.messageSubject.getValue();
+        currentMessage.push(messageContent);
+
+        this.messageSubject.next(currentMessage);
+      })
+
+      this.stompClient.activate()
+      if (this.newJoin) {
+        console.info('first join')
+        this.firstJoined(roomId)
+        this.newJoin = false
+      }
+    }
   }
 
-  firstJoined(roomId: string){
+  firstJoined(roomId: string) {
     if (this.stompClient && this.stompClient.connected) {
       // tell your name to the server - send to @MessageMapping path
       // only send this when the user FIRST join
@@ -59,7 +86,7 @@ export class WebSocketService {
     }
   }
 
-  leaveRoom(roomId: string){
+  leaveRoom(roomId: string) {
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.send(`/app/chat/sendmessage/${roomId}`,
         {},
@@ -74,7 +101,7 @@ export class WebSocketService {
       // send to @MessageMapping path
       this.stompClient.send(`/app/chat/sendmessage/${roomId}`, {}, JSON.stringify(chatMessage));
     }
-    
+
   }
 
   getMessageSubject() {

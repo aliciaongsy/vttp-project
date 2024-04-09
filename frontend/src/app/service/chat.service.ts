@@ -33,8 +33,10 @@ export class ChatService {
     return firstValueFrom(this.http.post<any>(`${URL}/api/chat/create`, chatRoom))
   }
   
-  leaveChatRoom(id: string, roomId: string){
-    return firstValueFrom(this.http.delete<any>(`${URL}/api/${id}/chat/leave/${roomId}`))
+  leaveChatRoom(id: string, name: string, roomId: string){
+    const params = new HttpParams()
+      .set("name", name)
+    return firstValueFrom(this.http.delete<any>(`${URL}/api/${id}/chat/leave/${roomId}`,{params}))
   }
 
   getAllMessages(roomId: string): Observable<ChatMessage[]> {
