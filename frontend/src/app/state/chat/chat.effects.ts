@@ -41,8 +41,9 @@ export class ChatEffects {
     loadChatRoom$ = createEffect(() => 
         this.actions$.pipe(
             ofType(loadChatRoom),
-            switchMap((action) => 
-                this.chatSvc.getChatRoomDetails(action.roomId).pipe(
+            withLatestFrom(this.store.select(selectRoomId)),
+            switchMap(([action, roomId]) => 
+                this.chatSvc.getChatRoomDetails(roomId).pipe(
                     map((value) => loadChatRoomFromService({chatRoom: value}))
                 )
             )
