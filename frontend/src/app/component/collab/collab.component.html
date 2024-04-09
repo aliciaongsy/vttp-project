@@ -105,8 +105,8 @@
                                 [draggable]="false" [resizable]="false"
                                 [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
                                     <p>Are you sure you want to leave?</p>
-                                    <p-button size="small">No</p-button>
-                                    <p-button size="small">Yes</p-button>
+                                    <p-button size="small" (click)="closeDialog()">No</p-button>
+                                    <p-button size="small" (click)="leaveRoom()">Yes</p-button>
                             </p-dialog>
                         </div>
                         <div>
@@ -114,12 +114,12 @@
                             [style]="{'height': '450px'}">
                                 <ng-template pTemplate="item" let-item>
                                     <div class="message"
-                                        [ngClass]="{'left': item.sender !== name, 'right': item.sender === name}">
+                                        [ngClass]="{'left': item.sender !== name&&item.type==='CHAT', 'right': item.sender === name&&item.type==='CHAT', 'middle': item.type==='LEAVE'||item.type=='JOIN'}">
                                         <div class="bubble">
-                                            <p *ngIf="item.sender !== name" style="border-bottom: 1px solid #010662;">
+                                            <p *ngIf="item.sender !== name&&item.type==='CHAT'" style="border-bottom: 1px solid #010662;">
                                                 {{item.sender}}:</p>
                                             <p>{{item.content}}</p>
-                                            <p class="date">{{ item.timestamp | date: 'short' }}</p>
+                                            <p *ngIf="item.type==='CHAT'" class="date">{{ item.timestamp | date: 'short' }}</p>
                                         </div>
                                     </div>
                                 </ng-template>

@@ -1,14 +1,16 @@
 import { Injectable, inject } from "@angular/core";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { Actions, act, createEffect, ofType } from "@ngrx/effects";
 import { AppState } from "../app.state";
 import { Store } from "@ngrx/store";
 import { TaskService } from "../../service/task.service";
-import { addWorkspace, changeStatus, createChatRoom, deleteWorkspace, joinChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadUserProfile, loadWorkspaces, updateProfile } from "./user.actions";
+import { addWorkspace, changeStatus, createChatRoom, deleteWorkspace, joinChatRoom, leaveChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadUserProfile, loadWorkspaces, updateProfile } from "./user.actions";
 import { from, map, switchMap, withLatestFrom } from "rxjs";
 import { selectUser, selectUserDetails } from "./user.selectors";
 import { ChatService } from "../../service/chat.service";
 import { addTask } from "../tasks/task.actions";
 import { UserService } from "../../service/user.service";
+import { WebSocketService } from "../../service/websocket.service";
+import { enterChatRoom } from "../chat/chat.actions";
 
 @Injectable()
 export class UserEffects {
@@ -17,6 +19,7 @@ export class UserEffects {
     private taskSvc = inject(TaskService)
     private chatSvc = inject(ChatService)
     private userSvc = inject(UserService)
+    private webSocketSvc = inject(WebSocketService)
 
     loadWorkspaces$ = createEffect(() =>
         this.actions$.pipe(
@@ -111,6 +114,23 @@ export class UserEffects {
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>
                 this.chatSvc.joinChatRoom(details.id, details.name, action.roomId)
+            ),
+            withLatestFrom(this.store.select(selectUserDetails)),
+            switchMap(([action, details]) =>
+                
+                this.chatSvc.getChatList(details.id).pipe(
+                    map((value) => loadChats({ chats: value }))
+                )
+            )
+        ),
+    )
+
+    leaveChatRoom$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(leaveChatRoom),
+            withLatestFrom(this.store.select(selectUserDetails)),
+            switchMap(([action, details]) =>
+                this.chatSvc.leaveChatRoom(details.id, action.roomId)
             ),
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>

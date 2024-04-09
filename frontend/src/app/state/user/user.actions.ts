@@ -26,6 +26,11 @@ export const joinChatRoom = createAction(
     props<{ id: string, roomId: string }>()
 )
 
+export const leaveChatRoom = createAction(
+    '[User Page] Leave Chat Room',
+    props<{ id: string, roomId: string }>()
+)
+
 export const getChatList = createAction(
     '[User Page] Reload Chats'
 )

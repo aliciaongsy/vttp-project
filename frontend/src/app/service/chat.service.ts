@@ -34,7 +34,7 @@ export class ChatService {
   }
   
   leaveChatRoom(id: string, roomId: string){
-    return this.http.delete<any>(`${URL}/api/${id}/chat/join/${roomId}`)
+    return firstValueFrom(this.http.delete<any>(`${URL}/api/${id}/chat/leave/${roomId}`))
   }
 
   getAllMessages(roomId: string): Observable<ChatMessage[]> {

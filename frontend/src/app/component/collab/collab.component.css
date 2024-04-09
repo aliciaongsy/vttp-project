@@ -68,6 +68,13 @@ form{
     color: #010662;
 }
 
+:host ::ng-deep .p-dropdown .p-dropdown-label {
+    background: transparent;
+    border: 0 none;
+    color: #010662;
+    font-family: "Lora", sans-serif;
+}
+
 /* search public chats results */
 .result{
     margin: 1ch 0;
@@ -128,6 +135,11 @@ form{
 .left{
     display: flex;
     justify-content: flex-start;
+}
+
+.middle{
+    display: flex;
+    justify-content: center;
 }
 
 .bubble{

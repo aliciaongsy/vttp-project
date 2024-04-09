@@ -5,20 +5,13 @@ import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
 import { WebSocketService } from '../../service/websocket.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChatDetails, ChatMessage, ChatRoom } from '../../model';
-import { ActivatedRoute } from '@angular/router';
-import { createChatRoom, joinChatRoom } from '../../state/user/user.actions';
+import { ActivatedRoute, Router } from '@angular/router';
+import { createChatRoom, joinChatRoom, leaveChatRoom } from '../../state/user/user.actions';
 import { enterChatRoom, loadAllMessages, loadChatRoom, sendMessage } from '../../state/chat/chat.actions';
 import { selectChat, selectChatRoom, selectMessages, selectName } from '../../state/chat/chat.selector';
-import { Scroller } from 'primeng/scroller';
 import { ChatService } from '../../service/chat.service';
 import { MenuItem, MessageService } from 'primeng/api';
 
-interface PageEvent {
-  first: number;
-  rows: number;
-  page: number;
-  pageCount: number;
-}
 
 @Component({
   selector: 'app-collab',
@@ -34,6 +27,7 @@ export class CollabComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder)
   private activatedRoute = inject(ActivatedRoute)
   private messageService = inject(MessageService)
+  private router = inject(Router)
 
   // dialogs
   joinRoomVisible: boolean = false
@@ -183,19 +177,22 @@ export class CollabComponent implements OnInit, OnDestroy {
     this.createRoomVisible = false
   }
 
-  // join existing room
+  // join room dialog 
   join() {
     this.joinRoomVisible = true
   }
 
+  // join room
   joinRoom() {
     this.joinRoomVisible = false
     const roomId = this.joinForm.value['id']
     this.messageSvc.joinRoom(roomId);
     this.ngrxStore.dispatch(joinChatRoom({ id: this.uid, roomId }))
     this.joinForm.reset()
+    this.messageSvc.firstJoined(roomId)
   }
 
+  // search chat room dialog
   findPublicChatRoom() {
     this.joinRoomVisible = false
     this.publicChatVisible = true
@@ -242,5 +239,16 @@ export class CollabComponent implements OnInit, OnDestroy {
   loadDetails(){
     this.chatRoomDetailsVisible = true
     this.chatRoomDetails$ = this.ngrxStore.select(selectChatRoom)
+  }
+
+  closeDialog(){
+    this.leaveChatVisible = false
+  }
+
+  leaveRoom(){
+    this.ngrxStore.dispatch(leaveChatRoom({ id: this.uid, roomId: this.currentChatRoomId}))
+    this.leaveChatVisible = false
+    this.messageSvc.leaveRoom(this.currentChatRoomId)
+    this.router.navigate(['/collab'])
   }
 }
