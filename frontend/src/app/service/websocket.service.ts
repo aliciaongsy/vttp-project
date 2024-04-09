@@ -52,9 +52,18 @@ export class WebSocketService {
     if (this.stompClient && this.stompClient.connected) {
       // tell your name to the server - send to @MessageMapping path
       // only send this when the user FIRST join
-      this.stompClient.send(`/app/chat/adduser/${roomId}`,
+      this.stompClient.send(`/app/chat/sendmessage/${roomId}`,
         {},
         JSON.stringify({ content: `${this.name} has joined the chat`, sender: this.name, type: 'JOIN' })
+      )
+    }
+  }
+
+  leaveRoom(roomId: string){
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.send(`/app/chat/sendmessage/${roomId}`,
+        {},
+        JSON.stringify({ content: `${this.name} has left the chat`, sender: this.name, type: 'LEAVE' })
       )
     }
   }
