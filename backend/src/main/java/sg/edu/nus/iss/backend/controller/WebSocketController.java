@@ -50,9 +50,16 @@ public class WebSocketController {
         return chatSvc.getChatRoomDetails(roomId);
     }
 
+    @GetMapping("/api/chat/existing/{roomId}")
+    @ResponseBody
+    public ResponseEntity<String> checkExistingChatroom(@PathVariable String roomId) {
+        return chatSvc.checkExistingChatroom(roomId);
+    }
+
     @PostMapping("/api/chat/join/{roomId}")
     @ResponseBody
     public ResponseEntity<String> joinChatRoom(@PathVariable String roomId, @RequestBody String payload) {
+        System.out.println("join chat room: "+roomId);
         JsonReader reader = Json.createReader(new StringReader(payload));
         JsonObject o = reader.readObject();
         String name = o.getString("name");
@@ -82,9 +89,9 @@ public class WebSocketController {
 
     @DeleteMapping("/api/{id}/chat/leave/{roomId}")
     @ResponseBody
-    public ResponseEntity<String> leaveChatRoom(@PathVariable String id, @PathVariable String roomId) {
+    public ResponseEntity<String> leaveChatRoom(@PathVariable String id, @PathVariable String roomId, @RequestParam String name) {
         try {
-            chatSvc.leaveRoom(id, roomId);
+            chatSvc.leaveRoom(id, roomId, name);
         } catch (ChatRoomException e) {
 
             e.printStackTrace();

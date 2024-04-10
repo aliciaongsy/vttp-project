@@ -20,6 +20,7 @@ public class ChatRoom {
     private String ownerName;
     private String name;
     private List<String> users;
+    private List<String> usernames;
     private int userCount;
     private long createDate;
     private String type;
@@ -38,6 +39,9 @@ public class ChatRoom {
 
     public List<String> getUsers() { return users; }
     public void setUsers(List<String> users) { this.users = users; }
+
+    public List<String> getUsernames() { return usernames; }
+    public void setUsernames(List<String> usernames) { this.usernames = usernames; }
 
     public int getUserCount() { return userCount; }
     public void setUserCount(int userCount) { this.userCount = userCount; }
@@ -66,12 +70,14 @@ public class ChatRoom {
     }
 
     public ChatRoom docToChatRoom(Document doc){
+        System.out.println("doc to chat room: " + doc.toJson());
         ChatRoom room = new ChatRoom();
         room.setRoomId(doc.getString("roomId"));
         room.setOwnerId(doc.getString("ownerId"));
         room.setOwnerName(doc.getString("ownerName"));
         room.setName(doc.getString("name"));
         room.setUsers(doc.getList("users", String.class));
+        room.setUsernames(doc.getList("usernames", String.class));
         room.setUserCount(doc.getInteger("userCount"));
         room.setCreateDate(doc.getLong("createDate"));
         room.setType(doc.getString("type"));
@@ -82,11 +88,15 @@ public class ChatRoom {
         List<String> users = new ArrayList<>();
         room.getUsers().forEach(u -> users.add(u));
 
+        List<String> usernames = new ArrayList<>();
+        room.getUsernames().forEach(u -> usernames.add(u));
+
         Document doc = new Document();
         doc.put("roomId", room.getRoomId());
         doc.put("ownerId", room.getOwnerId());
         doc.put("ownerName", room.getOwnerName());
-        doc.put("name", room.getName());
+        doc.put("name", room.getName());        
+        doc.put("usernames", usernames);
         doc.put("users", users);
         doc.put("userCount", room.getUserCount());
         doc.put("createDate", room.getCreateDate());
@@ -100,12 +110,18 @@ public class ChatRoom {
             builder.add(u);
         }
 
+        JsonArrayBuilder builder2 = Json.createArrayBuilder();
+        for (String u: room.getUsernames()){
+            builder2.add(u);
+        }
+
         JsonObjectBuilder b = Json.createObjectBuilder();
         return b.add("roomId", room.getRoomId())
             .add("ownerId", room.getOwnerId())
             .add("ownerName", room.getOwnerName())
             .add("name", room.getName())
             .add("users", builder.build())
+            .add("usernames", builder2.build())
             .add("userCount", room.getUserCount())
             .add("createDate", room.getCreateDate())
             .add("type", room.getType())
@@ -119,11 +135,18 @@ public class ChatRoom {
             users.add(u.getString(i));
         }
 
+        JsonArray u2 = o.getJsonArray("usernames");
+        List<String> usernames = new LinkedList<>();
+        for(int i = 0; i < u2.size(); i++){
+            usernames.add(u2.getString(i));
+        }
+
         ChatRoom room = new ChatRoom();
         room.setOwnerId(o.getString("ownerId"));
         room.setOwnerName(o.getString("ownerName"));
         room.setName(o.getString("name"));
         room.setUsers(users);
+        room.setUsernames(usernames);
         room.setUserCount(o.getInt("userCount"));
         room.setCreateDate(o.getJsonNumber("createDate").longValue());
         room.setType(o.getString("type"));

@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
 import sg.edu.nus.iss.backend.exception.ChatListException;
@@ -32,6 +33,8 @@ public class ChatRepository {
 
     // --- chat room ---
     public ChatRoom getDetailsByRoomId(String roomId) {
+
+        System.out.println(roomId);
 
         Criteria criteria = Criteria.where("roomId").is(roomId);
         Query query = new Query(criteria);
@@ -78,6 +81,7 @@ public class ChatRepository {
                 .and("chats.ownerId").as("ownerId")
                 .and("chats.ownerName").as("ownerName")
                 .and("chats.name").as("name")
+                .and("chats.usernames").as("usernames")
                 .and("chats.users").as("users")
                 .and("chats.userCount").as("userCount")
                 .and("chats.createDate").as("createDate")
@@ -144,11 +148,13 @@ public class ChatRepository {
         }
     }
 
-    public void addNewUser(String roomId, String id) throws ChatListException {
+    public void addNewUser(String roomId, String id, String name) throws ChatListException {
         Criteria criteria = Criteria.where("roomId").is(roomId);
         Query query = new Query(criteria);
 
-        Update updateOps = new Update().push("users").value(id).inc("userCount", 1);
+        Update updateOps = new Update().push("users").value(id)
+            .push("usernames").value(name)
+            .inc("userCount", 1);
 
         UpdateResult updateResult = template.updateFirst(query, updateOps, Document.class, "chatroom");
 
@@ -222,13 +228,56 @@ public class ChatRepository {
             $inc: { userCount: -1 }
         }
     ); */
-    public void removeUserFromChatRoom(String roomId, String id) throws ChatRoomException{
+    public void removeUserFromChatRoom(String roomId, String id, String name) throws ChatRoomException{
+        // check if user is owner
+        Criteria c = Criteria.where("roomId").is(roomId).andOperator(Criteria.where("ownerId").is(id));
+
+        Query q = new Query(c);
+
         Criteria criteria = Criteria.where("roomId").is(roomId);
 
         Query query = new Query(criteria);
 
+        List<Document> doc = template.find(q, Document.class, "chatroom");
+        if (!doc.isEmpty()){
+            // if there is currently only one person in the chat room -> delete chatroom after leaving
+            if(doc.getFirst().getList("usernames", String.class).size()<2){
+                // delete chat room
+                DeleteResult delete = template.remove(q, "chatroom");
+
+                DeleteResult deleteMsg = template.remove(query, "chatmessage");
+
+                if (delete.getDeletedCount() == 0 || deleteMsg.getDeletedCount() == 0){
+                    throw new ChatRoomException("error deleting chat room");
+                }
+
+                return;
+            }
+
+            System.out.println("transfering ownership");
+            // transfer ownership to next user
+            String transferName = doc.getFirst().getList("usernames", String.class).get(1);
+            String transferId = doc.getFirst().getList("users", String.class).get(1);
+
+            Update updateOps = new Update()
+                .set("ownerName", transferName)
+                .set("ownerId", transferId)
+                .pull("users", id)
+                .pull("usernames", name)
+                .inc("userCount", -1);
+
+            UpdateResult update = template.updateFirst(q, updateOps, "chatroom");
+
+            if (update.getModifiedCount() == 0){
+                throw new ChatRoomException("error transferring ownership");
+            }
+
+            return;
+        }
+
         Update updateOps = new Update()
             .pull("users", id)
+            .pull("usernames", name)
             .inc("userCount", -1);
         
         UpdateResult update = template.updateFirst(query, updateOps, "chatroom");

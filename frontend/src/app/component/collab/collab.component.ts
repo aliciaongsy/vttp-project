@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectChats, selectError, selectStatus, selectUserDetails } from '../../state/user/user.selectors';
-import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
+import { selectChats, selectJoinStatus, selectStatus, selectUserDetails } from '../../state/user/user.selectors';
+import { Observable, Subscription, firstValueFrom } from 'rxjs';
 import { WebSocketService } from '../../service/websocket.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChatDetails, ChatMessage, ChatRoom } from '../../model';
@@ -55,8 +55,6 @@ export class CollabComponent implements OnInit, OnDestroy {
   loadStatus$!: Subscription
   searchResult$!: Observable<ChatDetails[]>
   chatRoomDetails$!: Observable<ChatRoom>
-  errorSub$!: Subscription
-  error!: string
 
   // menu 
   items!: MenuItem[];
@@ -93,6 +91,7 @@ export class CollabComponent implements OnInit, OnDestroy {
           }
         )
         this.ngrxStore.dispatch(loadChatRoom({ roomId: this.currentChatRoomId }))
+
       }
     })
 
@@ -101,9 +100,6 @@ export class CollabComponent implements OnInit, OnDestroy {
       this.name = value.name
       this.uid = value.id
     })
-
-    this.chatList$ = this.ngrxStore.select(selectChats)
-    this.chatName$ = this.ngrxStore.select(selectName)
 
     this.form = this.fb.group({
       name: this.fb.control<string>('', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]),
@@ -142,14 +138,8 @@ export class CollabComponent implements OnInit, OnDestroy {
       }
     ]
 
-    this.errorSub$ = this.ngrxStore.select(selectError).subscribe(
-      (value) => {
-        this.error = value
-        console.info(value)
-        if (value.length>0) {
-          alert('error: room does not exist')
-        }
-      })
+    this.chatList$ = this.ngrxStore.select(selectChats)
+    this.chatName$ = this.ngrxStore.select(selectName)
   }
 
   ngOnDestroy(): void {
@@ -162,7 +152,6 @@ export class CollabComponent implements OnInit, OnDestroy {
     if (this.loadStatus$) {
       this.loadStatus$.unsubscribe()
     }
-    this.errorSub$.unsubscribe()
   }
 
   selectedChat(chatroom: string) {
@@ -204,12 +193,26 @@ export class CollabComponent implements OnInit, OnDestroy {
     this.joinRoomVisible = false
     this.messageSvc.newJoin = true
     const roomId = this.joinForm.value['id']
-    this.messageSvc.joinRoom(roomId);
-    this.ngrxStore.dispatch(joinChatRoom({ id: this.uid, roomId }))
+
+    // check if chat room exists
+    firstValueFrom(this.chatSvc.checkExistingChatroom(this.joinForm.value['id']))
+      .then((value) => {
+        // only subscribe if chat room exist
+        console.info('existing chatroom')
+        this.currentChatRoom = value.name
+        this.messageSvc.joinRoom(roomId);
+        this.ngrxStore.dispatch(joinChatRoom({ id: this.uid, roomId }))
+        this.ngrxStore.dispatch(enterChatRoom({ name: this.currentChatRoom }))
+        this.joinForm.reset()
+        this.router.navigate([`/chat/${roomId}`])
+      })
+      .catch(() => {
+        console.info('no such chat room')
+        this.router.navigate([`/collab`])
+        alert(`chat room does not exist`)
+      }
+      )
     this.joinForm.reset()
-    if(this.error.length==0){
-      this.router.navigate([`/chat/${roomId}`])
-    }
   }
 
   // search chat room dialog

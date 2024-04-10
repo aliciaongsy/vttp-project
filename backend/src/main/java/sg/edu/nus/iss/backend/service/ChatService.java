@@ -32,6 +32,21 @@ public class ChatService {
 
     public ResponseEntity<String> getChatRoomDetails(String roomId) {
         ChatRoom room = chatRepo.getDetailsByRoomId(roomId);
+
+        if (room == null){
+            JsonObject o = buildJsonObject("error", "chat room does not exist");
+            return ResponseEntity.badRequest().body(o.toString());
+        }
+        return ResponseEntity.ok(room.toJson(room).toString());
+    }
+
+    public ResponseEntity<String> checkExistingChatroom(String roomId) {
+        ChatRoom room = chatRepo.getDetailsByRoomId(roomId);
+
+        if (room == null){
+            JsonObject o = buildJsonObject("error", "chat room does not exist");
+            return ResponseEntity.badRequest().body(o.toString());
+        }
         return ResponseEntity.ok(room.toJson(room).toString());
     }
 
@@ -48,7 +63,7 @@ public class ChatService {
 
     @Transactional(rollbackFor = { ChatRoomException.class, ChatListException.class })
     public void joinRoom(String id, String name, String roomId) throws ChatListException, ChatRoomException {
-        chatRepo.addNewUser(roomId, id);
+        chatRepo.addNewUser(roomId, id, name);
         chatRepo.joinChatRoom(id, roomId);
     }
 
@@ -70,8 +85,8 @@ public class ChatService {
     }
 
     @Transactional(rollbackFor = { ChatRoomException.class, ChatListException.class })
-    public void leaveRoom(String id, String roomId) throws ChatRoomException, ChatListException {
-        chatRepo.removeUserFromChatRoom(roomId, id);
+    public void leaveRoom(String id, String roomId, String name) throws ChatRoomException, ChatListException {
+        chatRepo.removeUserFromChatRoom(roomId, id, name);
         chatRepo.leaveChatRoom(id, roomId);
     }
 

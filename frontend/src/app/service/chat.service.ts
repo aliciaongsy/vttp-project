@@ -21,12 +21,16 @@ export class ChatService {
     return this.http.get<ChatRoom>(`${URL}/api/chat/details/${roomId}`)
   }
 
-  joinChatRoom(userId: string, name: string, roomId: string): Promise<any> {
+  checkExistingChatroom(roomId:string): Observable<ChatRoom> {
+    return this.http.get<ChatRoom>(`${URL}/api/chat/existing/${roomId}`)
+  }
+
+  joinChatRoom(userId: string, name: string, roomId: string): Observable<any> {
     const payload = {
       id: userId,
       name: name
     }
-    return firstValueFrom(this.http.post<any>(`${URL}/api/chat/join/${roomId}`, payload))
+    return this.http.post<any>(`${URL}/api/chat/join/${roomId}`, payload)
   }
 
   createChatRoom(chatRoom: ChatRoom): Promise<any> {
