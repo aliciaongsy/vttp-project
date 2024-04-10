@@ -35,6 +35,10 @@ export const changeAuthStatus = createAction(
     props<{ email: string }>()
 )
 
+export const resetAuthStatus = createAction(
+    '[Planner Page] Reset Auth Status'
+)
+
 export const resetPlannerState = createAction(
     '[Planner Page] Reset State'
 )

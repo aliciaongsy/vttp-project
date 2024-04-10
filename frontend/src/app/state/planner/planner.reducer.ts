@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { addEvent, changeAuthStatus, changeCalendarMode, loadAllEvents, loadAllEventsFromService, loadAllOutstandingTasks, loadAllOutstandingTasksFromService, resetPlannerState } from "./planner.actions";
+import { addEvent, changeAuthStatus, changeCalendarMode, loadAllEvents, loadAllEventsFromService, loadAllOutstandingTasks, loadAllOutstandingTasksFromService, resetAuthStatus, resetPlannerState } from "./planner.actions";
 import { Event, Task } from "../../model";
 
 export interface PlannerState {
@@ -54,6 +54,11 @@ export const plannerReducer = createReducer(
         ...state,
         authStatus: true,
         email: email
+    })),
+    on(resetAuthStatus, (state) => ({
+        ...state,
+        authStatus: false,
+        email: ''
     })),
     on(resetPlannerState, (state) => ({
         id: '',
