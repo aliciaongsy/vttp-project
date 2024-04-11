@@ -70,7 +70,7 @@
                     </div>
                     <div *ngIf="chatList$ | async as chatList">
                         <p *ngFor="let c of chatList" width="max" [routerLink]="['/chat', c.roomId]"
-                            (click)="selectedChat(c.name)">{{c.name}}</p>
+                            (click)="selectedChat(c.name)" style="cursor: pointer;">{{c.name}}</p>
                     </div>
                 </div>
             </ng-template>
@@ -112,18 +112,22 @@
                             </p-dialog>
                         </div>
                         <div>
-                            <p-scroller [items]="messageList" [itemSize]="messageList.length" [showLoader]="true" scrollHeight="450px"
+                            <p-scroller [items]="messageList" [itemSize]="messageLength" [showLoader]="true" scrollHeight="450px"
                             [style]="{'height': '450px'}">
                                 <ng-template pTemplate="item" let-item>
-                                    <div class="message"
-                                        [ngClass]="{'left': item.sender !== name&&item.type==='CHAT', 'right': item.sender === name&&item.type==='CHAT', 'middle': item.type==='LEAVE'||item.type=='JOIN'}">
+                                    <p class="middle">{{item.date}}</p>
+                                    <div *ngFor="let message of item.message">
+                                        <div class="message"
+                                        [ngClass]="{'left': message.sender !== name&&message.type==='CHAT', 'right': message.sender === name&&message.type==='CHAT', 'middle': message.type==='LEAVE'||message.type=='JOIN'}">
                                         <div class="bubble">
-                                            <p *ngIf="item.sender !== name&&item.type==='CHAT'" style="border-bottom: 1px solid #010662;">
-                                                {{item.sender}}:</p>
-                                            <p>{{item.content}}</p>
-                                            <p *ngIf="item.type==='CHAT'" class="date">{{ item.timestamp | date: 'dd/MM/yy, h:mm a' }}</p>
+                                            <p *ngIf="message.sender !== name&&message.type==='CHAT'" style="border-bottom: 1px solid #010662;">
+                                                {{message.sender}}:</p>
+                                            <p>{{message.content}}</p>
+                                            <p *ngIf="message.type==='CHAT'" class="date">{{ message.timestamp | date: 'h:mm a' }}</p>
                                         </div>
                                     </div>
+                                    </div>
+                                    
                                 </ng-template>
                             </p-scroller>
                             <form [formGroup]="messageForm">

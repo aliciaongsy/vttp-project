@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectChats, selectJoinStatus, selectStatus, selectUserDetails } from '../../state/user/user.selectors';
+import { selectChats, selectStatus, selectUserDetails } from '../../state/user/user.selectors';
 import { Observable, Subscription, firstValueFrom } from 'rxjs';
 import { WebSocketService } from '../../service/websocket.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -66,6 +66,7 @@ export class CollabComponent implements OnInit, OnDestroy {
 
   first: number = 0;
   rows: number = 5;
+  messageLength!: number;
 
   ngOnInit(): void {
     this.loginSub$ = this.ngrxStore.select(selectStatus)
@@ -85,6 +86,30 @@ export class CollabComponent implements OnInit, OnDestroy {
               this.messageSub$ = this.ngrxStore.select(selectMessages).subscribe(
                 (value) => {
                   this.messageList = value
+                  this.messageLength = value.length
+
+                  // group messages by date
+                  const groups = this.messageList.reduce((groups, message) => {
+                    var date= new Date(message.timestamp).toISOString().split('T')[0]
+                    if (!groups[date]) {
+                      groups[date] = [];
+                    }
+                    groups[date].push(message);
+                    return groups;
+                  }, {});
+
+                  this.messageList = Object.keys(groups).map((date) => {
+                    // change date format to dd-MM-yyyy
+                    const day = date.split('-')[2] as string
+                    const month = date.split('-')[1] as string
+                    const year = date.split('-')[0] as string
+                    const d = day+'-'+month+'-'+year
+                    return {
+                      date: d,
+                      message: groups[date]
+                    };
+                  });
+
                 }
               )
             }
