@@ -19,7 +19,7 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td><p-button (onClick)="createChannel()" size="small" height="40px"
+                            <td><p-button (click)="createChannel()" size="small" height="40px"
                                     [disabled]="form.invalid">Create</p-button></td>
                         </tr>
                     </table>
@@ -31,7 +31,7 @@
                 <p-button size="small" (click)="findPublicChatRoom()">Find Public ChatRooms</p-button>
                 <form [formGroup]="joinForm" style="padding-top: 1ch;">
                     Room ID: <input pInputText type="text" formControlName="id">
-                    <p-button (onClick)="joinRoom()" size="small" height="40px"
+                    <p-button (click)="joinRoom()" size="small" height="40px"
                         [disabled]="joinForm.invalid">Join</p-button>
                 </form>
             </p-dialog>
@@ -41,7 +41,7 @@
                 <form [formGroup]="searchForm">
                     <input pInputText type="text" placeholder="Search topics, eg. productivity" style="width: 90%;"
                         formControlName="search">
-                    <p-button (onClick)="searchRoom()" size="small" height="40px" icon="pi pi-search"
+                    <p-button (click)="searchRoom()" size="small" height="40px" icon="pi pi-search"
                         [style]="{'width': '10%'}" [disabled]="searchForm.invalid"></p-button>
                 </form>
                 <div *ngIf="searchResult$ | async as results" class="results">
@@ -50,7 +50,7 @@
                     </div>
                     <div *ngFor="let result of results" class="result">
                         {{result.name}}
-                        <p-button [style]="{'height': '10px'}" (onClick)="joinPublicRoom(result.roomId)">+</p-button>
+                        <p-button [style]="{'height': '10px'}" (click)="joinPublicRoom(result.roomId, result.name)" [disabled]="">+</p-button>
                     </div>
                     <div *ngIf="results.length>5">
                         <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows"
@@ -133,7 +133,7 @@
                             <form [formGroup]="messageForm">
                                 <input pInputText type="text" formControlName="message"
                                     style="width: 95%; padding-top: 1ch;" placeholder="enter a message...">
-                                <p-button (onClick)="sendMessage()" size="small" height="40px" icon="pi pi-send"
+                                <p-button (click)="sendMessage()" size="small" height="40px" icon="pi pi-send"
                                     [style]="{'width': '5%'}" [disabled]="messageForm.invalid"></p-button>
                             </form>
                         </div>

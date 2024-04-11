@@ -252,9 +252,23 @@ export class CollabComponent implements OnInit, OnDestroy {
     this.searchForm.reset()
   }
 
-  joinPublicRoom(roomId: string) {
-    this.messageSvc.joinRoom(roomId);
-    this.ngrxStore.dispatch(joinChatRoom({ id: this.uid, roomId }))
+  joinPublicRoom(roomId: string, name: string) {
+    firstValueFrom(this.chatSvc.checkIfUserJoined(this.uid, roomId))
+      .then(() => {
+        this.messageSvc.newJoin = true
+        this.messageSvc.joinRoom(roomId);
+        this.ngrxStore.dispatch(joinChatRoom({ id: this.uid, roomId }))
+        this.ngrxStore.dispatch(enterChatRoom({ name }))
+        this.router.navigate([`/chat/${roomId}`])
+      })
+      .catch(() => {
+        if(confirm('you are already a member of this chat room\nclick ok to redirect to chat room')){
+          this.messageSvc.joinRoom(roomId);
+          this.ngrxStore.dispatch(joinChatRoom({ id: this.uid, roomId }))
+          this.ngrxStore.dispatch(enterChatRoom({ name }))
+          this.router.navigate([`/chat/${roomId}`])
+        }
+      })
   }
 
   sendMessage() {

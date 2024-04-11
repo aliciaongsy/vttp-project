@@ -163,6 +163,21 @@ public class ChatRepository {
         }
     }
 
+    /* db.chatlist.find({
+        id: "d73726d8",
+        "chats": {"$elemMatch": {"roomId": "811cc6"}}
+    }); */        
+    public boolean checkIfUserJoined(String id, String roomId){
+        Criteria criteria = Criteria.where("id").is(id)
+                    .andOperator(Criteria.where("chats").elemMatch(Criteria.where("roomId").is(roomId)));
+
+        Query query = new Query(criteria);
+
+        List<Document> docs = template.find(query, Document.class, "chatlist");
+
+        return !(docs.isEmpty());
+    }
+
     public void joinChatRoom(String id, String roomId) throws ChatListException, ChatRoomException {
 
         // chat if it is a valid room id
@@ -189,21 +204,11 @@ public class ChatRepository {
             }
         }
         else{
-            // db.chatlist.find({
-            // id: "d73726d8",
-            // "chats": {"$elemMatch": {"roomId": "811cc6"}}
-            // });
-
             // check if user has already joined the chat room
-            Criteria criteria2 = Criteria.where("id").is(id)
-                    .andOperator(Criteria.where("chats").elemMatch(Criteria.where("roomId").is(roomId)));
-
-            Query query2 = new Query(criteria2);
-
-            List<Document> docs2 = template.find(query2, Document.class, "chatlist");
+            boolean joined = checkIfUserJoined(id, roomId);
 
             // user is already in the chat room
-            if (!docs2.isEmpty()) {
+            if (joined) {
                 throw new ChatListException("user is already in the chat room");
             }
 

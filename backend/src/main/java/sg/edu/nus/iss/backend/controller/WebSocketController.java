@@ -144,6 +144,13 @@ public class WebSocketController {
         JsonObjectBuilder b = Json.createObjectBuilder();
         b.add("message", "successfully created new chat room");
         return ResponseEntity.ok().body(b.build().toString());
+
+    }
+
+    @GetMapping("/api/chatroom/{roomId}/exist")
+    @ResponseBody
+    public ResponseEntity<String> checkIfUserJoined(@PathVariable String roomId, @RequestParam String id){
+        return chatSvc.checkIfUserJoined(id, roomId);
     }
 
     @GetMapping("/api/chats/public")

@@ -61,6 +61,17 @@ public class ChatService {
         return ResponseEntity.ok(b.build().toString());
     }
 
+    public ResponseEntity<String> checkIfUserJoined(String id, String roomId){
+        boolean joined = chatRepo.checkIfUserJoined(id, roomId);
+
+        if (joined) {
+            JsonObject o = buildJsonObject("error", "user is already in the chat room");
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
+        }
+        JsonObject o = buildJsonObject("message", "user is not in the chat room");
+        return ResponseEntity.ok(o.toString());
+    }
+
     @Transactional(rollbackFor = { ChatRoomException.class, ChatListException.class })
     public void joinRoom(String id, String name, String roomId) throws ChatListException, ChatRoomException {
         chatRepo.addNewUser(roomId, id, name);
