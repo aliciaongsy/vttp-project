@@ -4,6 +4,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,9 @@ import sg.edu.nus.iss.backend.service.GoogleCalService;
 @RequestMapping("/api")
 public class GoogleCalController {
 
+	@Value("${url}")
+	private String url;
+
 	@Autowired
 	private GoogleCalService googleSvc;
 
@@ -60,9 +64,9 @@ public class GoogleCalController {
 		email = googleSvc.getEmail();
 
 		if (authStatus) {
-			return new RedirectView("http://localhost:8080/api/google/auth/success");
+			return new RedirectView(String.format("%s%s", url,"/api/google/auth/success"));
 		} else {
-			return new RedirectView("http://localhost:8080/api/google/auth/error");
+			return new RedirectView(String.format("%s%s", url,"/api/google/auth/error"));
 		}
 
 	}
