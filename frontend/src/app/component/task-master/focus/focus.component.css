@@ -55,6 +55,32 @@
     border: 1px solid #FFF9F4;
 }
 
+.info{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding-right: 1mm;
+    padding-bottom: 1mm;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+    background: #FFF9F4;
+    padding-bottom: 0;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+    background: #FFF9F4;
+    color: #010662;
+}
+
+ol{
+    padding-left: 1em;
+}
+
+li{
+    margin: 1ch;
+}
+
 /* :host ::ng-deep .p-button:hover{
     border: 1px solid #010662;
     background: #d4dbe3;

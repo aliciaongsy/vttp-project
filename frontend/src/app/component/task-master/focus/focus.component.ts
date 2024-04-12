@@ -34,6 +34,7 @@ export class FocusComponent implements OnInit, OnDestroy {
 
   // dialog
   visible: boolean = false
+  infoVisible: boolean = false
 
   ngOnInit(): void {
     this.changeToPomodoro()
@@ -226,6 +227,10 @@ export class FocusComponent implements OnInit, OnDestroy {
         )
       }
     }
+  }
+
+  openInfo(){
+    this.infoVisible = true
   }
 
 }
