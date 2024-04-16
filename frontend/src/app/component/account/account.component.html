@@ -10,7 +10,8 @@
         <p>Name: {{userDetail.name}}</p>
         <p>ID: {{userDetail.id}}</p>
         <p>Email: {{userDetail.email}}</p>
-        <p>Joined: {{userDetail.createDate | date: 'dd/MM/yyyy'}}</p>
+        <p style="margin-bottom: 2ch;">Joined: {{userDetail.createDate | date: 'dd/MM/yyyy'}}</p>
+        <a href="https://t.me/tasks_sync_bot" class="button" target="_blank"><span class="pi pi-telegram"></span> task buddy bot</a>
     </div>
     <div class="display">
         <p-toast></p-toast>
@@ -22,30 +23,45 @@
             <div class="row">
                 <div class="row-item">
                     <h4>Tasks summary:</h4>
-                    <div class="center">
-                        <p-chart *ngIf="taskSummary!=''" type="doughnut" [data]="data" [options]="options"
-                            width="200px"></p-chart>
+                    <div *ngIf="taskSummary && taskSummary!='' && taskSummary.total!=0" class="center">
+                        <p-chart *ngIf="taskSummary && taskSummary!='' && taskSummary.total!=0 " type="doughnut" [data]="data"
+                            [options]="options" width="200px"></p-chart>
                     </div>
+                    <p *ngIf="taskSummary=='' || taskSummary.total==0 ">no available data!</p>
                 </div>
                 <p-divider layout="vertical"></p-divider>
-                <div class="row-item">
-                    <h4>Outstanding tasks:</h4>
-                    <p *ngFor="let t of tasks">{{t.task}} (due: <i>{{t.due | date: 'dd/MM/yyyy'}}</i>)</p>
+                <div style="overflow: auto;">
+                    <h4>7 days focus session data:</h4>
+                    <p-chart *ngIf="date.length!=0" type="bar" [data]="barData" [options]="barOptions" width="500px"></p-chart>
+                    <p *ngIf="date.length==0">no available data!</p>
                 </div>
-                <p-divider layout="vertical"></p-divider>
             </div>
             <p-divider></p-divider>
             <div class="row">
-                <div class="row-item">
+                <div class="row-item scroll">
+                    <h4>Outstanding tasks:</h4>
+                    <p *ngIf="tasks.length==0 || workspaces.length==0">no outstanding tasks (˶ᵔ ᵕ ᵔ˶)</p>
+                    <div *ngIf="tasks.length!=0 && workspaces.length!=0">
+                        <p *ngFor="let t of tasks">{{t.task}}</p>
+                    </div>
+                </div>
+                <p-divider layout="vertical"></p-divider>
+                <div class="row-item scroll">
                     <h4>Active workspaces:</h4>
-                    <p class="route" *ngFor="let w of workspaces" [routerLink]="['/workspace', w]">{{w}}</p>
+                    <p *ngIf="workspaces.length==0">no workspaces</p>
+                    <div *ngIf="workspaces.length!=0">
+                        <p class="route" *ngFor="let w of workspaces" [routerLink]="['/workspace', w]">{{w}}</p>
+                    </div>
                 </div>
                 <p-divider layout="vertical"></p-divider>
-                <div class="row-item">
+                <div class="row-item scroll">
                     <h4>Active chat rooms:</h4>
-                    <p class="route" *ngFor="let c of chatDetails" [routerLink]="['/chat', c.roomId]">{{c.name}}</p>
+                    <p *ngIf="chatDetails.length==0">no active chat rooms</p>
+                    <div *ngIf="chatDetails.length!=0">
+                        <p class="route" *ngFor="let c of chatDetails" [routerLink]="['/chat', c.roomId]"
+                        (click)="enterRoom(c.name)">{{c.name}}</p>
+                    </div>
                 </div>
-                <p-divider layout="vertical"></p-divider>
             </div>
         </div>
         <div *ngIf="currentTab=='Account'" style="height: 80%">
@@ -80,8 +96,8 @@
                                                     output="base64"></image-cropper>
                                             </div>
                                             <div class="row-button">
-                                                <p-button (click)="crop()">Crop</p-button>
                                                 <p-button (click)="closeDialog()">Cancel</p-button>
+                                                <p-button (click)="crop()">Crop</p-button>                                                
                                             </div>
                                         </p-dialog>
                                     </td>
@@ -113,31 +129,36 @@
                                     <td>New Password: </td>
                                     <td><input pInputText type="password" formControlName="new"></td>
                                 </tr>
-                                <tr *ngIf="changePasswordForm.controls['new'].dirty && changePasswordForm.get('new')?.errors?.['pattern']" class="error">
+                                <tr *ngIf="changePasswordForm.controls['new'].dirty && changePasswordForm.get('new')?.errors?.['pattern']"
+                                    class="error">
                                     <td></td>
-                                    <td>hint: min 8 characters - 1 special character, 1 digit, 1 uppercase, 1 lowercase</td>
+                                    <td>hint: min 8 characters - 1 special character, 1 digit, 1 uppercase, 1 lowercase
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Confirm New Password: </td>
                                     <td><input pInputText type="password" formControlName="confirm"></td>
                                 </tr>
-                                <tr *ngIf="changePasswordForm.controls['confirm'].dirty && unmatchedPassword()" class="error">
+                                <tr *ngIf="changePasswordForm.controls['confirm'].dirty && unmatchedPassword()"
+                                    class="error">
                                     <td></td>
                                     <td>password does not match</td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><p-button type="submit" [disabled]="unmatchedPassword()"
+                                    <td><p-button type="submit" [disabled]="unmatchedPassword() || changePasswordForm.invalid"
                                             [style]="{'height': '40px'}">Change</p-button></td>
                                 </tr>
                             </table>
                         </form>
                     </div>
                     <div *ngIf="accountTab=='delete'">
-                        <form [formGroup]="changePasswordForm" (submit)="changePassword()">
+                        <form [formGroup]="deleteAccountForm" (submit)="deleteAccount()">
                             <table>
                                 <tr>
-                                    <td><h3 style="color:crimson">Delete Account</h3></td>
+                                    <td>
+                                        <h3 style="color:crimson">Delete Account</h3>
+                                    </td>
                                     <td></td>
                                 </tr>
                                 <tr>
@@ -146,11 +167,14 @@
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><p style="padding: 1ch 0; margin: 0"><i style="color: crimson;">Enter current password to proceed</i></p></td>
+                                    <td>
+                                        <p style="padding: 1ch 0; margin: 0"><i style="color: crimson;">Enter current
+                                                password to proceed</i></p>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><p-button type="submit" [disabled]="unmatchedPassword()"
+                                    <td><p-button type="submit" [disabled]="deleteAccountForm.invalid"
                                             [style]="{'height': '40px'}">Delete</p-button></td>
                                 </tr>
                             </table>

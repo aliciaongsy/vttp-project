@@ -7,10 +7,6 @@ export const selectCurrentDate = createSelector(
     selectFocus,
     (state: FocusState) => state.currentDate
 )
-export const selectDuration = createSelector(
-    selectFocus,
-    (state: FocusState) => state.todayFocusDuration
-)
 export const selectSessions = createSelector(
     selectFocus,
     (state: FocusState) => state.sessions

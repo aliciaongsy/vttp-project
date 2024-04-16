@@ -6,10 +6,6 @@
                 <td>Name:</td>
                 <td><input type="text" formControlName="name"></td>
             </tr>
-            <!-- <tr *ngIf="form.dirty && form.controls['name'].invalid">
-                <td></td>
-                <td style="color: rgb(191, 23, 43);">minimum 3 characters</td>
-            </tr> -->
             <tr *ngIf="form.controls['name'].dirty && form.get('name')?.errors" class="error">
                 <td></td>
                 <td>minimum 3 characters</td>
@@ -44,7 +40,7 @@
             </tr>
             <tr>
                 <td></td>
-                <td><p-button type="submit" size="small">Sign up</p-button></td>
+                <td><p-button type="submit" size="small" [disabled]="unmatchedPassword() || form.invalid">Sign up</p-button></td>
             </tr>
         </table>
         <p>Already a member? <a [routerLink]="['/login']">Sign in here!</a></p>

@@ -12,15 +12,15 @@ export class FocusService {
 
   private http = inject(HttpClient)
 
-  getSessions(id: string, workspace: string){
-    return this.http.get<FocusSession[]>(`${URL}/api/${id}/${workspace}/sessions`)
+  getSessions(id: string){
+    return this.http.get<FocusSession[]>(`${URL}/api/${id}/focus/sessions`)
   }
 
-  addSessions(id: string, workspace: string, date: string, duration: number){
+  addSessions(id: string, date: string, duration: number){
     const data = {
       date: date,
       duration: duration
     }
-    return this.http.post<any>(`${URL}/api/${id}/${workspace}/session/new`, data)
+    return this.http.post<any>(`${URL}/api/${id}/focus/session/new`, data)
   }
 }

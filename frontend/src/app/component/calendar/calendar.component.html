@@ -1,23 +1,28 @@
-<div class="row">
-    <div *ngIf="tasks$ | async as tasks" id="draggable">
-        <p>
-            <strong>Outstanding Tasks</strong>
-        </p>
-        <div *ngFor="let t of tasks">
-            <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
-                <div class='fc-event-main'>{{t.task}}</div>
+<div *ngIf="loginStatus else noAccess" style="height: 100%">
+    <div class="row">
+        <div *ngIf="tasks$ | async as tasks" id="draggable">
+            <p>
+                <strong>Outstanding Tasks</strong>
+            </p>
+            <div *ngFor="let t of tasks">
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
+                    <div class='fc-event-main'>{{t.task}}</div>
+                </div>
             </div>
         </div>
-    </div>
-    <div id="calendar-container">
-        <div *ngIf="authStatus==false" style="padding: 1ch 0">
-            <!-- <p-button icon="pi pi-sync" size="small" [style]="{'background':'#FFF9F4', 'color': '#010662', 'border': 'none'}">Sync with Google Calendar</p-button> -->
-            <a href="{{googleLoginUrl}}" target="_blank" (click)="syncCal()"><i class="pi pi-sync" style="font-size: 1rem"></i> Sync with Google Calendar</a>
+        <div id="calendar-container">
+            <p-toast key="success" position="top-right"></p-toast>
+            <div *ngIf="authStatus==false" style="padding: 1ch 0">
+                <a href="{{googleLoginUrl}}" target="_blank" (click)="syncCal()"><i class="pi pi-link"
+                        style="font-size: 1rem"></i> Link to Google Calendar</a>
+            </div>
+            <div *ngIf="authStatus">
+                <p>Linked to Google Calendar: <i>{{userEmail}}</i></p>
+            </div>
+            <div id="calendar"></div>
         </div>
-        <div *ngIf="authStatus">
-            <p>Synced with Google Calendar: <i>{{userEmail}}</i></p>
-        </div>
-        <!-- <full-calendar [options]="calendarOptions" id="cal"></full-calendar> -->
-        <div id="calendar"></div>
     </div>
 </div>
+<ng-template #noAccess>
+    <h2 style="padding: 0 2ch;"><a [routerLink]="['/login']" style="color:#010662">Login</a> to access this feature</h2>
+</ng-template>

@@ -26,6 +26,11 @@ export const loadChatRoom = createAction(
     props<{ roomId: string }>()
 )
 
+export const loadChatRoomError = createAction(
+    '[Chat Page] Load Chat Room Error',
+    props<{ error: string }>()
+)
+
 export const loadChatRoomFromService = createAction(
     '[Chat Page] Load Chat Room From Service',
     props<{ chatRoom: ChatRoom }>()

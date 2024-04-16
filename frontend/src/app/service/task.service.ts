@@ -18,7 +18,7 @@ export class TaskService {
       .set('id', id)
 
     // endpoint: localhost:8080/api/workspace/all?id=
-    return firstValueFrom(this.http.get<string[]>(`${URL}/api/workspace/all`, {params}))
+    return this.http.get<string[]>(`${URL}/api/workspace/all`, {params})
   }
 
   addWorkspace(id: string, workspace: string){
@@ -53,12 +53,17 @@ export class TaskService {
     return this.http.put<any>(`${URL}/api/${id}/${workspace}/task/complete`, payload)
   }
 
-  deleteTask(id: string, workspace: string, taskId: string){
-    return this.http.delete<any>(`${URL}/api/${id}/${workspace}/task/delete/${taskId}`)
+  deleteTask(id: string, workspace: string, taskId: string, completed: boolean){
+    const params = new HttpParams()
+      .set("completed", completed);
+    
+    return this.http.delete<any>(`${URL}/api/${id}/${workspace}/task/delete/${taskId}`, { params })
   }
 
-  updateTask(id: string, workspace: string, taskId: string, task: Task){
-    return this.http.put<any>(`${URL}/api/${id}/${workspace}/task/update/${taskId}`, task)
+  updateTask(id: string, workspace: string, taskId: string, task: Task, statusChange: boolean){
+    const params = new HttpParams()
+      .set("completeStatusChange", statusChange);
+    return this.http.put<any>(`${URL}/api/${id}/${workspace}/task/update/${taskId}`, task, { params })
   }
 
   getAllOutstandingTasks(id: string){
@@ -69,5 +74,14 @@ export class TaskService {
     return this.http.get<any>(`${URL}/api/${id}/tasks/summary`)
   }
 
+  getUpdateCount(){
+    return this.http.get<any>(`${URL}/api/telegram/updates`)
+  }
 
+  updateCount(count: number){
+    const params = new HttpParams()
+      .set("updateCount", count);
+
+    return firstValueFrom(this.http.get<any>(`${URL}/api/telegram/updated`, { params }))
+  }
 }

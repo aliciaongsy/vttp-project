@@ -6,6 +6,10 @@ export const changeStatus = createAction(
     props<{ currUser: UserDetails }>()
 )
 
+export const loadAllData = createAction(
+    '[User Page] Load All Data'
+)
+
 export const addWorkspace = createAction(
     '[User Page] Add Workspace',
     props<{ workspace: string }>()

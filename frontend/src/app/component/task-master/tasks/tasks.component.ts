@@ -2,13 +2,14 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Task } from '../../../model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
+import { Observable, Subscription, firstValueFrom, interval, map } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectUserDetails } from '../../../state/user/user.selectors';
 import { addTask, changeCompleteStatus, deleteTask, loadAllTasks, updateTask } from '../../../state/tasks/task.actions';
 import { selectActionStatus, selectTask } from '../../../state/tasks/task.selector';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
+import { TaskService } from '../../../service/task.service';
 
 interface Column {
   field: string;
@@ -27,6 +28,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   private activatedRoute = inject(ActivatedRoute)
   private ngrxStore = inject(Store)
   private messageSvc = inject(MessageService)
+  private taskSvc = inject(TaskService)
 
   taskForm!: FormGroup
   minDate!: Date
@@ -58,13 +60,18 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   paramSub$!: Subscription | undefined
 
+  teleSub$!: Subscription
+
   ngOnInit(): void {
     this.taskForm = this.createForm()
     this.minDate = new Date()
 
-    var date = new Date()
-    date.setDate(date.getDate() - 1)
-    this.dueDate = date
+    this.dueDate = new Date()
+    // this.dueDate.setDate(this.dueDate.getDate() - 1)
+    this.dueDate.setHours(0)
+    this.dueDate.setMinutes(0)
+    this.dueDate.setSeconds(0)
+    this.dueDate.setMilliseconds(0)
     console.info(this.dueDate)
 
     // get workspace name - get parent path variable {workspace}/tasks
@@ -111,6 +118,16 @@ export class TasksComponent implements OnInit, OnDestroy {
       }
     )
 
+    this.teleSub$ = interval(5000).subscribe(() => 
+      this.taskSvc.getUpdateCount().subscribe(
+        (value) => {
+          if(value.count > 0){
+            console.info(value.count)
+            this.ngrxStore.dispatch(loadAllTasks({id: this.uid, workspace: this.currentWorkspace}))
+            this.taskSvc.updateCount(value.count)
+          }
+        }))
+
   }
 
   ngOnDestroy(): void {
@@ -136,6 +153,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   formDialog() {
     this.visible = true
+    this.taskForm = this.createForm()
   }
 
   addTask() {
@@ -197,19 +215,22 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
   completedSwitch(data: Task) {
+    console.info(data)
     var task: Task = {
       id: data.id,
       task: data.task,
-      status: !(data.completed) ? "Completed" : data.status === 'Completed' ? "In Progress" : data.status,
+      status: (data.completed) ? "Completed" : data.status === 'Completed' ? "In Progress" : data.status,
       priority: data.priority,
       start: data.start,
       due: data.due,
-      completed: !(data.completed)
+      completed: (data.completed)
     }
     console.info(task)
     const taskId = data.id
     // dispatch action to update completed boolean
     this.ngrxStore.dispatch(changeCompleteStatus({ taskId: taskId!, task: task, completed: task.completed }))
+
+    this.currentAction = 'update'
   }
 
   // --- editing task ---
@@ -226,7 +247,7 @@ export class TasksComponent implements OnInit, OnDestroy {
     })
   }
 
-  updateTask() {
+  updateTask(data: Task) {
     const task = this.taskForm.value as Task
     task.id = this.editId
     task.start = this.taskForm.value.start.getTime()
@@ -234,8 +255,11 @@ export class TasksComponent implements OnInit, OnDestroy {
     task.completed = this.taskForm.value.status == "Completed" ? true : false
     console.info(task)
 
+    const statusChange: boolean = ((data.status!="Completed") && (this.taskForm.value.status=='Completed')) || ((data.status=="Completed") && (this.taskForm.value.status!='Completed'))
+    console.info(statusChange)
+
     // dispatch action to update task
-    this.ngrxStore.dispatch(updateTask({ taskId: this.editId, task: task }))
+    this.ngrxStore.dispatch(updateTask({ taskId: this.editId, task: task, completeStatusChange: statusChange }))
 
     // close dialog
     this.editVisible = false

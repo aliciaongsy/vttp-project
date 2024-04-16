@@ -1,9 +1,8 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { firstValueFrom } from 'rxjs';
 import { selectCurrentDate } from '../../../state/focus/focus.selector';
-import { incFocusDuration, persistData, resetState } from '../../../state/focus/focus.actions';
-import { selectUserDetails } from '../../../state/user/user.selectors';
+import { incFocusDuration, setCurrentDate } from '../../../state/focus/focus.actions';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -11,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './focus.component.html',
   styleUrl: './focus.component.css'
 })
-export class FocusComponent implements OnInit, OnDestroy {
+export class FocusComponent implements OnInit {
 
   private ngrxStore = inject(Store)
   private activatedRoute = inject(ActivatedRoute)
@@ -43,13 +42,6 @@ export class FocusComponent implements OnInit, OnDestroy {
     this.currentWorkspace = this.activatedRoute.parent?.snapshot.params['w']
   }
 
-  ngOnDestroy(): void {
-    if (this.update) {
-      firstValueFrom(this.ngrxStore.select(selectUserDetails)).then((value) => {
-        this.ngrxStore.dispatch(persistData({ id: value.id, workspace: this.currentWorkspace }))
-      })
-    }
-  }
 
   changeToPomodoro() {
     document.querySelector(`#${this.timerMode}`)?.classList.remove('active')
@@ -188,8 +180,8 @@ export class FocusComponent implements OnInit, OnDestroy {
   }
 
   countdown() {
+    this.ngrxStore.dispatch(setCurrentDate())
     if (this.isRunning) {
-      const date = new Date().toISOString().split('T')[0]
       const duration = this.duration / (60 * 1000)
 
       const currentTime = performance.now();
@@ -212,16 +204,9 @@ export class FocusComponent implements OnInit, OnDestroy {
           value => {
             // only persist data if it is in the pomodoro or custom mode
             if (this.timerMode == 'pomodoro' || this.timerMode == 'custom') {
-              if (value == date) {
-                console.info(value)
-                this.ngrxStore.dispatch(incFocusDuration({ duration }))
-              }
-              // in the event that user use the timer pass midnight
-              else {
-                console.info(date)
-                console.info('reset')
-                this.ngrxStore.dispatch(resetState({ duration }))
-              }
+              console.info(value)
+              this.update = true
+              this.ngrxStore.dispatch(incFocusDuration({ duration }))
             }
           }
         )
@@ -229,7 +214,7 @@ export class FocusComponent implements OnInit, OnDestroy {
     }
   }
 
-  openInfo(){
+  openInfo() {
     this.infoVisible = true
   }
 

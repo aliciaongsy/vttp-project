@@ -23,3 +23,7 @@ export const selectChatRoom = createSelector(
     selectChat,
     (state: ChatState) => state.chatRoom
 )
+export const selectError = createSelector(
+    selectChat,
+    (state: ChatState) => state.error
+)

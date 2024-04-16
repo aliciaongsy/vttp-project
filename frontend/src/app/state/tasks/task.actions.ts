@@ -36,7 +36,7 @@ export const deleteTaskError = createAction(
 // --- update task ---
 export const updateTask = createAction(
     '[Task Page] Update Task',
-    props<{ taskId: string, task: Task }>()
+    props<{ taskId: string, task: Task, completeStatusChange: boolean }>()
 )
 
 export const updateTaskSuccess = createAction(

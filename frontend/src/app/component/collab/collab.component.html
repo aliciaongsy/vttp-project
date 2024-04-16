@@ -1,145 +1,168 @@
-<div class="base">
-    <div class="row">
-        <h2>Welcome to collaborative space!</h2>
-        <div>
-            <p-button icon="pi pi-plus" label="Create Room" size="small" (click)="create()"
-                [style]="{ margin: '0 1ch'}"></p-button>
-            <p-dialog header="Create new room" [(visible)]="createRoomVisible" [modal]="true" [style]="{ width: '40vw'}"
-                [draggable]="false" [resizable]="false"
-                [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
-                <form [formGroup]="form">
-                    <table>
-                        <tr>
-                            <td>Room Name:</td>
-                            <td><input pInputText type="text" formControlName="name"></td>
-                        </tr>
-                        <tr>
-                            <td>Room Type:</td>
-                            <td><p-dropdown formControlName="type" [options]="types" appendTo="body"></p-dropdown></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td><p-button (click)="createChannel()" size="small" height="40px"
-                                    [disabled]="form.invalid">Create</p-button></td>
-                        </tr>
-                    </table>
-                </form>
-            </p-dialog>
-            <p-button icon="pi pi-plus" label="Join Room" size="small" (click)="join()"></p-button>
-            <p-dialog header="Join existing room" [(visible)]="joinRoomVisible" [modal]="true" [draggable]="false"
-                [resizable]="false" [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
-                <p-button size="small" (click)="findPublicChatRoom()">Find Public ChatRooms</p-button>
-                <form [formGroup]="joinForm" style="padding-top: 1ch;">
-                    Room ID: <input pInputText type="text" formControlName="id">
-                    <p-button (click)="joinRoom()" size="small" height="40px"
-                        [disabled]="joinForm.invalid">Join</p-button>
-                </form>
-            </p-dialog>
-            <p-dialog header="Search for public chatrooms" [(visible)]="publicChatVisible" [modal]="true"
-                [draggable]="false" [resizable]="false"
-                [style]="{ width: '40vw', color: '#010662', background: '#FFF9F4', border:'none' }">
-                <form [formGroup]="searchForm">
-                    <input pInputText type="text" placeholder="Search topics, eg. productivity" style="width: 90%;"
-                        formControlName="search">
-                    <p-button (click)="searchRoom()" size="small" height="40px" icon="pi pi-search"
-                        [style]="{'width': '10%'}" [disabled]="searchForm.invalid"></p-button>
-                </form>
-                <div *ngIf="searchResult$ | async as results" class="results">
-                    <div *ngIf="results.length==0">
-                        <p>no search results</p>
+<div *ngIf="loginStatus else noAccess" style="height: 100%">
+    <div class="base">
+        <div class="row">
+            <h2>Welcome to chat hub!</h2>
+            <div>
+                <p-button icon="pi pi-plus" label="Create Room" size="small" (click)="create()"
+                    [style]="{ margin: '0 1ch'}"></p-button>
+                <p-dialog header="Create new room" [(visible)]="createRoomVisible" [modal]="true"
+                    [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false"
+                    [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+                    <form [formGroup]="form">
+                        <table>
+                            <tr>
+                                <td>Room Name:</td>
+                                <td><input pInputText type="text" formControlName="name"></td>
+                            </tr>
+                            <tr>
+                                <td>Room Type:</td>
+                                <td><p-dropdown formControlName="type" [options]="types" appendTo="body"></p-dropdown>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><p-button (click)="createChannel()" size="small" height="40px"
+                                        [disabled]="form.invalid">Create</p-button></td>
+                            </tr>
+                        </table>
+                    </form>
+                </p-dialog>
+                <p-button icon="pi pi-plus" label="Join Room" size="small" (click)="join()"></p-button>
+                <p-dialog header="Join existing room" [(visible)]="joinRoomVisible" [modal]="true" [draggable]="false"
+                    [resizable]="false" [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+                    <p-button size="small" (click)="findPublicChatRoom()">Find Public ChatRooms</p-button>
+                    <form [formGroup]="joinForm" style="padding-top: 1ch;">
+                        Room ID: <input pInputText type="text" formControlName="id">
+                        <p-button (click)="joinRoom()" size="small" height="40px"
+                            [disabled]="joinForm.invalid">Join</p-button>
+                    </form>
+                </p-dialog>
+                <p-dialog header="Search for public chatrooms" [(visible)]="publicChatVisible" [modal]="true"
+                    [draggable]="false" [resizable]="false"
+                    [style]="{ width: '40vw', color: '#010662', background: '#FFF9F4', border:'none' }">
+                    <form [formGroup]="searchForm">
+                        <input pInputText type="text" placeholder="Search topics, eg. productivity" style="width: 90%;"
+                            formControlName="search">
+                        <p-button (click)="searchRoom()" size="small" height="40px" icon="pi pi-search"
+                            [style]="{'width': '10%'}" [disabled]="searchForm.invalid"></p-button>
+                    </form>
+                    <div *ngIf="searchResult$ | async as results" class="results">
+                        <div *ngIf="results.length==0">
+                            <p>no search results</p>
+                        </div>
+                        <div *ngFor="let result of results" class="result">
+                            {{result.name}}
+                            <p-button [style]="{'height': '10px'}" (click)="joinPublicRoom(result.roomId, result.name)"
+                                [disabled]="">+</p-button>
+                        </div>
+                        <div *ngIf="results.length>5">
+                            <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows"
+                                [totalRecords]="results.length"></p-paginator>
+                        </div>
                     </div>
-                    <div *ngFor="let result of results" class="result">
-                        {{result.name}}
-                        <p-button [style]="{'height': '10px'}" (click)="joinPublicRoom(result.roomId, result.name)" [disabled]="">+</p-button>
-                    </div>
-                    <div *ngIf="results.length>5">
-                        <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows"
-                            [totalRecords]="results.length"></p-paginator>
+                </p-dialog>
+            </div>
+        </div>
+        <div *ngIf="chatList$ | async as chatList" style="flex: 1">
+            <div *ngIf="chatList.length!=0 else noChat" class="card">
+                <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '100%', background: '#FFF9F4', border: 'none'}"
+                    styleClass="mb-5">
+                    <ng-template pTemplate>
+                        <div class="col flex align-items-center justify-content-center" id="leftpanel">
+                            <div class="row">
+                                <p><strong>Chats</strong></p>
+                            </div>
+                            <div *ngIf="chatList$ | async as chatList">
+                                <p *ngFor="let c of chatList" width="max" [routerLink]="['/chat', c.roomId]"
+                                    (click)="selectedChat(c.name)" style="cursor: pointer;">{{c.name}}</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate>
+                        <div class="col flex align-items-center justify-content-center" id="rightpanel">
+                            <div *ngIf="this.currentChatRoomId==undefined" style="text-align: center; padding-top: 5%">
+                                <h3>Click on chatroom to view chat</h3>
+                                <img id="image" src="/assets/chat.png" width="300px" height="300px">
+                            </div>
+                            <div *ngIf="this.currentChatRoomId!=undefined" class="chat">
+                                <div *ngIf="chatName$ | async as name" class="chatName">
+                                    <h2>{{name}}
+                                        <span>
+                                            <p-toast></p-toast>
+                                            <p-menu #menu [model]="items" [popup]="true"></p-menu>
+                                            <p-button icon="pi pi-ellipsis-v" size="small"
+                                                [style]="{'background': '#FFF9F4', 'color': '#010662', 'float': 'right'}"
+                                                (click)="menu.toggle($event)"></p-button>
+                                        </span>
+                                    </h2>
+                                    <p-dialog header="Chat Room Details" [(visible)]="chatRoomDetailsVisible"
+                                        [modal]="true" [draggable]="false" [resizable]="false"
+                                        [style]="{ width: 'fit-content', color: '#010662', background: '#FFF9F4', border:'none' }">
+                                        <div *ngIf="chatRoomDetails$ | async as details">
+                                            <p><strong>Room ID: </strong>{{details.roomId}}</p>
+                                            <p><strong>Created on: </strong>{{details.createDate | date: 'dd/MM/yyyy'}}</p>
+                                            <p><strong>Owner: </strong>{{details.ownerName}}</p>
+                                            <p><strong>Number of users: </strong>{{details.userCount}}</p>
+                                        </div>
+                                    </p-dialog>
+                                    <p-dialog header="Leave Chat" [(visible)]="leaveChatVisible" [modal]="true"
+                                        [draggable]="false" [resizable]="false"
+                                        [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
+                                        <p>Are you sure you want to leave?</p>
+                                        <div class="row">
+                                            <p-button size="small" (click)="closeDialog()"
+                                                [style]="{'background': '#FFF9F4', 'color': '#010662', 'border': '1px solid #010662'}">Cancel</p-button>
+                                            <p-button size="small" (click)="leaveRoom()"
+                                                [style]="{'border': '1px solid #010662'}">Leave</p-button>
+                                        </div>
+                                    </p-dialog>
+                                    <p *ngIf="messageCount==1" style="font-size: 14px;">{{messageCount}} message</p>
+                                    <p *ngIf="messageCount>1" style="font-size: 14px;">{{messageCount}} messages</p>
+                                </div>
+                                <div>
+                                    <p-scroller [items]="messageList" [itemSize]="messageLength" [showLoader]="true"
+                                        scrollHeight="450px" [style]="{'height': '450px'}">
+                                        <ng-template pTemplate="item" let-item>
+                                            <p class="middle" style="font-weight: bold;">{{item.date}}</p>
+                                            <div *ngFor="let message of item.message">
+                                                <div class="message"
+                                                    [ngClass]="{'left': message.sender !== name&&message.type==='CHAT', 'right': message.sender === name&&message.type==='CHAT', 'middle': message.type==='LEAVE'||message.type=='JOIN'}">
+                                                    <div class="bubble">
+                                                        <p *ngIf="message.sender !== name&&message.type==='CHAT'"
+                                                            style="border-bottom: 1px solid #010662; font-weight: bold;">
+                                                            {{message.sender}}:</p>
+                                                        <p>{{message.content}}</p>
+                                                        <p *ngIf="message.type==='CHAT'" class="date">{{
+                                                            message.timestamp | date: 'h:mm a' }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </ng-template>
+                                    </p-scroller>
+                                    <form [formGroup]="messageForm">
+                                        <input pInputText type="text" formControlName="message"
+                                            style="width: 95%; padding-top: 1ch;" placeholder="enter a message...">
+                                        <p-button (click)="sendMessage()" size="small" height="40px" icon="pi pi-send"
+                                            [style]="{'width': '5%'}" [disabled]="messageForm.invalid"></p-button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-splitter>
+            </div>
+            <ng-template #noChat>
+                <div class="center">
+                    <div>
+                        <h3 style="text-align: center;">No active chat rooms. Join one now!</h3>
+                        <img src="/assets/chat2.png" alt="" width="400px">
                     </div>
                 </div>
-            </p-dialog>
+            </ng-template>
         </div>
     </div>
-    <div class="card">
-        <p-splitter [panelSizes]="[20, 80]" [style]="{ height: '80vh', background: '#FFF9F4', border: 'none'}"
-            styleClass="mb-5">
-            <ng-template pTemplate>
-                <div class="col flex align-items-center justify-content-center" id="leftpanel">
-                    <div class="row">
-                        <p>Chats</p>
-                    </div>
-                    <div *ngIf="chatList$ | async as chatList">
-                        <p *ngFor="let c of chatList" width="max" [routerLink]="['/chat', c.roomId]"
-                            (click)="selectedChat(c.name)" style="cursor: pointer;">{{c.name}}</p>
-                    </div>
-                </div>
-            </ng-template>
-            <ng-template pTemplate>
-                <div class="col flex align-items-center justify-content-center" id="rightpanel">
-                    <div *ngIf="this.currentChatRoomId==undefined" style="text-align: center;">
-                        <h3>Click on chatroom to view chat</h3>
-                        <img id="image" src="/assets/chat.png" width="300px" height="300px">
-                    </div>
-                    <div *ngIf="this.currentChatRoomId!=undefined" class="chat">
-                        <div *ngIf="chatName$ | async as name" class="chatName">
-                            <h2>{{name}}
-                                <span>
-                                    <p-toast></p-toast>
-                                    <p-menu #menu [model]="items" [popup]="true"></p-menu>
-                                    <p-button icon="pi pi-ellipsis-v" size="small"
-                                        [style]="{'background': '#FFF9F4', 'color': '#010662', 'float': 'right'}"
-                                        (click)="menu.toggle($event)"></p-button>
-                                </span>
-                            </h2>
-                            <p-dialog header="Chat Room Details" [(visible)]="chatRoomDetailsVisible" [modal]="true"
-                                [draggable]="false" [resizable]="false"
-                                [style]="{ width: '20vw', color: '#010662', background: '#FFF9F4', border:'none' }">
-                                <div *ngIf="chatRoomDetails$ | async as details">
-                                    <p><strong>Room ID: </strong>{{details.roomId}}</p>
-                                    <p><strong>Created on: </strong>{{details.createDate | date: 'dd/MM/yyyy'}}</p>
-                                    <p><strong>Owner: </strong>{{details.ownerName}}</p>
-                                    <p><strong>Number of users: </strong>{{details.userCount}}</p>
-                                </div>
-                            </p-dialog>
-                            <p-dialog header="Leave Chat" [(visible)]="leaveChatVisible" [modal]="true"
-                                [draggable]="false" [resizable]="false"
-                                [style]="{ color: '#010662', background: '#FFF9F4', border:'none' }">
-                                    <p>Are you sure you want to leave?</p>
-                                    <div class="row">
-                                        <p-button size="small" (click)="closeDialog()" [style]="{'background': '#FFF9F4', 'color': '#010662', 'border': '1px solid #010662'}">Cancel</p-button>
-                                        <p-button size="small" (click)="leaveRoom()" [style]="{'border': '1px solid #010662'}">Leave</p-button>
-                                    </div>                        
-                            </p-dialog>
-                        </div>
-                        <div>
-                            <p-scroller [items]="messageList" [itemSize]="messageLength" [showLoader]="true" scrollHeight="450px"
-                            [style]="{'height': '450px'}">
-                                <ng-template pTemplate="item" let-item>
-                                    <p class="middle">{{item.date}}</p>
-                                    <div *ngFor="let message of item.message">
-                                        <div class="message"
-                                        [ngClass]="{'left': message.sender !== name&&message.type==='CHAT', 'right': message.sender === name&&message.type==='CHAT', 'middle': message.type==='LEAVE'||message.type=='JOIN'}">
-                                        <div class="bubble">
-                                            <p *ngIf="message.sender !== name&&message.type==='CHAT'" style="border-bottom: 1px solid #010662;">
-                                                {{message.sender}}:</p>
-                                            <p>{{message.content}}</p>
-                                            <p *ngIf="message.type==='CHAT'" class="date">{{ message.timestamp | date: 'h:mm a' }}</p>
-                                        </div>
-                                    </div>
-                                    </div>
-                                    
-                                </ng-template>
-                            </p-scroller>
-                            <form [formGroup]="messageForm">
-                                <input pInputText type="text" formControlName="message"
-                                    style="width: 95%; padding-top: 1ch;" placeholder="enter a message...">
-                                <p-button (click)="sendMessage()" size="small" height="40px" icon="pi pi-send"
-                                    [style]="{'width': '5%'}" [disabled]="messageForm.invalid"></p-button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </ng-template>
-        </p-splitter>
-    </div>
 </div>
+<ng-template #noAccess>
+    <h2 style="padding: 0 2ch;"><a [routerLink]="['/login']" style="color:#010662">Login</a> to access this feature</h2>
+</ng-template>

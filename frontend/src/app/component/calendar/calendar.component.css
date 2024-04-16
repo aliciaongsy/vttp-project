@@ -1,7 +1,8 @@
 .row{
     display: flex;
-    padding: 1ch 2ch;
-    height: 90vh;
+    padding: 0 2ch;
+    height: 100%;
+    max-height: 100vh;
 }
 
 /* draggable */
@@ -26,11 +27,11 @@ div #draggable{
 div #calendar-container{
     padding-left: 1ch;
     width: 100%;
-    height: 100%;
+    height: 90%;
 }
 
 .fc-view-harness.fc-view-harness-active {
-    height: 80vh;
+    height: 70vh;
 }
 
 #calendar{

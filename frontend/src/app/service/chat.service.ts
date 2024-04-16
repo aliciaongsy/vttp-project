@@ -47,6 +47,12 @@ export class ChatService {
     return this.http.get<ChatMessage[]>(`${URL}/api/chat/messages/${roomId}`)
   }
 
+  checkIfUserJoined(id: string, roomId: string){
+    const params = new HttpParams()
+      .set("id", id)
+    return this.http.get<ChatDetails[]>(`${URL}/api/chatroom/${roomId}/exist`, {params})
+  }
+
   getPublicChats(name: string): Observable<ChatDetails[]>{
     const params = new HttpParams()
       .set("name", name)

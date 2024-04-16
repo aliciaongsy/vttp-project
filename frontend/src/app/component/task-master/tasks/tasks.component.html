@@ -49,7 +49,7 @@
                     <tr>
                         <td></td>
                         <td>
-                            <p-button size="small" type="submit">Add</p-button>
+                            <p-button size="small" type="submit" [disabled]="taskForm.invalid">Add</p-button>
                         </td>
                     </tr>
                 </table>
@@ -57,7 +57,7 @@
         </p-dialog>
     </div>
 </div>
-<div *ngIf="tasks | async as tasks" style="padding: 0 2ch;">
+<div *ngIf="tasks | async as tasks" style="padding: 0 2ch; overflow: auto;">
     <div *ngIf="tasks.length!=0">
         <p-toast key="error" position="top-right"></p-toast>
         <p-toast key="success" position="top-right"></p-toast>
@@ -109,10 +109,10 @@
                                     [(ngModel)]="rowData[col.field]"></p-checkbox>
                             </span>
                             <span *ngSwitchCase="'actions'">
-                                <p-button icon="pi pi-file-edit" (click)="editForm(rowData)"></p-button>
+                                <p-button icon="pi pi-file-edit" (click)="editForm(rowData)" [style]="{'margin-right': '1em'}"></p-button>
                                 <p-dialog header="Edit Task" [(visible)]="editVisible" [modal]="true"
                                     [style]="{ width: 'fit-content'}" [draggable]="false" [resizable]="false">
-                                    <form [formGroup]="taskForm" (submit)="updateTask()">
+                                    <form [formGroup]="taskForm" (submit)="updateTask(rowData)">
                                         <table>
                                             <tr>
                                                 <td>Task:</td>
@@ -146,7 +146,7 @@
                                             <tr>
                                                 <td></td>
                                                 <td>
-                                                    <p-button size="small" type="submit">Update</p-button>
+                                                    <p-button size="small" type="submit" [disabled]="taskForm.pristine">Update</p-button>
                                                 </td>
                                             </tr>
                                         </table>
@@ -158,9 +158,9 @@
                                     <p style="color: #8B0000; font-weight: 500; padding-bottom: 1ch;">Are you sure you
                                         want to delete task?</p>
                                     <div class="button">
+                                        <p-button (click)="closeDialog()">Cancel</p-button>
                                         <p-button [style]="{background: '#8B0000'}"
                                             (click)="deleteTask(rowData)">Yes</p-button>
-                                        <p-button (click)="closeDialog()">Cancel</p-button>
                                     </div>
                                 </p-dialog>
                             </span>

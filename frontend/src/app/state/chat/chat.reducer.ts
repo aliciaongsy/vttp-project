@@ -8,6 +8,7 @@ export interface ChatState {
     messages: ChatMessage[]
     loadStatus: 'NA' | 'pending' | 'complete',
     chatRoom: ChatRoom
+    error: string
 }
 
 export const initialState: ChatState = {
@@ -25,7 +26,8 @@ export const initialState: ChatState = {
         userCount: 0,
         createDate: 0,
         type: 'Private'
-    }
+    },
+    error: ''
 }
 
 export const chatReducer = createReducer(
@@ -71,6 +73,7 @@ export const chatReducer = createReducer(
             userCount: 0,
             createDate: 0,
             type: 'Private' as const
-        }
+        },
+        error: ''
     }))
 ) 

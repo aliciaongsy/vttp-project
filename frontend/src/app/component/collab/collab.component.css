@@ -1,6 +1,8 @@
 .base{
     padding: 0 2ch;
-    height: 90vh;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .row{
@@ -31,6 +33,12 @@ td{
     width: 100%;
 }
 
+.center{
+    display: flex;
+    height: 80%;
+    justify-content: center;
+    align-items: center;
+}
 
 :host ::ng-deep .p-button{
     background: #010662;
@@ -76,6 +84,10 @@ form{
     font-family: "Lora", sans-serif;
 }
 
+.card{
+    height: 100%;
+}
+
 /* search public chats results */
 .result{
     margin: 1ch 0;
@@ -101,12 +113,16 @@ form{
 }
 
 .chatName h2{
-    text-align: center;
-    margin: 1ch 0;
+    /* text-align: center; */
+    margin: 1ch 0 0 0;
 }
 
 .chatName span{
     float: right;
+}
+
+.chatName p{
+    margin-top: 0;
 }
 
 :host ::ng-deep .p-menu.p-menu-overlay{
@@ -156,12 +172,25 @@ form{
 .date{
     font-size: 12px;
     font-style: italic;
+    text-align: right;
 }
 
 :host ::ng-deep .p-scroller-content {
     position: relative;
     overflow: auto;
     max-height: 100%;
+}
+
+:host ::ng-deep .p-paginator{
+    background-color: #FFF9F4;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last{
+    color: #010662;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page{
+    font-family: "Lora", sans-serif;
 }
 
 /* :host ::ng-deep .p-scroller{

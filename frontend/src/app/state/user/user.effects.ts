@@ -1,16 +1,14 @@
 import { Injectable, inject } from "@angular/core";
-import { Actions, act, createEffect, ofType } from "@ngrx/effects";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { AppState } from "../app.state";
 import { Store } from "@ngrx/store";
 import { TaskService } from "../../service/task.service";
-import { addWorkspace, changeStatus, createChatRoom, deleteWorkspace, joinChatRoom, leaveChatRoom, loadChats, loadOutstandingTasks, loadTaskSummary, loadUserProfile, loadWorkspaces, updateProfile } from "./user.actions";
+import { addWorkspace, changeStatus, createChatRoom, deleteWorkspace, joinChatRoom, leaveChatRoom, loadAllData, loadChats, loadOutstandingTasks, loadTaskSummary, loadUserProfile, loadWorkspaces, updateProfile } from "./user.actions";
 import { from, map, switchMap, withLatestFrom } from "rxjs";
 import { selectUser, selectUserDetails } from "./user.selectors";
 import { ChatService } from "../../service/chat.service";
-import { addTask } from "../tasks/task.actions";
 import { UserService } from "../../service/user.service";
-import { WebSocketService } from "../../service/websocket.service";
-import { enterChatRoom } from "../chat/chat.actions";
+import { PlannerService } from "../../service/planner.service";
 
 @Injectable()
 export class UserEffects {
@@ -19,25 +17,23 @@ export class UserEffects {
     private taskSvc = inject(TaskService)
     private chatSvc = inject(ChatService)
     private userSvc = inject(UserService)
-    private webSocketSvc = inject(WebSocketService)
+    private plannerSvc = inject(PlannerService)
 
     loadWorkspaces$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(changeStatus, addWorkspace),
+            ofType(changeStatus, loadAllData),
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>
-                from(this.taskSvc.retrieveWorkspaces(details.id)).pipe(
-                    map((value) => loadWorkspaces({ workspaces: value }))
-                    // catchError(() => )
+                this.taskSvc.retrieveWorkspaces(details.id).pipe(
+                    map((value) => loadWorkspaces({ workspaces: value })),
                 )
-
             )
         )
     )
 
     loadChats$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(changeStatus, createChatRoom, joinChatRoom),
+            ofType(changeStatus, loadAllData),
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>
                 this.chatSvc.getChatList(details.id).pipe(
@@ -49,11 +45,15 @@ export class UserEffects {
 
     loadOutstandingTasks$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(changeStatus, addTask),
+            ofType(changeStatus, loadAllData),
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>
-                this.taskSvc.getAllOutstandingTasks(details.id).pipe(
-                    map((value) => loadOutstandingTasks({ tasks: value }))
+                this.taskSvc.retrieveWorkspaces(details.id).pipe(
+                    switchMap((value) => 
+                        this.plannerSvc.getAllOutstandingTasks(details.id, value).pipe(
+                            map(value => loadOutstandingTasks({ tasks: value }))
+                        )
+                    )
                 )
             )
         )
@@ -61,7 +61,7 @@ export class UserEffects {
 
     loadTaskSummary$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(changeStatus),
+            ofType(changeStatus, loadAllData),
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>
                 this.taskSvc.getTaskSummary(details.id).pipe(
@@ -76,8 +76,14 @@ export class UserEffects {
             ofType(addWorkspace),
             withLatestFrom(this.store.select(selectUser)),
             switchMap(([action, user]) =>
-                this.taskSvc.addWorkspace(user.user.id, action.workspace)
-            ),
+                from(this.taskSvc.addWorkspace(user.user.id, action.workspace))
+                // .pipe(
+                //     switchMap((details) =>
+                //         from(this.taskSvc.retrieveWorkspaces(user.user.id)).pipe(
+                //             map((value) => loadWorkspaces({ workspaces: value }))
+                //         )
+                //     ))
+            )
         ),
         { dispatch: false }
     )
@@ -117,7 +123,6 @@ export class UserEffects {
             ),
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>
-                
                 this.chatSvc.getChatList(details.id).pipe(
                     map((value) => loadChats({ chats: value }))
                 )
@@ -130,7 +135,7 @@ export class UserEffects {
             ofType(leaveChatRoom),
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>
-                this.chatSvc.leaveChatRoom(details.id, action.roomId)
+                this.chatSvc.leaveChatRoom(details.id, details.name, action.roomId)
             ),
             withLatestFrom(this.store.select(selectUserDetails)),
             switchMap(([action, details]) =>

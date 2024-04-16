@@ -7,21 +7,26 @@ import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { selectUser } from '../../state/user/user.selectors';
+import { selectStatus, selectUser } from '../../state/user/user.selectors';
 import { addEvent, changeAuthStatus, changeCalendarMode, loadAllEvents, loadAllOutstandingTasks } from '../../state/planner/planner.actions';
 import { selectAllEvents, selectLoadStatus, selectAllOutstandingTasks, selectCalendarMode, selectAuthStatus, selectEmail } from '../../state/planner/planner.selector';
 import { GoogleService } from '../../service/google.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
-  styleUrl: './calendar.component.css'
+  styleUrl: './calendar.component.css',
+  providers: [MessageService]
 })
 export class CalendarComponent implements OnInit, OnDestroy {
   private ngrxStore = inject(Store);
   private activatedRoute = inject(ActivatedRoute)
   private googleSvc = inject(GoogleService)
+  private messageSvc = inject(MessageService)
 
+  loginStatus: boolean = false
+  loginSub$!: Subscription
   currentWorkspace!: string
   tasks$!: Observable<Task[]>
   tasksSub$!: Subscription
@@ -44,6 +49,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+    this.loginSub$ = this.ngrxStore.select(selectStatus)
+      .subscribe((value) => this.loginStatus = value)
+    
     this.currentWorkspace = this.activatedRoute.parent?.snapshot.params['w']
     // getting task data 
     firstValueFrom(this.ngrxStore.select(selectUser)).then((value) => {
@@ -117,13 +125,13 @@ export class CalendarComponent implements OnInit, OnDestroy {
       error: (error) => console.info(error.error.error)
     })
 
-    this.calModeSub$ = this.ngrxStore.select(selectCalendarMode).subscribe((value)=> {
+    this.calModeSub$ = this.ngrxStore.select(selectCalendarMode).subscribe((value) => {
       this.calendarMode = value
-      if (this.calendarMode=='google'){
-        this.authStatusSub$  = this.ngrxStore.select(selectAuthStatus).subscribe((value) => {
+      if (this.calendarMode == 'google') {
+        this.authStatusSub$ = this.ngrxStore.select(selectAuthStatus).subscribe((value) => {
           this.authStatus = value
-          if (this.authStatus){
-            firstValueFrom(this.ngrxStore.select(selectEmail)).then((value)=>this.userEmail=value)
+          if (this.authStatus) {
+            firstValueFrom(this.ngrxStore.select(selectEmail)).then((value) => this.userEmail = value)
             this.googleEvent$ = this.googleSvc.getEvents().subscribe((value) => {
               this.events = value
               this.loadCalendar()
@@ -158,6 +166,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.ngrxStore.dispatch(addEvent({ events: eventsToAdd }))
       }
     }
+    this.loginSub$.unsubscribe()
     this.events$.unsubscribe()
     this.loadStatus$.unsubscribe()
     this.tasksSub$.unsubscribe()
@@ -167,7 +176,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     if (this.authStatusSub$) {
       this.authStatusSub$.unsubscribe()
     }
-    if (this.calModeSub$){
+    if (this.calModeSub$) {
       this.calModeSub$.unsubscribe()
     }
   }
@@ -228,12 +237,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
         })
       }
       this.eventUpdated = true
-      
+
 
     })
     // move event
     this.calendar.on('eventDrop', (info) => {
-      
+
       console.info(info)
       if (this.calendarMode === 'google') {
         const event: Event = {
@@ -265,15 +274,18 @@ export class CalendarComponent implements OnInit, OnDestroy {
     })
   }
 
-  syncCal(){
-    this.authStatusSub$ = interval(5000).pipe(takeWhile(() => this.authStatus == false)).subscribe(() =>
+  syncCal() {
+    this.authStatusSub$ = interval(3000).pipe(takeWhile(() => this.authStatus == false)).subscribe(() =>
       this.googleSvc.getStatus().subscribe(
         (value) => {
           console.info(value)
           this.authStatus = value.status
           this.userEmail = value.email
           if (this.authStatus) {
-            this.ngrxStore.dispatch(changeAuthStatus({email: value.email}))
+            this.messageSvc.clear()
+            this.messageSvc.add({ key: 'success', severity: 'success', summary: 'success', detail: 'successfully linked to google calendar' })
+
+            this.ngrxStore.dispatch(changeAuthStatus({ email: value.email }))
             // get events on successful authorisation
             this.googleEvent$ = this.googleSvc.getEvents().subscribe((value) => {
 

@@ -67,6 +67,7 @@ export class CollabComponent implements OnInit, OnDestroy {
   first: number = 0;
   rows: number = 5;
   messageLength!: number;
+  messageCount!: number;
 
   ngOnInit(): void {
     this.loginSub$ = this.ngrxStore.select(selectStatus)
@@ -77,7 +78,7 @@ export class CollabComponent implements OnInit, OnDestroy {
     this.route$ = this.activatedRoute.params.subscribe(params => {
       this.currentChatRoomId = params['roomId']
 
-      if (this.currentChatRoomId && this.loginStatus == true) {
+      if (this.currentChatRoomId!=undefined && this.loginStatus == true) {
         this.messageSvc.joinRoom(this.currentChatRoomId)
         this.ngrxStore.dispatch(loadAllMessages({ roomId: this.currentChatRoomId }))
         this.loadStatus$ = this.ngrxStore.select(selectChat).subscribe(
@@ -87,6 +88,8 @@ export class CollabComponent implements OnInit, OnDestroy {
                 (value) => {
                   this.messageList = value
                   this.messageLength = value.length
+
+                  this.messageCount = value.filter(v => v.type=='CHAT').length
 
                   // group messages by date
                   const groups = this.messageList.reduce((groups, message) => {
@@ -198,7 +201,7 @@ export class CollabComponent implements OnInit, OnDestroy {
       ownerName: this.name,
       name: this.form.value['name'],
       users: users,
-      usernames: [this.form.value['name']],
+      usernames: [this.name],
       userCount: 1,
       createDate: new Date().getTime(),
       type: this.form.value['type']
