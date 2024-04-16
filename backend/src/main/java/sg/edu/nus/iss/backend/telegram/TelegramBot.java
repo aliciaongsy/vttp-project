@@ -32,6 +32,9 @@ public class TelegramBot extends AbilityBot {
     @Autowired
     private TelegramService teleSvc;
 
+    @Autowired
+    private RemindersService remindersService;
+
     // account details
     private String email;
     private String id;
@@ -54,10 +57,16 @@ public class TelegramBot extends AbilityBot {
                 .locality(USER)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    // method returns id if it is linked, else it is an empty string
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId()).length()>0;
                     System.out.println(linked);
                     if (linked) {
                         responseHandler.accountLinked(ctx.chatId(), ctx.user().getFirstName());
+                        id = teleSvc.getUserIdByChatId(ctx.chatId());
+                        // teleSvc.getOutstandingTasks(id).forEach(t -> {
+                        //     remindersService.saveReminders(new Reminder(ctx.chatId().toString(), t.getId(), t.getTask(), t.getDue()));
+                        // });
+                        remindersService.setChatId(ctx.chatId().toString());
                     } else {
                         responseHandler.replyToStart(ctx.chatId(), ctx.user().getFirstName());
                     }
@@ -84,7 +93,7 @@ public class TelegramBot extends AbilityBot {
                 .locality(USER)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId()).length()>0;
                     if (linked) {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
                         System.out.println(id);
@@ -103,7 +112,7 @@ public class TelegramBot extends AbilityBot {
                 .locality(USER)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId()).length()>0;
                     if (linked) {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
                         System.out.println(id);
@@ -122,7 +131,7 @@ public class TelegramBot extends AbilityBot {
                 .locality(USER)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId()).length()>0;
                     if (linked) {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
                         System.out.println(id);
@@ -140,7 +149,7 @@ public class TelegramBot extends AbilityBot {
                 .locality(USER)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId()).length()>0;
                     if (linked) {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
                         System.out.println(id);
@@ -158,7 +167,7 @@ public class TelegramBot extends AbilityBot {
                 .locality(USER)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId());
+                    boolean linked = teleSvc.checkLinkedAccount(ctx.chatId()).length()>0;
                     if (linked) {
                         id = teleSvc.getUserIdByChatId(ctx.chatId());
                         System.out.println(id);
@@ -279,7 +288,7 @@ public class TelegramBot extends AbilityBot {
                     break;
 
                 case State.AWAITING_EDIT:
-                    String value = upd.getMessage().getText();
+                    String value = upd.getMessage().getText().trim();
                     boolean updated = false;
                     System.out.println(this.varToEdit);
                     switch (this.varToEdit) {
