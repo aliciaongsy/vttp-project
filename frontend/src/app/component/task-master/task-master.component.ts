@@ -27,12 +27,9 @@ export class TaskMasterComponent implements OnInit, OnDestroy {
 
   loginStatus!: Observable<boolean>
 
-  // tab: string = 'Overview'
-
   paramSub$!: Subscription
 
-  menuItems: MenuItem[] = [
-    // { label: 'Overview', routerLink: 'overview' },  
+  menuItems: MenuItem[] = [ 
     { label: 'Tasks', routerLink: 'tasks' },
     { label: 'Focus Session', routerLink: 'focus' }
   ]
@@ -71,11 +68,6 @@ export class TaskMasterComponent implements OnInit, OnDestroy {
   }
 
   createWorkspace() {
-    console.info("press button")
-    console.info(this.name)
-
-    // this.store.addWorkspace(this.name)
-
     this.ngrxStore.dispatch(addWorkspace({workspace: this.name}))
     // close dialog
     this.visible = false

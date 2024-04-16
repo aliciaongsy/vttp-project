@@ -50,22 +50,26 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.loginSub$ = this.ngrxStore.select(selectStatus)
-      .subscribe((value) => this.loginStatus = value)
+      .subscribe((value) => {
+        this.loginStatus = value
+        if (value){
+          // getting task data 
+          firstValueFrom(this.ngrxStore.select(selectUser)).then((value) => {
+            this.uid = value.user.id
+            // loads data from mongodb
+            this.ngrxStore.dispatch(loadAllOutstandingTasks({ id: value.user.id, workspaces: value.workspaces }))
+            this.ngrxStore.dispatch(loadAllEvents({ id: value.user.id }))
+          })
+
+          this.tasks$ = this.ngrxStore.select(selectAllOutstandingTasks).pipe(
+            map((value) => {
+              return [...value]
+            })
+          )
+        }
+      })
     
     this.currentWorkspace = this.activatedRoute.parent?.snapshot.params['w']
-    // getting task data 
-    firstValueFrom(this.ngrxStore.select(selectUser)).then((value) => {
-      this.uid = value.user.id
-      // loads data from mongodb
-      this.ngrxStore.dispatch(loadAllOutstandingTasks({ id: value.user.id, workspaces: value.workspaces }))
-      this.ngrxStore.dispatch(loadAllEvents({ id: value.user.id }))
-    })
-
-    this.tasks$ = this.ngrxStore.select(selectAllOutstandingTasks).pipe(
-      map((value) => {
-        return [...value]
-      })
-    )
 
     // calendar mode is mongo by default
     this.calendarMode = 'mongo'
