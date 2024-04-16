@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { ChatMessage } from '../model';
-import { BehaviorSubject, Subscription, interval, takeWhile } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+const URL = environment.url
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +23,8 @@ export class WebSocketService {
   newJoin: boolean = false
 
   initSocketConnection() {
-    const socket = new SockJS('//localhost:8080/socket');
+    const socket = new SockJS(`${URL}/socket`);
+
     this.stompClient = Stomp.over(socket);
 
     socket.onerror = (error) => {
@@ -81,7 +85,7 @@ export class WebSocketService {
       // only send this when the user FIRST join
       this.stompClient.send(`/app/chat/sendmessage/${roomId}`,
         {},
-        JSON.stringify({ content: `${this.name} has joined the chat`, sender: this.name, type: 'JOIN' })
+        JSON.stringify({ content: `${this.name} has joined the chat`, sender: this.name, type: 'JOIN', timestamp: new Date().getTime() })
       )
     }
   }
@@ -90,7 +94,7 @@ export class WebSocketService {
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.send(`/app/chat/sendmessage/${roomId}`,
         {},
-        JSON.stringify({ content: `${this.name} has left the chat`, sender: this.name, type: 'LEAVE' })
+        JSON.stringify({ content: `${this.name} has left the chat`, sender: this.name, type: 'LEAVE', timestamp: new Date().getTime() })
       )
     }
   }
