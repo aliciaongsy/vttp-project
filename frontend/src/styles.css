@@ -11,7 +11,28 @@
         font-family: 'Lora', sans-serif;
         /* extend background to the full page */
         height: 100vh;
+        max-height: 100vh;
         margin: 0 !important;
         padding: 0 !important;
+    }
+
+    app-task-master{
+        flex: 1;
+    }
+
+    app-collab{
+        flex: 1;
+    }
+
+    app-calendar{
+        flex: 1;
+    }
+
+    app-login{
+        flex: 1
+    }
+
+    app-register{
+        flex: 1
     }
 }

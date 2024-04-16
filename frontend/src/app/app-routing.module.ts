@@ -4,9 +4,6 @@ import { HomeComponent } from './component/home/home.component';
 import { LoginComponent } from './component/login/login.component';
 import { RegisterComponent } from './component/register/register.component';
 import { TaskMasterComponent } from './component/task-master/task-master.component';
-import { FeaturesComponent } from './component/features/features.component';
-import { AttributionsComponent } from './component/attributions/attributions.component';
-import { OverviewComponent } from './component/task-master/overview/overview.component';
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { AccountComponent } from './component/account/account.component';
 import { canLeave } from './guard';
@@ -22,7 +19,6 @@ const routes: Routes = [
   { path: 'workspace/:w', 
     component: TaskMasterComponent,
     children: [
-      { path: 'overview', component: OverviewComponent },
       { path: 'tasks', component: TasksComponent },
       { path: 'focus', component: FocusComponent }
     ]
@@ -30,8 +26,6 @@ const routes: Routes = [
   { path: 'collab', component: CollabComponent },
   { path: 'chat/:roomId', component: CollabComponent },
   { path: 'calendar', component: CalendarComponent },
-  { path: 'features', component: FeaturesComponent },
-  { path: 'attributions', component: AttributionsComponent },
   { path: 'account', component: AccountComponent },
   { path: '**', redirectTo: '/', pathMatch: 'full'}
 ];

@@ -5,12 +5,11 @@
     color: #010662;
     font-family: 'Lora', sans-serif;
     /* extend background to the full page */
+    max-height: 100vh;
     height: 100vh;
     margin: 0 !important;
     padding: 0 !important;
-}
-
-
-p {
-    font-size: xx-large;
+    /* overflow: scroll; */
+    display: flex;
+    flex-direction: column;
 }

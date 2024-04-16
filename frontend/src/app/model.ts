@@ -68,6 +68,7 @@ export interface ChatRoom{
     ownerName: string
     name: string
     users: string[]
+    usernames: string[]
     userCount: number
     createDate: number // milliseconds
     type: 'Private' | 'Public'

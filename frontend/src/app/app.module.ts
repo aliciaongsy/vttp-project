@@ -12,11 +12,8 @@ import { LoginComponent } from './component/login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RegisterComponent } from './component/register/register.component';
 import { TaskMasterComponent } from './component/task-master/task-master.component';
-import { AttributionsComponent } from './component/attributions/attributions.component';
-import { FeaturesComponent } from './component/features/features.component';
 import { HttpClientModule } from '@angular/common/http';
 import { UserService } from './service/user.service';
-import { OverviewComponent } from './component/task-master/overview/overview.component';
 import { TasksComponent } from './component/task-master/tasks/tasks.component';
 import { TaskService } from './service/task.service';
 import { AccountComponent } from './component/account/account.component';
@@ -74,9 +71,6 @@ import { ChatEffects } from './state/chat/chat.effects';
     LoginComponent,
     RegisterComponent,
     TaskMasterComponent,
-    AttributionsComponent,
-    FeaturesComponent,
-    OverviewComponent,
     TasksComponent,
     AccountComponent,
     FocusComponent,
