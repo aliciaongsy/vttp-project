@@ -123,15 +123,21 @@ public class UserRepository {
     }
 
     public void deleteTelegramUser(String id) throws DeleteUserException{
-        if(template.update(Queries.SQL_DELETE_TELEGRAM_USER, id)!=1){
-            throw new DeleteUserException("error deleting from telegram_bot table");
-        };
+        SqlRowSet rs = template.queryForRowSet(Queries.SQL_SELECT_TELEGRAM_USER_BY_ID, id);
+        if(rs.first()){
+            if(template.update(Queries.SQL_DELETE_TELEGRAM_USER, id)!=1){
+                throw new DeleteUserException("error deleting from telegram_bot table");
+            };
+        }
     }
 
     public void deleteTaskSummaryById(String id) throws DeleteUserException{
-        if(template.update(Queries.SQL_DELETE_TASK_BY_USER, id)!=0){
-            throw new DeleteUserException("error deleting from task_data table");
-        };
+        SqlRowSet rs = template.queryForRowSet(Queries.SQL_SELECT_TASK_DATA_BY_ID, id);
+        if(rs.first()){
+            if(template.update(Queries.SQL_DELETE_TASK_BY_USER, id)!=0){
+                throw new DeleteUserException("error deleting from task_data table");
+            };
+        }
     }
 
 }

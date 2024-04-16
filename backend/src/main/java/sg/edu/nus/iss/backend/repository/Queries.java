@@ -57,9 +57,19 @@ public class Queries {
         where id=?
         """;
 
+    public final static String SQL_SELECT_TELEGRAM_USER_BY_ID = """
+        select * from telegram_bot
+        where id = ?
+        """;
+
     public final static String SQL_DELETE_TELEGRAM_USER = """
         delete from telegram_bot
         where id=?
+        """;
+
+    public final static String SQL_SELECT_TASK_DATA_BY_ID = """
+        select * from telegram_bot
+        where id = ?
         """;
 
     public final static String SQL_DELETE_TASK_BY_USER = """
