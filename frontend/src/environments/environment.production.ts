@@ -1,3 +1,3 @@
 export const environment = {
-    url: 'railway'
+    url: 'https://task-buddy.up.railway.app'
 };
