@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { AppState } from "../app.state";
-import { Store, select } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 import { addEvent, loadAllEvents, loadAllEventsFromService, loadAllOutstandingTasks, loadAllOutstandingTasksFromService } from "./planner.actions";
 import { map, switchMap, withLatestFrom } from "rxjs";
 import { selectPlanner } from "./planner.selector";

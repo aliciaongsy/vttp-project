@@ -7,30 +7,22 @@
             <a class="nav-link" [routerLink]="['/']">Home</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/features']">Features</a>
-        </li>
-        <li class="nav-item">
             <a class="nav-link" [routerLink]="['/tasktracker']">Task Tracker</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/collab']">Collab Corner</a>
+            <a class="nav-link" [routerLink]="['/collab']">Chat Hub</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" [routerLink]="['/calendar']">Calendar</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" [routerLink]="['/attributions']">Attributions</a>
         </li>
     </ul>
     <div *ngIf="loginStatus | async else login">
         <!-- display user -->
         <div *ngIf="user | async as user">
-            <!-- <a class="d-lg-inline-block my-2 my-md-0 ms-md-3 p-3" [routerLink]="['/login']" id="login">{{user.name}}</a> -->
             <p-splitButton [label]="user.name" [model]="items" styleClass="p-button-text p-button-sm p-button-plain mr-2 mb-2"></p-splitButton>
         </div>
     </div>
     <ng-template #login>
         <a class="d-lg-inline-block my-2 my-md-0 ms-md-3 p-3" [routerLink]="['/login']" id="login">Login</a>
-        <!-- <p-splitButton label="User" [model]="items" styleClass="p-button-text p-button-sm p-button-secondary mr-2 mb-2"></p-splitButton> -->
     </ng-template>
 </nav>

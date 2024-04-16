@@ -75,6 +75,11 @@ input{
     background: #d4dbe3;
 }
 
+/* button */
+:host ::ng-deep .p-button.p-button-icon-only {
+    width: 1em;
+}
+
 /* check box */
 :host ::ng-deep button.p-ripple.p-element.p-button.p-component.p-button-icon-only {
     color: #010662;
@@ -83,8 +88,7 @@ input{
 }
 
 p-checkbox {
-    display: flex;
-    /* justify-content: center; */
+    margin-left: 2em;
 }
 
 :host ::ng-deep .p-checkbox .p-checkbox-box {

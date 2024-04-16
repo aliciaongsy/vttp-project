@@ -1,12 +1,10 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subscription, firstValueFrom } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Store } from '@ngrx/store';
-import { selectStatus, selectUserDetails, selectWorkspaces } from '../../state/user/user.selectors';
+import { selectStatus, selectWorkspaces } from '../../state/user/user.selectors';
 import { addWorkspace, deleteWorkspace } from '../../state/user/user.actions';
-import { loadAllTasks } from '../../state/tasks/task.actions';
-import { selectTask } from '../../state/tasks/task.selector';
 
 @Component({
   selector: 'app-task-master',
@@ -54,9 +52,10 @@ export class TaskMasterComponent implements OnInit, OnDestroy {
         label: 'Delete',
         icon: 'pi pi-trash',
         command: () => {
-          // console.info(value)
-          this.ngrxStore.dispatch(deleteWorkspace({workspace: this.currentWorkspace}))
-          this.router.navigate(['/tasktracker'])
+          if(confirm(`Are you sure you want to delete workspace: ${this.currentWorkspace}?`)){
+            this.ngrxStore.dispatch(deleteWorkspace({workspace: this.currentWorkspace}))
+            this.router.navigate(['/tasktracker'])
+          }
         }
       }
     ]

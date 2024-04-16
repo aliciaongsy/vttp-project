@@ -46,7 +46,7 @@
         </div>
         <div class="info">
             <p-button icon="pi pi-info-circle" [rounded]="true" [style]="{'background': '#e1e0e0'}" (click)="openInfo()"></p-button>
-            <p-dialog header="Pomodoro Technique" [(visible)]="infoVisible" [style]="{width: '30vw'}" [draggable]="false" [resizable]="false" [modal]="true">
+            <p-dialog header="Pomodoro Technique" [(visible)]="infoVisible" [style]="{width: 'min-content'}" [draggable]="false" [resizable]="false" [modal]="true">
                 <ol>
                     <li>Plan your tasks</li>
                     <li>Do 1 Pomodoro - Time for 25 minutes then take a 5 minutes break <span><img src="/assets/pomodoro1.png" alt="" width="350px"></span></li>

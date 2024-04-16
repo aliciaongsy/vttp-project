@@ -6,7 +6,7 @@ div{
 }
 
 .card{
-    height: 90vh
+    height: 100%
 }
 
 div #tabmenu{
@@ -158,23 +158,3 @@ a {
 #tab2{
     padding: 0 2ch;
 }
-
-
-/* div button {
-    color: #010662;
-    border: none;
-    border-color: #010662;
-    height: 30px;
-    border-radius: 30%;
-    font-size: medium;
-}
-
-div button:hover {
-    border-color: #010662;
-    background-color: #363886;
-    color: #FFF9F4;
-}
-
-div button:focus{
-    box-shadow: none;
-} */

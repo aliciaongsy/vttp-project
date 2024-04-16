@@ -1,22 +1,19 @@
 #main {
     display: flex;
-    align-content: center;
+    align-items: center;
     justify-content: center;
-    
+    height: 65vh;
 }
 
 .home {
-    padding-top:6%;
-    padding-bottom:6%;
+    padding-bottom:5%;
     height: auto;
     width: 40%;
 }
 
 p {
     font-size: xx-large;
-    /* width: 40%; */
-    /* padding-top: 2.5cm;
-    padding-bottom: 2.5cm; */
+    margin-bottom: 2mm;
 }
 
 :host ::ng-deep .p-button {

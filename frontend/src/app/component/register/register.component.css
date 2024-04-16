@@ -1,8 +1,8 @@
 .form{
     padding: 2em;
     font-size: 16px;
+    height: 80%;
     display: flex;
-    align-content: center;
     justify-content: center;
 }
 
@@ -10,6 +10,7 @@ form{
     margin-right: 1ch;
     padding-right: 1cm;
     border-right: 2.5px solid;
+    height: 100%;
 }
 
 .error{
@@ -64,10 +65,6 @@ input:focus{
 
 :host ::ng-deep .p-button:focus {
     box-shadow: none;
-}
-
-p{
-    padding-top: 2ch;
 }
 
 a{
