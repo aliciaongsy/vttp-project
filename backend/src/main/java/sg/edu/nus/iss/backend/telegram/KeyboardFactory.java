@@ -47,13 +47,13 @@ public class KeyboardFactory {
 
     public static InlineKeyboardMarkup editTasks() {
         InlineKeyboardButton name = InlineKeyboardButton.builder().text("name").callbackData("task").build();
-        InlineKeyboardButton status = InlineKeyboardButton.builder().text("status").callbackData("status").build();
-        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { name, status };
-
         InlineKeyboardButton priority = InlineKeyboardButton.builder().text("priority").callbackData("priority")
                 .build();
+        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { name, priority };
+
+        InlineKeyboardButton status = InlineKeyboardButton.builder().text("status").callbackData("status").build();
         InlineKeyboardButton start = InlineKeyboardButton.builder().text("start").callbackData("start").build();
-        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { priority, start };
+        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { status, start };
 
         InlineKeyboardButton due = InlineKeyboardButton.builder().text("due").callbackData("due").build();
         InlineKeyboardButton complete = InlineKeyboardButton.builder().text("complete").callbackData("complete")

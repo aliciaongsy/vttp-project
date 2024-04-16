@@ -22,8 +22,10 @@ public class TelegramService {
     @Autowired
     private TaskRepository taskRepo;
 
+    private int updateCount = 0;
+
     // --- user repository ---
-    public boolean checkLinkedAccount(long chatid){
+    public String checkLinkedAccount(long chatid){
         return userRepo.checkIfAccountIsLinked(Long.toString(chatid));
     }
     
@@ -55,11 +57,19 @@ public class TelegramService {
     }
 
     public boolean updateCompleteStatus(String id, String workspace, String taskId, boolean complete){
-        return taskRepo.updateCompleteStatus(id, workspace, taskId, complete);
+        boolean updated = taskRepo.updateCompleteStatus(id, workspace, taskId, complete);
+        if (updated){
+            updateCount+=1;
+        }
+        return updated;
     }
 
     public boolean updateTaskDetails(String id, String workspace, String taskId, String variable, String value){
-        return taskRepo.updateTaskByAttribute(id, workspace, taskId, variable, value);
+        boolean updated = taskRepo.updateTaskByAttribute(id, workspace, taskId, variable, value);
+        if (updated){
+            updateCount+=1;
+        }
+        return updated;
     }
 
     public Task getTaskDueSoon(String id){
@@ -126,7 +136,7 @@ public class TelegramService {
         return tasks;
     }
 
-     public List<String> getOutstandingTasksWorkspace(String id){
+    public List<String> getOutstandingTasksWorkspace(String id){
         List<Document> docs = taskRepo.getOutstandingTasks(id);
         if (docs.isEmpty()) {
             return new LinkedList<>();
@@ -139,6 +149,17 @@ public class TelegramService {
         });
 
         return workspaces;
+    }
+
+    public int getUpdateCount(){
+        System.out.println("get count: "+ updateCount);
+        return updateCount;
+    }
+
+    public int decreaseCount(int count){
+        updateCount-=count;
+        System.out.println("decrease count: "+ updateCount);
+        return updateCount;
     }
 
 }

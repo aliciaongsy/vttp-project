@@ -428,18 +428,20 @@ public class ResponseHandler {
         // task already completed
         if (completeStatus) {
             message.setChatId(chatId);
-            message.setText("task is already completed, unable to process action");
-            message.setReplyMarkup(new ReplyKeyboardRemove(true));
+            message.setText("task is already completed, unable to process action\nchoose another task or press /stop to cancel");
+            message.setReplyMarkup(KeyboardFactory.getTasks(tasks));
             sender.execute(message);
+            chatStates.put(chatId, State.AWAITING_TASK_SELECTION);
             return;
         }
 
         // successful update
         if (updateStatus) {
             message.setChatId(chatId);
-            message.setText("successfully marked task as complete");
-            message.setReplyMarkup(new ReplyKeyboardRemove(true));
+            message.setText("successfully marked task as completed!\nchoose another task or press /stop to cancel");
+            message.setReplyMarkup(KeyboardFactory.getTasks(tasks));
             sender.execute(message);
+            chatStates.put(chatId, State.AWAITING_TASK_SELECTION);
             return;
         }
 
