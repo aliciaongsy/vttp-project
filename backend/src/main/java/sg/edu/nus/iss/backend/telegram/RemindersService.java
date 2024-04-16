@@ -41,7 +41,6 @@ public class RemindersService {
 
     public List<Reminder> getAllReminders(){
         if (chatId==null){
-            System.out.println("chat id is null");
             return new ArrayList<>();
         }
         List<Reminder> reminders = remindersStore.getAllReminders(chatId);

@@ -65,15 +65,7 @@ public class RemindersStore {
             reminders.add(r);
         });
 
-        System.out.println(reminders);
-
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
-        // cal.set(Calendar.HOUR_OF_DAY, 0);
-        // cal.set(Calendar.MINUTE, 0);
-        // cal.set(Calendar.SECOND, 0);
-        // cal.set(Calendar.MILLISECOND, 0);
-        // long from = cal.getTime().getTime();
-        // System.out.println(from);
 
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
@@ -90,11 +82,6 @@ public class RemindersStore {
         }
 
         return list;
-
-        // return reminders
-        //         .stream()
-        //         .filter(r -> r.getDue() >= from && r.getDue() <= to && r.isCompleted() == false)
-        //         .toList();
     }
 
     public void markComplete(Reminder reminder) {
