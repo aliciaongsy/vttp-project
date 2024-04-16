@@ -26,17 +26,15 @@ public class FocusController {
     @Autowired
     private FocusService focusSvc;
 
-    @GetMapping(path = "/{id}/{workspace}/sessions")
+    @GetMapping(path = "/{id}/focus/sessions")
     @ResponseBody
-    public ResponseEntity<String> getTasks(@PathVariable String id, @PathVariable String workspace) {
-        return focusSvc.getAllSessions(id, workspace);
+    public ResponseEntity<String> getTasks(@PathVariable String id) {
+        return focusSvc.getAllSessions(id);
     }
     
-    @PostMapping(path = "/{id}/{workspace}/session/new")
+    @PostMapping(path = "/{id}/focus/session/new")
     @ResponseBody
-    public ResponseEntity<String> addNewTask(@PathVariable String id, @PathVariable String workspace,
-            @RequestBody String payload) {
-        System.out.println("enter focus controller");
+    public ResponseEntity<String> addNewTask(@PathVariable String id, @RequestBody String payload) {
         JsonReader reader = Json.createReader(new StringReader(payload));
         System.out.println(payload);
         JsonObject o = reader.readObject();
@@ -44,6 +42,6 @@ public class FocusController {
         String date = o.getString("date");
         int duration = o.getInt("duration");
 
-        return focusSvc.addSession(id, workspace, date, duration);
+        return focusSvc.addSession(id, date, duration);
     }
 }

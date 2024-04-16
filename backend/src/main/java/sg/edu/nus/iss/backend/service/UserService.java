@@ -24,6 +24,7 @@ import sg.edu.nus.iss.backend.exception.DeleteUserException;
 import sg.edu.nus.iss.backend.model.User;
 import sg.edu.nus.iss.backend.repository.ImageRepository;
 import sg.edu.nus.iss.backend.repository.UserRepository;
+import sg.edu.nus.iss.backend.telegram.RemindersService;
 
 @Service
 public class UserService {
@@ -34,6 +35,9 @@ public class UserService {
     @Autowired
     private ImageRepository imgRepo;
 
+    @Autowired
+    private RemindersService remindersService;
+
     public JsonObject buildJsonObject(String key, String value) {
         JsonObjectBuilder b = Json.createObjectBuilder();
         b.add(key, value);
@@ -43,10 +47,10 @@ public class UserService {
     public ResponseEntity<String> existingUser(String email) {
         boolean exist = userRepo.existingUser(email);
         if (exist) {
-            JsonObject o = buildJsonObject("message", "user does not exists");
+            JsonObject o = buildJsonObject("message", "existing user");
             return ResponseEntity.ok(o.toString());
         }
-        JsonObject o = buildJsonObject("message", "existing user");
+        JsonObject o = buildJsonObject("message", "user does not exists");
         return ResponseEntity.status(HttpStatusCode.valueOf(404)).body(o.toString());
     }
 
@@ -57,9 +61,11 @@ public class UserService {
             // password validation
             boolean valid = userRepo.checkPassword(email, password);
             if (valid) {
-                // JsonObject o = buildJsonObject("message", "successfully logged in");
-                // return ResponseEntity.ok(o.toString());
                 JsonObject o = userRepo.findUserByEmail(email).get();
+
+                String chatId = userRepo.getChatIdByUserId(o.getString("id"));
+                remindersService.setChatId(chatId);
+                
                 return ResponseEntity.ok(o.toString());
             }
 

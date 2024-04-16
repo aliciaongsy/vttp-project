@@ -11,7 +11,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-
     @Value("${url}")
 	private String url;
 
@@ -28,11 +27,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/topic");
     }
 
-    // @Override
-    // public void configureWebSocketTransport( WebSocketTransportRegistration registration )
-    // {
-    //     registration.setMessageSizeLimit( 300000 * 50 ); // default : 64 * 1024
-    //     registration.setSendTimeLimit( 30 * 10000 ); // default : 10 * 10000
-    //     registration.setSendBufferSizeLimit( 3 * 512 * 1024 ); // default : 512 * 1024
-    // }
 }

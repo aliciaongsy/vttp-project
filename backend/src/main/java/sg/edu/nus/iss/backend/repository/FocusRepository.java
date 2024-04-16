@@ -31,8 +31,7 @@ public class FocusRepository {
     {
         $match: {
             $and: [
-                {id: "d73726d8"},
-                {workspace: "workspace1"}
+                {id: "d73726d8"}
             ]
         }
     },
@@ -47,9 +46,9 @@ public class FocusRepository {
         }
     }
     ]); */
-    public List<Session> getAllSessions(String id, String workspace){
+    public List<Session> getAllSessions(String id){
         MatchOperation matchOps = Aggregation
-                .match(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
+                .match(Criteria.where("id").is(id));
 
         AggregationOperation unwindOps = Aggregation.unwind("sessions");
 
@@ -80,9 +79,9 @@ public class FocusRepository {
         return sessions;
     }
 
-    public boolean addSessionToWorkspace(String id, String workspace, String date, int duration) {
+    public boolean addSessionToWorkspace(String id, String date, int duration) {
 
-        Query query = new Query(Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace)));
+        Query query = new Query(Criteria.where("id").is(id));
 
         List<Document> result = template.find(query, Document.class, "focus");
 
@@ -97,14 +96,13 @@ public class FocusRepository {
 
             Document doc = new Document();
             doc.put("id", id);
-            doc.put("workspace", workspace);
             doc.put("sessions", docList);
             Document insert = template.insert(doc, "focus");
             return !(insert.isEmpty());
         }
 
         // else - check if data for current date already exist in db
-        Criteria criteria = Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace),Criteria.where("sessions").elemMatch(Criteria.where("date").is(date)));
+        Criteria criteria = Criteria.where("id").is(id).andOperator(Criteria.where("sessions").elemMatch(Criteria.where("date").is(date)));
 
         Query query2 = new Query(criteria);
 

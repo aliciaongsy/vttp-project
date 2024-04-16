@@ -14,14 +14,23 @@ import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import sg.edu.nus.iss.backend.exception.DeleteWorkspaceException;
+import sg.edu.nus.iss.backend.exception.UpdateCountException;
 import sg.edu.nus.iss.backend.model.Task;
 import sg.edu.nus.iss.backend.repository.TaskRepository;
+import sg.edu.nus.iss.backend.repository.UserRepository;
+import sg.edu.nus.iss.backend.telegram.RemindersService;
 
 @Service
 public class TaskService {
 
     @Autowired
     private TaskRepository taskRepo;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Autowired
+    private RemindersService remindersService;
 
     public JsonObject buildJsonObject(String key, String value) {
         JsonObjectBuilder b = Json.createObjectBuilder();
@@ -66,7 +75,16 @@ public class TaskService {
     }
 
     public ResponseEntity<String> addNewTask(String id, String workspace, Task task) {
+        String chatId = userRepo.getChatIdByUserId(id);
+        if (!chatId.isEmpty()) {
+            remindersService.addNewReminder(chatId, task);
+        }
         boolean added = taskRepo.addTaskToWorkspace(id, workspace, task);
+        try {
+            taskRepo.updateTaskCount(id, task.isCompleted(), "add");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (added) {
             JsonObject o = buildJsonObject("message", "successfully added new task to workspace");
             return ResponseEntity.ok(o.toString());
@@ -77,6 +95,11 @@ public class TaskService {
 
     public ResponseEntity<String> updateCompletedStatus(String id, String workspace, String taskId, boolean completed) {
         boolean updated = taskRepo.updateCompleteStatus(id, workspace, taskId, completed);
+        try {
+            taskRepo.updateTaskCount(id, completed, "update");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (updated) {
             JsonObject o = buildJsonObject("message", "successfully updated completed status");
             return ResponseEntity.ok(o.toString());
@@ -85,8 +108,17 @@ public class TaskService {
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
-    public ResponseEntity<String> deleteTaskById(String id, String workspace, String taskId) {
+    public ResponseEntity<String> deleteTaskById(String id, String workspace, String taskId, boolean completed) {
+        String chatId = userRepo.getChatIdByUserId(id);
+        if (!chatId.isEmpty()) {
+            remindersService.deleteReminder(chatId, taskId);
+        }
         boolean deleted = taskRepo.deleteTaskById(id, workspace, taskId);
+        try {
+            taskRepo.updateTaskCount(id, completed, "delete");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (deleted) {
             JsonObject o = buildJsonObject("message", "successfully deleted task");
             return ResponseEntity.ok(o.toString());
@@ -95,9 +127,21 @@ public class TaskService {
         return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(o.toString());
     }
 
-    public ResponseEntity<String> updateTaskById(String id, String workspace, String taskId, Task task) {
+    public ResponseEntity<String> updateTaskById(String id, String workspace, String taskId, Task task, boolean completeStatusChange) {
+        String chatId = userRepo.getChatIdByUserId(id);
+        if (!chatId.isEmpty()) {
+            remindersService.addNewReminder(chatId, task);
+        }
         boolean updated = taskRepo.updateTaskById(id, workspace, taskId, task);
 
+        // only update sql count if there has been a status change
+        if (completeStatusChange) {
+            try {
+                taskRepo.updateTaskCount(id, task.isCompleted(), "update");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if (updated) {
             JsonObject o = buildJsonObject("message", "successfully updated task");
             return ResponseEntity.ok(o.toString());
@@ -112,7 +156,7 @@ public class TaskService {
         if (docs.isEmpty()) {
             return ResponseEntity.ok(builder.build().toString());
         }
-        
+
         docs.forEach(d -> {
             System.out.println(d.toJson());
             Task t = new Task();
@@ -123,14 +167,14 @@ public class TaskService {
         return ResponseEntity.ok(builder.build().toString());
     }
 
-    public ResponseEntity<String> getTaskDataSummary(String id){
+    public ResponseEntity<String> getTaskDataSummary(String id) {
         JsonObject o = taskRepo.getTaskDataSummary(id);
 
         return ResponseEntity.ok(o.toString());
     }
 
-    @Transactional(rollbackFor={DeleteWorkspaceException.class})
-    public void deleteWorkspace(String id, String workspace) throws DeleteWorkspaceException{
+    @Transactional(rollbackFor = { DeleteWorkspaceException.class, UpdateCountException.class })
+    public void deleteWorkspace(String id, String workspace) throws DeleteWorkspaceException, UpdateCountException {
         taskRepo.deleteWorkspace(id, workspace);
         taskRepo.deleteWorkspaceTasks(id, workspace);
     }

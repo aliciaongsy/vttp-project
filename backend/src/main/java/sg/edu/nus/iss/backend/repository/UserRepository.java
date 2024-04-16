@@ -72,14 +72,25 @@ public class UserRepository {
         return "";
     }
 
+    public String getChatIdByUserId(String id){
+        SqlRowSet rs = template.queryForRowSet(Queries.SQL_GET_CHATID_BY_USERID, id);
+        if (rs.first()){
+            return rs.getString("chatid");
+        }
+        return "";
+    }
+
     public boolean checkEmailAndId(String email, String id){
         SqlRowSet rs = template.queryForRowSet(Queries.SQL_FIND_USER_BY_EMAIL_AND_ID, email, id);
         return rs.first();
     }
 
-    public boolean checkIfAccountIsLinked(String chatid){
+    public String checkIfAccountIsLinked(String chatid){
         SqlRowSet rs = template.queryForRowSet(Queries.SQL_FIND_USER_BY_CHATID, chatid);
-        return rs.first();
+        if (rs.first()){
+            return rs.getString("id");
+        }
+        return "";
     }
 
     public boolean addTelegramDetails(String chatid, String username, String email, String id){

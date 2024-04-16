@@ -3,9 +3,11 @@ package sg.edu.nus.iss.backend.repository;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.aggregation.SortOperation;
@@ -32,6 +35,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import sg.edu.nus.iss.backend.exception.DeleteWorkspaceException;
+import sg.edu.nus.iss.backend.exception.UpdateCountException;
 import sg.edu.nus.iss.backend.model.Task;
 
 @Repository
@@ -61,10 +65,13 @@ public class TaskRepository {
 
     public boolean addWorkspace(String id, String workspace) {
 
-        List<String> w = getWorkspacesById(id);
+        Criteria criteria = Criteria.where("id").is(id);
+        Query query = new Query(criteria);
+
+        List<Document> docs = template.find(query, Document.class, "workspaces");
 
         // if there is no workspace data for this particular id
-        if (w.size() == 0) {
+        if (docs.isEmpty()) {
             List<String> workspaces = new ArrayList<>();
             workspaces.add(workspace);
 
@@ -75,9 +82,6 @@ public class TaskRepository {
             Document insert = template.insert(doc, "workspaces");
             return !(insert.isEmpty());
         }
-
-        Criteria criteria = Criteria.where("id").is(id);
-        Query query = new Query(criteria);
 
         Update updateOps = new Update().push("workspaces").value(workspace);
 
@@ -102,8 +106,58 @@ public class TaskRepository {
         }
     }
 
-    public void deleteWorkspaceTasks(String id, String workspace) throws DeleteWorkspaceException{
+    /*db.tasks.aggregate([
+    {
+        $match: { "id": "ebfba879", "workspace" : "project"}
+        
+    },
+    {
+        $unwind: "$tasks"
+    },
+    {
+        $group: {
+            _id: "$tasks.completed",
+            "count": {$sum: 1}
+        }
+    }
+    ]) */
+    public void deleteWorkspaceTasks(String id, String workspace) throws DeleteWorkspaceException, UpdateCountException{
+
+        // get count for incompelete and completed tasks
         Criteria criteria = Criteria.where("id").is(id).andOperator(Criteria.where("workspace").is(workspace));
+
+        MatchOperation matchOps = Aggregation.match(criteria);
+
+        AggregationOperation unwindOps = Aggregation.unwind("$tasks");
+
+        GroupOperation groupOps = Aggregation.group("$tasks.completed").count().as("count");
+
+        Aggregation pipeline = Aggregation.newAggregation(matchOps, unwindOps, groupOps);
+
+        AggregationResults<Document> results = template.aggregate(pipeline, "tasks", Document.class);
+
+
+        /*{
+            "_id" : true,
+            "count" : 1.0
+        }
+        {
+            "_id" : false,
+            "count" : 1.0
+        }
+        */
+        List<Document> docs = results.getMappedResults();
+
+        // decrease count in sql db
+        for (Document doc: docs){
+            System.out.println("decrease count in sql");
+            boolean bool = doc.getBoolean("_id");
+            int count = doc.getInteger("count");
+            updateCountAfterDeleteWorkspace(id, bool, count);
+        }
+        
+
+        // delete all tasks
         Query query = new Query(criteria);
 
         DeleteResult delete = template.remove(query, Document.class, "tasks");
@@ -204,6 +258,7 @@ public class TaskRepository {
         return updateResult.getModifiedCount() > 0;
 
     }
+        
 
     /* db.tasks.updateOne(
         {
@@ -516,7 +571,13 @@ public class TaskRepository {
         }
     ]); */
     public List<Document> getOutstandingTasks(String id){
-        long currentTime = new Date().getTime();
+
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        long currentTime = cal.getTime().getTime();
 
         MatchOperation match = Aggregation.match(Criteria.where("id").is(id));
 
@@ -560,6 +621,94 @@ public class TaskRepository {
             return builder.build();
         }
         return builder.build();
+    }
+
+    public void updateTaskCount(String id, boolean completed, String action) throws UpdateCountException{
+        switch(action){
+            case "add": 
+                {
+                    boolean empty = getTaskDataSummary(id).isEmpty();
+                    int update = 0;
+                    int upd = 0;
+                    if (empty){
+                        update = jdbcTemplate.update(Queries.SQL_INSERT_COUNT, id, completed ? 1 : 0, completed ? 0: 1);
+                    }
+                    else{
+                        update = jdbcTemplate.update(Queries.SQL_INCREMENT_TASK_COUNT, id);
+                        if (completed){
+                            upd = jdbcTemplate.update(Queries.SQL_INCREMENT_COMPLETE_COUNT, id);
+                        }
+                        else{
+                            upd = jdbcTemplate.update(Queries.SQL_INCREMENT_INCOMPLETE_COUNT, id);
+                        }
+                        if (upd == 0){
+                        throw new UpdateCountException("error updating count");
+                        }
+                    }
+                    if (update==0){
+                        throw new UpdateCountException("error updating count");
+                    }
+                }
+                break;
+            
+            case "delete":
+                {
+                    int update = jdbcTemplate.update(Queries.SQL_DECREASE_TASK_COUNT, id);
+                    int upd = 0;
+                    if (completed){
+                        upd = jdbcTemplate.update(Queries.SQL_DECREASE_COMPLETE_COUNT, id);
+                    }
+                    else{
+                        upd = jdbcTemplate.update(Queries.SQL_DECREASE_INCOMPLETE_COUNT, id);
+                    }
+
+                    if ( update==0 || upd == 0){
+                        throw new UpdateCountException("error updating count");
+                    }
+                }
+                break;
+
+            case "update": 
+                {
+                    int update = 0;
+                    int upd = 0;
+                    if (completed){
+                        upd = jdbcTemplate.update(Queries.SQL_INCREMENT_COMPLETE_COUNT, id);
+                        update = jdbcTemplate.update(Queries.SQL_DECREASE_INCOMPLETE_COUNT, id);
+                    }
+                    else{
+                        upd = jdbcTemplate.update(Queries.SQL_INCREMENT_INCOMPLETE_COUNT, id);
+                        update = jdbcTemplate.update(Queries.SQL_DECREASE_COMPLETE_COUNT, id);
+                    }
+
+                    if ( update==0 || upd == 0){
+                        throw new UpdateCountException("error updating count");
+                    }
+
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public void updateCountAfterDeleteWorkspace(String id, boolean completed, int deleteCount) throws UpdateCountException{
+
+        int update = jdbcTemplate.update(Queries.SQL_DECREASE_TASK_COUNT_BY_VALUE, deleteCount, id);
+        int upd = 0;
+        if (completed){
+            upd = jdbcTemplate.update(Queries.SQL_DECREASE_COMPLETE_COUNT_BY_VALUE, deleteCount, id);
+        }
+        else{
+            upd = jdbcTemplate.update(Queries.SQL_DECREASE_INCOMPLETE_COUNT_BY_VALUE, deleteCount, id);
+        }
+
+        if ( update==0 || upd == 0){
+            throw new UpdateCountException("error updating count");
+        }
+
+                
     }
 
 }

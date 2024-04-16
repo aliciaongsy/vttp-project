@@ -22,8 +22,10 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
 import sg.edu.nus.iss.backend.exception.DeleteWorkspaceException;
+import sg.edu.nus.iss.backend.exception.UpdateCountException;
 import sg.edu.nus.iss.backend.model.Task;
 import sg.edu.nus.iss.backend.service.TaskService;
+import sg.edu.nus.iss.backend.service.TelegramService;
 
 @Controller
 @RequestMapping("/api")
@@ -32,6 +34,9 @@ public class TaskController {
 
     @Autowired
     private TaskService taskSvc;
+
+    @Autowired
+    private TelegramService teleSvc;
 
     // --- workspace ----
     @GetMapping(path = "/workspace/all")
@@ -56,7 +61,7 @@ public class TaskController {
     public ResponseEntity<String> deleteWorkspace(@PathVariable String id, @PathVariable String ws){
         try {
             taskSvc.deleteWorkspace(id, ws);
-        } catch (DeleteWorkspaceException e) {
+        } catch (DeleteWorkspaceException | UpdateCountException e) {
             e.printStackTrace();
             JsonObjectBuilder b = Json.createObjectBuilder();
             b.add("error", e.getMessage());
@@ -111,14 +116,14 @@ public class TaskController {
     // delete task
     @DeleteMapping(path="/{id}/{workspace}/task/delete/{taskId}")
     @ResponseBody
-    public ResponseEntity<String> deleteTaskById(@PathVariable String id, @PathVariable String workspace, @PathVariable String taskId){
-        return taskSvc.deleteTaskById(id, workspace, taskId);
+    public ResponseEntity<String> deleteTaskById(@PathVariable String id, @PathVariable String workspace, @PathVariable String taskId, @RequestParam boolean completed){
+        return taskSvc.deleteTaskById(id, workspace, taskId, completed);
     }
 
     // update task details
     @PutMapping(path="/{id}/{workspace}/task/update/{taskId}")
     @ResponseBody
-    public ResponseEntity<String> updateTaskById(@PathVariable String id, @PathVariable String workspace, @PathVariable String taskId, @RequestBody String payload){
+    public ResponseEntity<String> updateTaskById(@PathVariable String id, @PathVariable String workspace, @PathVariable String taskId, @RequestBody String payload, @RequestParam boolean completeStatusChange){
         JsonReader reader = Json.createReader(new StringReader(payload));
         System.out.println(payload);
         JsonObject o = reader.readObject();
@@ -132,7 +137,7 @@ public class TaskController {
         task.setDue(o.getJsonNumber("due").longValue());
         task.setCompleted(o.getBoolean("completed"));
 
-        return taskSvc.updateTaskById(id, workspace, taskId, task);
+        return taskSvc.updateTaskById(id, workspace, taskId, task, completeStatusChange);
     }
 
     @GetMapping(path="/{id}/tasks/outstanding")
@@ -145,5 +150,25 @@ public class TaskController {
     @ResponseBody
     public ResponseEntity<String> getTaskDataSummary(@PathVariable String id){
         return taskSvc.getTaskDataSummary(id);
+    }
+
+    @GetMapping(path = "/telegram/updates")
+    @ResponseBody
+    public ResponseEntity<String> getTelegramUpdateStatus(){
+        int count = teleSvc.getUpdateCount();
+
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        b.add("count", count);
+        return ResponseEntity.ok().body(b.build().toString());
+    }
+
+    @GetMapping(path = "/telegram/updated")
+    @ResponseBody
+    public ResponseEntity<String> updateCount(@RequestParam int updateCount){
+        int count = teleSvc.decreaseCount(updateCount);
+
+        JsonObjectBuilder b = Json.createObjectBuilder();
+        b.add("count", count);
+        return ResponseEntity.ok().body(b.build().toString());
     }
 }

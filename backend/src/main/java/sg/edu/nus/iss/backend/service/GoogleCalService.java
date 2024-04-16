@@ -31,7 +31,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.Calendar.Events;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.EventDateTime;
 
@@ -94,12 +93,12 @@ public class GoogleCalService {
 
         authorizationUrl = flow.newAuthorizationUrl().setRedirectUri(redirectURI);
 
-        System.out.printf("google calendar authorization url: %s\n", authorizationUrl);
+        // System.out.printf("google calendar authorization url: %s\n", authorizationUrl);
         return authorizationUrl.build();
     }
 
     public boolean getTokenStatus(String code, String userId) {
-        com.google.api.services.calendar.model.Events eventList;
+        // com.google.api.services.calendar.model.Events eventList;
         try {
 
             TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectURI).execute();
@@ -107,9 +106,9 @@ public class GoogleCalService {
             credential = flow.createAndStoreCredential(response, userId);
             client = new Calendar.Builder(httpTransport, JSON_FACTORY, credential)
                     .setApplicationName(APPLICATION_NAME).build();
-            Events events = client.events();
-            eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
-            System.out.println("calendar event list:" + eventList.getItems());
+            // Events events = client.events();
+            // eventList = events.list("primary").setTimeMin(date1).setTimeMax(date2).execute();
+            // System.out.println("calendar event list:" + eventList.getItems());
             return true;
 
         } catch (Exception e) {
@@ -119,6 +118,8 @@ public class GoogleCalService {
     }
 
     public ResponseEntity<String> revokeToken(){
+
+        System.out.println("revoke token");
         
         String url = UriComponentsBuilder.fromUriString("https://oauth2.googleapis.com/revoke")
             .queryParam("token", credential.getAccessToken())
@@ -211,7 +212,6 @@ public class GoogleCalService {
                 event.setEnd(endDate);
             } catch (NullPointerException e) {
                 // non all-day event
-                System.out.println("non all-day event");
                 event.setAllDay(false);
             }
 
@@ -222,7 +222,6 @@ public class GoogleCalService {
                 String endDate = end.getString("dateTime");
                 event.setEnd(endDate);
             } catch (NullPointerException e) {
-                System.out.println("all-day event");
                 event.setAllDay(true);
             }
             events.add(event);

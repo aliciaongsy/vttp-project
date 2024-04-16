@@ -26,8 +26,8 @@ public class FocusService {
         return b.build();
     }
 
-    public ResponseEntity<String> getAllSessions(String id, String workspace){
-        List<Session> sessions = focusRepo.getAllSessions(id, workspace);
+    public ResponseEntity<String> getAllSessions(String id){
+        List<Session> sessions = focusRepo.getAllSessions(id);
         if (sessions.isEmpty()){
             JsonArrayBuilder b = Json.createArrayBuilder();
             return ResponseEntity.ok(b.build().toString());
@@ -37,8 +37,8 @@ public class FocusService {
         return ResponseEntity.ok(b.build().toString());
     }
 
-    public ResponseEntity<String> addSession(String id, String workspace, String date, int duration){
-        boolean added = focusRepo.addSessionToWorkspace(id, workspace, date, duration);
+    public ResponseEntity<String> addSession(String id, String date, int duration){
+        boolean added = focusRepo.addSessionToWorkspace(id, date, duration);
         if (added) {
             JsonObject o = buildJsonObject("message", "successfully added new session to workspace");
             return ResponseEntity.ok(o.toString());
